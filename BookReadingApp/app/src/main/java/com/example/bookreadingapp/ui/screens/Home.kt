@@ -22,6 +22,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -46,7 +47,7 @@ fun HomeScreen(navController: NavController) {
         ) {
             Image(
                 painter = painterResource(id = R.drawable.book_icon),
-                contentDescription = "Home Screen Image",
+                contentDescription = stringResource(R.string.home_screen_image),
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
                     .size(160.dp)
@@ -66,13 +67,13 @@ fun HomeScreen(navController: NavController) {
                 ) {
                     Spacer(modifier = Modifier.height(16.dp))
                     Text(
-                        text = "Welcome to Book Reader",
+                        text = stringResource(R.string.welcome_title),
                         fontSize = 24.sp,
                         fontWeight = FontWeight.Bold,
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
-                        text = "Explore freely available textbooks with images and tables. Enjoy seamless navigation across different screen sizes!",
+                        text = stringResource(R.string.welcome_message),
                         fontSize = 16.sp,
                         modifier = Modifier.padding(horizontal = 16.dp),
                         textAlign = TextAlign.Center
@@ -84,7 +85,7 @@ fun HomeScreen(navController: NavController) {
                         },
                         modifier = Modifier.padding(top = 16.dp)
                     ) {
-                        Text(text = "Go to Library")
+                        Text(text = stringResource(R.string.go_to_library))
                     }
                 }
             }

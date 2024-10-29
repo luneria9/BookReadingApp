@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">BookReadingApp</string>
+    <string name="welcome_title">Welcome to Book Reader</string>
+    <string name="welcome_message">Explore freely available textbooks with images and tables. Enjoy seamless navigation across different screen sizes!</string>
+    <string name="go_to_library">Go to Library</string>
+    <string name="home_screen_image">Home Screen Image</string>
 </resources>
