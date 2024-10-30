@@ -130,6 +130,7 @@ fun AdaptiveNavigationApp(windowSizeClass: WindowWidthSizeClass, modifier: Modif
     }
 }
 
+//referenced from https://gitlab.com/crdavis/adaptivenavigationegcode/-/tree/master?ref_type=heads
 @Composable
 fun BottomNavigationBar(navController: NavHostController) {
     NavigationBar {
@@ -155,6 +156,7 @@ fun BottomNavigationBar(navController: NavHostController) {
     }
 }
 
+//referenced from https://gitlab.com/crdavis/adaptivenavigationegcode/-/tree/master?ref_type=heads
 @Composable
 fun NavigationRailComponent(navController: NavController) {
     NavigationRail {
@@ -175,16 +177,17 @@ fun NavigationRailComponent(navController: NavController) {
     }
 }
 
+//referenced from https://gitlab.com/crdavis/adaptivenavigationegcode/-/tree/master?ref_type=heads
 @Composable
 fun PermanentNavigationDrawerComponent() {
-     val navController = rememberNavController()
+    val navController = rememberNavController()
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentRoutes = backStackEntry?.destination?.route
     PermanentNavigationDrawer(
         drawerContent = {
             PermanentDrawerSheet {
                 Column {
-                    Spacer(Modifier.height(12.dp))
+                    Spacer(Modifier.height(dimensionResource(R.dimen.spacer_medium)))
                     NavBarItems.BarItems.forEach { navItem ->
                         NavigationDrawerItem(
                             selected = currentRoutes == navItem.route,

@@ -34,6 +34,7 @@ import com.example.bookreadingapp.R
 import com.example.bookreadingapp.ui.NavRoutes
 import com.example.bookreadingapp.ui.theme.BookReadingAppTheme
 
+//referenced from https://gitlab.com/crdavis/adaptivenavigationegcode/-/tree/master?ref_type=heads
 @Composable
 fun HomeScreen(navController: NavController) {
     Box(
