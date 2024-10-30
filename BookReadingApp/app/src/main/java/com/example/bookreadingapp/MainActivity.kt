@@ -222,7 +222,7 @@ fun BookReadingTopAppBar(modifier: Modifier = Modifier){
                 Image(
                     modifier = Modifier
                         .size(200.dp)
-                        .padding(20.dp),
+                        .padding(dimensionResource(id = R.dimen.padding_medium)),
                     painter = painterResource(R.drawable.logo),
                     contentDescription = null
                 )

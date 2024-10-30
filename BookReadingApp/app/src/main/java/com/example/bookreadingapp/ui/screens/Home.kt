@@ -21,6 +21,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -53,16 +54,16 @@ fun HomeScreen(navController: NavController) {
                 modifier = Modifier
                     .size(160.dp)
                     .clip(CircleShape)
-                    .padding(bottom = 16.dp)
+                    .padding(dimensionResource(id = R.dimen.padding_medium))
             )
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp),
+                    .padding(dimensionResource(id = R.dimen.padding_medium))
             ) {
                 Column(
                     modifier = Modifier
-                        .padding(16.dp)
+                        .padding(dimensionResource(id = R.dimen.padding_medium))
                         .fillMaxWidth(),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
