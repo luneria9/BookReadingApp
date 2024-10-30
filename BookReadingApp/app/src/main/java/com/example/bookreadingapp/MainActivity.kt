@@ -50,7 +50,7 @@ class MainActivity : ComponentActivity() {
             BookReadingAppTheme  {
                 val windowSize = calculateWindowSizeClass1(this)
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    AdaptiveNavigationApp(
+                    BookReadingApp(
                         windowSizeClass = windowSize.widthSizeClass,
                         modifier = Modifier.padding(innerPadding)
                     )
@@ -88,7 +88,7 @@ fun NavigationHost(navController: NavHostController) {
 
 @Composable
 @ExperimentalMaterial3Api
-fun AdaptiveNavigationApp(windowSizeClass: WindowWidthSizeClass, modifier: Modifier) {
+fun BookReadingApp(windowSizeClass: WindowWidthSizeClass, modifier: Modifier) {
     val navController = rememberNavController()
 
      val adaptiveNavigationType = when (windowSizeClass) {
@@ -212,6 +212,6 @@ fun PermanentNavigationDrawerComponent() {
 @Composable
 fun GreetingPreview() {
     BookReadingAppTheme {
-        AdaptiveNavigationApp(windowSizeClass = Expanded, modifier = Modifier)
+        BookReadingApp(windowSizeClass = Expanded, modifier = Modifier)
     }
 }
