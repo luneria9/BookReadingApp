@@ -104,7 +104,12 @@ fun AdaptiveNavigationApp(windowSizeClass: WindowWidthSizeClass, modifier: Modif
     }
 
     Scaffold(
-        topBar = { BookReadingTopAppBar() },
+        topBar = {
+            val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route
+            if (currentRoute != Contents.route && currentRoute != Reading.route) {
+                BookReadingTopAppBar()
+            }
+        },
         bottomBar = {
             if (adaptiveNavigationType == AdaptiveNavigationType.BOTTOM_NAVIGATION) {
                 BottomNavigationBar(navController = navController)
@@ -221,7 +226,7 @@ fun BookReadingTopAppBar(modifier: Modifier = Modifier){
             ) {
                 Image(
                     modifier = Modifier
-                        .size(200.dp)
+                        .size(120.dp)
                         .padding(dimensionResource(id = R.dimen.padding_medium)),
                     painter = painterResource(R.drawable.logo),
                     contentDescription = null
