@@ -34,6 +34,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.bookreadingapp.R
 import com.example.bookreadingapp.ui.NavRoutes
 import com.example.bookreadingapp.ui.theme.BookReadingAppTheme
+import com.example.bookreadingapp.ui.theme.Typography
 
 //referenced from https://gitlab.com/crdavis/adaptivenavigationegcode/-/tree/master?ref_type=heads
 @Composable
@@ -54,43 +55,58 @@ fun HomeScreen(navController: NavController) {
                 modifier = Modifier
                     .size(160.dp)
                     .clip(CircleShape)
-                    .padding(dimensionResource(id = R.dimen.padding_medium))
+                    .padding(bottom = dimensionResource(id = R.dimen.padding_medium))
             )
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(dimensionResource(id = R.dimen.padding_medium))
-            ) {
-                Column(
-                    modifier = Modifier
-                        .padding(dimensionResource(id = R.dimen.padding_medium))
-                        .fillMaxWidth(),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Text(
-                        text = stringResource(R.string.welcome_title),
-                        fontSize = 24.sp,
-                        fontWeight = FontWeight.Bold,
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text(
-                        text = stringResource(R.string.welcome_message),
-                        fontSize = 16.sp,
-                        modifier = Modifier.padding(horizontal = 16.dp),
-                        textAlign = TextAlign.Center
-                    )
-                    Spacer(modifier = Modifier.height(24.dp))
-                    Button(
-                        onClick = {
-                            navController.navigate(NavRoutes.Library.route)
-                        },
-                        modifier = Modifier.padding(top = 16.dp)
-                    ) {
-                        Text(text = stringResource(R.string.go_to_library))
-                    }
-                }
-            }
+            WelcomeCard(navController)
+        }
+    }
+}
+
+@Composable
+fun WelcomeCard(navController: NavController) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(dimensionResource(id = R.dimen.padding_medium))
+    ) {
+        Column(
+            modifier = Modifier
+                .padding(dimensionResource(id = R.dimen.padding_medium))
+                .fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(
+                text = stringResource(R.string.welcome_title),
+                style = Typography.displaySmall
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            MessageWithButton(navController)
+        }
+    }
+}
+
+@Composable
+fun MessageWithButton(navController: NavController) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Text(
+            text = stringResource(R.string.welcome_message),
+            style = Typography.bodyMedium,
+            modifier = Modifier.padding(horizontal = 16.dp),
+            textAlign = TextAlign.Center
+        )
+        Spacer(modifier = Modifier.height(24.dp))
+        Button(
+            onClick = { navController.navigate(NavRoutes.Library.route) },
+            modifier = Modifier.padding(top = 16.dp)
+        ) {
+            Text(
+                text = stringResource(R.string.go_to_library),
+                style = Typography.labelLarge
+            )
         }
     }
 }
