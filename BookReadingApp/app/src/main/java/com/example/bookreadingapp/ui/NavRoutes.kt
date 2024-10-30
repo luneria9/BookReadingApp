@@ -1,5 +1,6 @@
 package com.example.bookreadingapp.ui
 
+//referenced from https://gitlab.com/crdavis/adaptivenavigationegcode/-/tree/master?ref_type=heads
 sealed class NavRoutes (val route: String) {
     object Home : NavRoutes("home")
     object Library : NavRoutes("library")
