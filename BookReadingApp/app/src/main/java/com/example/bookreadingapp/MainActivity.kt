@@ -37,6 +37,7 @@ import com.example.bookreadingapp.ui.screens.*
 import com.example.bookreadingapp.ui.utils.AdaptiveNavigationType
 import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass as calculateWindowSizeClass1
 import androidx.compose.material3.Scaffold
+import androidx.compose.ui.res.dimensionResource
 import com.example.bookreadingapp.ui.theme.BookReadingAppTheme
 
 
@@ -180,7 +181,7 @@ fun PermanentNavigationDrawerComponent() {
         drawerContent = {
             PermanentDrawerSheet {
                 Column {
-                    Spacer(Modifier.height(12.dp))
+                    Spacer(Modifier.height(dimensionResource(R.dimen.spacer_medium)))
                     NavBarItems.BarItems.forEach { navItem ->
                         NavigationDrawerItem(
                             selected = currentRoutes == navItem.route,
