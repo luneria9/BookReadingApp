@@ -98,7 +98,7 @@ fun BookReadingApp(windowSizeClass: WindowWidthSizeClass, modifier: Modifier) {
     }
 
     Scaffold(
-        topBar = { TopAppBar(title = { Text("Adaptive Navigation illustration app") }) },
+        topBar = { TopAppBar(title = { Text("Book reading app") }) },
         bottomBar = {
             if (adaptiveNavigationType == AdaptiveNavigationType.BOTTOM_NAVIGATION) {
                 BottomNavigationBar(navController = navController)
