@@ -37,6 +37,7 @@ import com.example.bookreadingapp.ui.theme.BookReadingAppTheme
 import com.example.bookreadingapp.ui.theme.Typography
 
 //referenced from https://gitlab.com/crdavis/adaptivenavigationegcode/-/tree/master?ref_type=heads
+// Main Home screen composable displaying a welcome card and an image icon
 @Composable
 fun HomeScreen(navController: NavController) {
     Box(
@@ -62,6 +63,7 @@ fun HomeScreen(navController: NavController) {
     }
 }
 
+// Composable to display a welcome card with a message and navigation button
 @Composable
 fun WelcomeCard(navController: NavController) {
     Card(
@@ -86,6 +88,7 @@ fun WelcomeCard(navController: NavController) {
     }
 }
 
+// Composable displaying a welcome message and a button to navigate to the library
 @Composable
 fun MessageWithButton(navController: NavController) {
     Column(
