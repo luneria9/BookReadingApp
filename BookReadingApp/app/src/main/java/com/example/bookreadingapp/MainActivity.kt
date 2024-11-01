@@ -65,7 +65,7 @@ fun NavigationHost(navController: NavHostController) {
     NavHost(navController = navController, startDestination = Home.route
     ) {
         composable(Home.route) {
-            HomeScreen()
+            HomeScreen(navController)
         }
 
         composable(Library.route) {
