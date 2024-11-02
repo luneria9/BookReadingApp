@@ -32,7 +32,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.NavHostController
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.bookreadingapp.ui.NavBarItems
 import com.example.bookreadingapp.ui.NavRoutes.*
@@ -56,7 +55,7 @@ class MainActivity : ComponentActivity() {
             BookReadingAppTheme  {
                 val windowSize = calculateWindowSizeClass1(this)
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    AdaptiveNavigationApp(
+                    BookReadingApp(
                         windowSizeClass = windowSize.widthSizeClass,
                         modifier = Modifier.padding(innerPadding)
                     )
@@ -94,7 +93,7 @@ fun NavigationHost(navController: NavHostController) {
 
 @Composable
 @ExperimentalMaterial3Api
-fun AdaptiveNavigationApp(windowSizeClass: WindowWidthSizeClass, modifier: Modifier) {
+fun BookReadingApp(windowSizeClass: WindowWidthSizeClass, modifier: Modifier) {
     val navController = rememberNavController()
 
      val adaptiveNavigationType = when (windowSizeClass) {
@@ -248,6 +247,6 @@ fun BookReadingTopAppBar(modifier: Modifier = Modifier){
 @Composable
 fun GreetingPreview() {
     BookReadingAppTheme {
-        AdaptiveNavigationApp(windowSizeClass = Expanded, modifier = Modifier)
+        BookReadingApp(windowSizeClass = Expanded, modifier = Modifier)
     }
 }
