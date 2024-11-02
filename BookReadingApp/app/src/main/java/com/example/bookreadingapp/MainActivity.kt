@@ -75,7 +75,7 @@ fun NavigationHost(navController: NavHostController) {
         }
 
         composable(Library.route) {
-            LibraryScreen()
+            LibraryScreen(navController)
         }
 
         composable(Search.route) {
