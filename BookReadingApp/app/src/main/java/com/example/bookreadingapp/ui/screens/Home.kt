@@ -10,31 +10,29 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Home
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.bookreadingapp.R
 import com.example.bookreadingapp.ui.NavRoutes
 import com.example.bookreadingapp.ui.theme.BookReadingAppTheme
+import com.example.bookreadingapp.ui.theme.Typography
 
 //referenced from https://gitlab.com/crdavis/adaptivenavigationegcode/-/tree/master?ref_type=heads
+// Main Home screen composable displaying a welcome card and an image icon
 @Composable
 fun HomeScreen(navController: NavController) {
     Box(
@@ -53,43 +51,60 @@ fun HomeScreen(navController: NavController) {
                 modifier = Modifier
                     .size(160.dp)
                     .clip(CircleShape)
-                    .padding(bottom = 16.dp)
+                    .padding(bottom = dimensionResource(id = R.dimen.padding_medium))
             )
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-            ) {
-                Column(
-                    modifier = Modifier
-                        .padding(16.dp)
-                        .fillMaxWidth(),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Text(
-                        text = stringResource(R.string.welcome_title),
-                        fontSize = 24.sp,
-                        fontWeight = FontWeight.Bold,
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text(
-                        text = stringResource(R.string.welcome_message),
-                        fontSize = 16.sp,
-                        modifier = Modifier.padding(horizontal = 16.dp),
-                        textAlign = TextAlign.Center
-                    )
-                    Spacer(modifier = Modifier.height(24.dp))
-                    Button(
-                        onClick = {
-                            navController.navigate(NavRoutes.Library.route)
-                        },
-                        modifier = Modifier.padding(top = 16.dp)
-                    ) {
-                        Text(text = stringResource(R.string.go_to_library))
-                    }
-                }
-            }
+            WelcomeCard(navController)
+        }
+    }
+}
+
+// Composable to display a welcome card with a message and navigation button
+@Composable
+fun WelcomeCard(navController: NavController) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(dimensionResource(id = R.dimen.padding_medium))
+    ) {
+        Column(
+            modifier = Modifier
+                .padding(dimensionResource(id = R.dimen.padding_medium))
+                .fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(
+                text = stringResource(R.string.welcome_title),
+                style = Typography.displaySmall
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            MessageWithButton(navController)
+        }
+    }
+}
+
+// Composable displaying a welcome message and a button to navigate to the library
+@Composable
+fun MessageWithButton(navController: NavController) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Text(
+            text = stringResource(R.string.welcome_message),
+            style = Typography.bodyMedium,
+            modifier = Modifier.padding(horizontal = 16.dp),
+            textAlign = TextAlign.Center
+        )
+        Spacer(modifier = Modifier.height(24.dp))
+        Button(
+            onClick = { navController.navigate(NavRoutes.Library.route) },
+            modifier = Modifier.padding(top = 16.dp)
+        ) {
+            Text(
+                text = stringResource(R.string.go_to_library),
+                style = Typography.labelLarge
+            )
         }
     }
 }

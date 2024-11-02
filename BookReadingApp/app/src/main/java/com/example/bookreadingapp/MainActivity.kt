@@ -6,6 +6,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Text
@@ -19,6 +20,8 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass.Companion.Compact
@@ -36,7 +39,10 @@ import com.example.bookreadingapp.ui.screens.*
 import com.example.bookreadingapp.ui.utils.AdaptiveNavigationType
 import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass as calculateWindowSizeClass1
 import androidx.compose.material3.Scaffold
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import com.example.bookreadingapp.ui.theme.BookReadingAppTheme
 
 
@@ -97,7 +103,12 @@ fun BookReadingApp(windowSizeClass: WindowWidthSizeClass, modifier: Modifier) {
     }
 
     Scaffold(
-        topBar = { TopAppBar(title = { Text("Book reading app") }) },
+        topBar = {
+            val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route
+            if (currentRoute != Contents.route && currentRoute != Reading.route) {
+                BookReadingTopAppBar()
+            }
+        },
         bottomBar = {
             if (adaptiveNavigationType == AdaptiveNavigationType.BOTTOM_NAVIGATION) {
                 BottomNavigationBar(navController = navController)
@@ -201,6 +212,31 @@ fun PermanentNavigationDrawerComponent() {
                 NavigationHost(navController = navController)
             }
         }
+    )
+}
+
+//Got code from code lab https://developer.android.com/codelabs/basic-android-kotlin-compose-material-theming#5
+@Composable
+fun BookReadingTopAppBar(modifier: Modifier = Modifier){
+    CenterAlignedTopAppBar(
+        title = {
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Image(
+                    modifier = Modifier
+                        .size(120.dp)
+                        .padding(dimensionResource(id = R.dimen.padding_medium)),
+                    painter = painterResource(R.drawable.logo),
+                    contentDescription = null
+                )
+                Text(
+                    text = "Literala",
+                    style = MaterialTheme.typography.displayLarge
+                )
+            }
+        },
+        modifier = modifier
     )
 }
 
