@@ -35,6 +35,7 @@ import com.example.bookreadingapp.ui.theme.BookReadingAppTheme
 // Referred to https://developer.android.com/codelabs/basic-android-kotlin-compose-material-theming#6
 @Composable
 fun LibraryScreen(navController: NavController) {
+    // Sample list of book images
     val sampleBooks = listOf(
         R.drawable.ic_launcher_foreground,
         R.drawable.ic_launcher_foreground,
@@ -50,6 +51,7 @@ fun LibraryScreen(navController: NavController) {
             .padding(dimensionResource(R.dimen.padding_medium)),
         contentAlignment = Alignment.TopCenter
     ) {
+        // Vertical grid layout for displaying books
         LazyVerticalGrid(
             columns = GridCells.Fixed(3),
             contentPadding = PaddingValues(dimensionResource(R.dimen.padding_medium))
@@ -63,6 +65,7 @@ fun LibraryScreen(navController: NavController) {
     }
 }
 
+// Composable function for individual book items
 @Composable
 fun BookItem(bookImg: Int, onClick: () -> Unit) {
     Card(
