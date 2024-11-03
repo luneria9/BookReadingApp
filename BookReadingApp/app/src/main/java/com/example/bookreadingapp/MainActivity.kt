@@ -44,7 +44,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.bookreadingapp.ui.theme.BookReadingAppTheme
+import com.example.bookreadingapp.viewModels.ReadingAppViewModel
 
 
 class MainActivity : ComponentActivity() {
@@ -67,7 +70,7 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun NavigationHost(navController: NavHostController) {
+fun NavigationHost(navController: NavHostController, viewModel: ReadingAppViewModel) {
     NavHost(navController = navController, startDestination = Home.route
     ) {
         composable(Home.route) {
@@ -87,14 +90,21 @@ fun NavigationHost(navController: NavHostController) {
         }
 
         composable(Reading.route) {
-            ReadingScreen()
+            ReadingScreen(
+                readingMode = viewModel.readingMode,
+                onReadingCheck = { viewModel.toggleReadingMode() }
+            )
         }
     }
 }
 
 @Composable
 @ExperimentalMaterial3Api
-fun BookReadingApp(windowSizeClass: WindowWidthSizeClass, modifier: Modifier) {
+fun BookReadingApp(
+    windowSizeClass: WindowWidthSizeClass,
+    viewModel: ReadingAppViewModel = viewModel(),
+    modifier: Modifier
+) {
     val navController = rememberNavController()
 
      val adaptiveNavigationType = when (windowSizeClass) {
@@ -111,16 +121,16 @@ fun BookReadingApp(windowSizeClass: WindowWidthSizeClass, modifier: Modifier) {
             }
         },
         bottomBar = {
-            if (adaptiveNavigationType == AdaptiveNavigationType.BOTTOM_NAVIGATION) {
+            if (adaptiveNavigationType == AdaptiveNavigationType.BOTTOM_NAVIGATION && !viewModel.readingMode) {
                 BottomNavigationBar(navController = navController)
             }
         }
     ) { paddingValues ->
         Row(modifier = Modifier.padding(paddingValues)) {
             if (adaptiveNavigationType == AdaptiveNavigationType.PERMANENT_NAVIGATION_DRAWER) {
-                PermanentNavigationDrawerComponent()
+                PermanentNavigationDrawerComponent(viewModel)
             }
-            if (adaptiveNavigationType == AdaptiveNavigationType.NAVIGATION_RAIL) {
+            if (adaptiveNavigationType == AdaptiveNavigationType.NAVIGATION_RAIL && !viewModel.readingMode) {
                 NavigationRailComponent(navController = navController)
             }
 
@@ -129,7 +139,7 @@ fun BookReadingApp(windowSizeClass: WindowWidthSizeClass, modifier: Modifier) {
                     .fillMaxSize()
                     .padding(paddingValues)
             ) {
-                NavigationHost(navController = navController)
+                NavigationHost(navController = navController, viewModel = viewModel)
             }
         }
     }
@@ -184,33 +194,36 @@ fun NavigationRailComponent(navController: NavController) {
 
 //referenced from https://gitlab.com/crdavis/adaptivenavigationegcode/-/tree/master?ref_type=heads
 @Composable
-fun PermanentNavigationDrawerComponent() {
+fun PermanentNavigationDrawerComponent(viewModel: ReadingAppViewModel) {
     val navController = rememberNavController()
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentRoutes = backStackEntry?.destination?.route
     PermanentNavigationDrawer(
         drawerContent = {
-            PermanentDrawerSheet {
-                Column {
-                    Spacer(Modifier.height(dimensionResource(R.dimen.spacer_medium)))
-                    NavBarItems.BarItems.forEach { navItem ->
-                        NavigationDrawerItem(
-                            selected = currentRoutes == navItem.route,
-                            onClick = {
+            if (!viewModel.readingMode) {
+                PermanentDrawerSheet {
+                    Column {
+                        Spacer(Modifier.height(dimensionResource(R.dimen.spacer_medium)))
+                        NavBarItems.BarItems.forEach { navItem ->
+                            NavigationDrawerItem(
+                                selected = currentRoutes == navItem.route,
+                                onClick = {
                                     navController.navigate(navItem.route)
-                            },
-                            icon = {
-                                Icon(navItem.image, contentDescription = navItem.title)
-                            },
-                            label = { Text(text = navItem.title) }
-                        )
+                                },
+                                icon = {
+                                    Icon(navItem.image, contentDescription = navItem.title)
+                                },
+                                label = { Text(text = navItem.title) }
+                            )
+                        }
                     }
                 }
-            } },
+            }
+        },
         content = {
-             Box(modifier = Modifier.fillMaxSize()) {
-                 //The call to NavigationHost is necessary to display the screen based on the route
-                NavigationHost(navController = navController)
+            Box(modifier = Modifier.fillMaxSize()) {
+                //The call to NavigationHost is necessary to display the screen based on the route
+                NavigationHost(navController = navController, viewModel = viewModel)
             }
         }
     )

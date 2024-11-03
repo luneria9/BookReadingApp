@@ -20,6 +20,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -37,22 +38,14 @@ fun ContentsScreen() {
             .verticalScroll(rememberScrollState())
     ) {
         Text(
-            text = "Table Of Contents",
+            text = stringResource(R.string.contents),
             fontSize = dimensionResource(R.dimen.font_big).value.sp,
             fontWeight = FontWeight.Bold,
             modifier = Modifier
                 .padding(dimensionResource(R.dimen.padding_medium))
         )
 
-//        Icon(
-//            imageVector = Icons.Filled.Info,
-//            contentDescription = "Contents",
-//            tint = Color.Blue,
-//            modifier = Modifier
-//                .size(150.dp)
-//                .align(Alignment.Center)
-//        )
-
+        // THIS IS ALL PLACEHOLDER
         Column(
             modifier = Modifier
         ) {
@@ -114,7 +107,6 @@ fun SubChapterRow(
     page: String
 ) {
     Row(
-        // Align text to center
         modifier = Modifier
             .fillMaxWidth()
     ) {

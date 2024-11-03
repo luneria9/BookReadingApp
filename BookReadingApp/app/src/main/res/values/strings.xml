@@ -6,4 +6,7 @@
     <string name="home_screen_image">Home Screen Image</string>
     <string name="search_for_books">Search for books</string>
     <string name="search">Search</string>
+    <string name="contents">Table Of Contents</string>
+    <string name="book_title">Book Title</string>
+    <string name="reading_mode">Reading Mode</string>
 </resources>
