@@ -126,13 +126,11 @@ fun BookReadingApp(
         }
     ) { paddingValues ->
         Row(modifier = Modifier.padding(paddingValues)) {
-            if (!viewModel.readingMode) {
-                if (adaptiveNavigationType == AdaptiveNavigationType.PERMANENT_NAVIGATION_DRAWER) {
-                    PermanentNavigationDrawerComponent(viewModel)
-                }
-                if (adaptiveNavigationType == AdaptiveNavigationType.NAVIGATION_RAIL) {
-                    NavigationRailComponent(navController = navController)
-                }
+            if (adaptiveNavigationType == AdaptiveNavigationType.PERMANENT_NAVIGATION_DRAWER) {
+                PermanentNavigationDrawerComponent(viewModel)
+            }
+            if (adaptiveNavigationType == AdaptiveNavigationType.NAVIGATION_RAIL && !viewModel.readingMode) {
+                NavigationRailComponent(navController = navController)
             }
 
             Box(
@@ -201,26 +199,29 @@ fun PermanentNavigationDrawerComponent(viewModel: ReadingAppViewModel) {
     val currentRoutes = backStackEntry?.destination?.route
     PermanentNavigationDrawer(
         drawerContent = {
-            PermanentDrawerSheet {
-                Column {
-                    Spacer(Modifier.height(dimensionResource(R.dimen.spacer_medium)))
-                    NavBarItems.BarItems.forEach { navItem ->
-                        NavigationDrawerItem(
-                            selected = currentRoutes == navItem.route,
-                            onClick = {
+            if (!viewModel.readingMode) {
+                PermanentDrawerSheet {
+                    Column {
+                        Spacer(Modifier.height(dimensionResource(R.dimen.spacer_medium)))
+                        NavBarItems.BarItems.forEach { navItem ->
+                            NavigationDrawerItem(
+                                selected = currentRoutes == navItem.route,
+                                onClick = {
                                     navController.navigate(navItem.route)
-                            },
-                            icon = {
-                                Icon(navItem.image, contentDescription = navItem.title)
-                            },
-                            label = { Text(text = navItem.title) }
-                        )
+                                },
+                                icon = {
+                                    Icon(navItem.image, contentDescription = navItem.title)
+                                },
+                                label = { Text(text = navItem.title) }
+                            )
+                        }
                     }
                 }
-            } },
+            }
+        },
         content = {
-             Box(modifier = Modifier.fillMaxSize()) {
-                 //The call to NavigationHost is necessary to display the screen based on the route
+            Box(modifier = Modifier.fillMaxSize()) {
+                //The call to NavigationHost is necessary to display the screen based on the route
                 NavigationHost(navController = navController, viewModel = viewModel)
             }
         }
