@@ -45,6 +45,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavGraph.Companion.findStartDestination
+import com.example.bookreadingapp.ui.NavRoutes
 import com.example.bookreadingapp.ui.theme.BookReadingAppTheme
 import com.example.bookreadingapp.viewModels.ReadingAppViewModel
 
@@ -70,7 +72,7 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun NavigationHost(navController: NavHostController, viewModel: ReadingAppViewModel) {
-    NavHost(navController = navController, startDestination = Home.route
+    NavHost(navController = navController, startDestination = NavRoutes.Home.route
     ) {
         composable(Home.route) {
             HomeScreen(navController)
@@ -127,7 +129,7 @@ fun BookReadingApp(
     ) { paddingValues ->
         Row(modifier = Modifier.padding(paddingValues)) {
             if (adaptiveNavigationType == AdaptiveNavigationType.PERMANENT_NAVIGATION_DRAWER) {
-                PermanentNavigationDrawerComponent(viewModel)
+                PermanentNavigationDrawerComponent(viewModel, navController)
             }
             if (adaptiveNavigationType == AdaptiveNavigationType.NAVIGATION_RAIL && !viewModel.readingMode) {
                 NavigationRailComponent(navController = navController)
@@ -154,7 +156,13 @@ fun BottomNavigationBar(navController: NavHostController) {
             NavigationBarItem(
                 selected = currentRoutes == navItem.route,
                 onClick = {
-                    navController.navigate(navItem.route)
+                    navController.navigate(navItem.route) {
+                        popUpTo(navController.graph.findStartDestination().id) {
+                            saveState = true
+                        }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
                 },
                 icon = {
                     Icon(
@@ -172,7 +180,7 @@ fun BottomNavigationBar(navController: NavHostController) {
 
 //referenced from https://gitlab.com/crdavis/adaptivenavigationegcode/-/tree/master?ref_type=heads
 @Composable
-fun NavigationRailComponent(navController: NavController) {
+fun NavigationRailComponent(navController: NavHostController) {
     NavigationRail {
         val backStackEntry by navController.currentBackStackEntryAsState()
         val currentRoutes = backStackEntry?.destination?.route
@@ -193,8 +201,10 @@ fun NavigationRailComponent(navController: NavController) {
 
 //referenced from https://gitlab.com/crdavis/adaptivenavigationegcode/-/tree/master?ref_type=heads
 @Composable
-fun PermanentNavigationDrawerComponent(viewModel: ReadingAppViewModel) {
-    val navController = rememberNavController()
+fun PermanentNavigationDrawerComponent(
+    viewModel: ReadingAppViewModel,
+    navController: NavHostController
+) {
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentRoutes = backStackEntry?.destination?.route
     PermanentNavigationDrawer(
@@ -244,7 +254,7 @@ fun BookReadingTopAppBar(modifier: Modifier = Modifier){
                     contentDescription = null
                 )
                 Text(
-                    text = "Literala",
+                    text = stringResource(R.string.title),
                     style = MaterialTheme.typography.displayLarge
                 )
             }
