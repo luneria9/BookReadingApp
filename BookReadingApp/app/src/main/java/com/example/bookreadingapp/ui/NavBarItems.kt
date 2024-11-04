@@ -26,15 +26,5 @@ object NavBarItems {
             image = Icons.Filled.Search,
             route = "search"
         ),
-        BarItem(
-            title = "Contents",
-            image = Icons.Filled.Info,
-            route = "contents"
-        ),
-        BarItem(
-            title = "Reading",
-            image = Icons.Filled.Face,
-            route = "reading"
-        )
     )
 }
