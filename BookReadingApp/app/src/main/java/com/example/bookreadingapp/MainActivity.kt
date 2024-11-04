@@ -117,7 +117,7 @@ fun BookReadingApp(
     Scaffold(
         topBar = {
             val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route
-            if (currentRoute != Contents.route && currentRoute != Reading.route) {
+            if (currentRoute !== Contents.route || currentRoute !== Reading.route) {
                 BookReadingTopAppBar()
             }
         },
