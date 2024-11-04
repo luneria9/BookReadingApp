@@ -9,4 +9,6 @@
     <string name="contents">Table Of Contents</string>
     <string name="book_title">Book Title</string>
     <string name="reading_mode">Reading Mode</string>
+    <string name="read">Read</string>
+    <string name="table_of_contents">Table of Contents</string>
 </resources>
