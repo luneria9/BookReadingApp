@@ -1,22 +1,26 @@
+import android.content.Context
+import android.os.Build
+import androidx.annotation.RequiresApi
 import com.mohamedrejeb.ksoup.html.parser.KsoupHtmlHandler
 import com.mohamedrejeb.ksoup.html.parser.KsoupHtmlParser
-import org.jsoup.Jsoup
-import java.io.File;  // Import the File class
-import java.io.FileNotFoundException;  // Import this class to handle errors
-import java.util.Scanner; // Import the Scanner class to read text files
+import java.io.File
+import java.nio.file.Paths
+import java.util.Scanner
 
+// extract content from html
+// multiple html books
 
-var html = StringBuilder();
-
-
-fun readFile(path: String) :String {
-    var data =""
-    var myObj = File(path);
-    var myReader = Scanner(myObj);
-    while (myReader.hasNextLine()) {
-        data += myReader.nextLine();
+var html = StringBuilder()
+fun readFile(paths: MutableList<String>) :String {
+    var data = ""
+    for (path in paths){
+        var myObj = File(path)
+        var myReader = Scanner(myObj)
+        while (myReader.hasNextLine()) {
+            data += myReader.nextLine()
+        }
+        myReader.close();
     }
-    myReader.close();
     return data
 }
 
@@ -25,17 +29,16 @@ var string = ""
 val unclosedTagList = mutableListOf<String>()
 
 // Create a handler
-// TODO fix table handling
 val handler = KsoupHtmlHandler
     .Builder()
     .onOpenTag { name, _, _ ->
         unclosedTagList.add(name)
         if (unclosedTagList.lastOrNull() == "img") string += """
             IMAGE PLACEHOLDER
-        """.trimIndent()
+        """
         if (unclosedTagList.lastOrNull() == "table") string += """
             TABLE PLACEHOLDER
-        """.trimIndent()
+        """
     }
     .onText { text ->
         if (text.isBlank()) return@onText
@@ -47,20 +50,62 @@ val handler = KsoupHtmlHandler
         else if (unclosedTagList.lastOrNull() == "tr") return@onText
         else if (unclosedTagList.lastOrNull() == "td") return@onText
         else if (unclosedTagList.lastOrNull() == "tbody") return@onText
+        else if (unclosedTagList.lastOrNull() == "h1") string += """
+            
+            $text
+            
+        """
+        else if (unclosedTagList.lastOrNull() == "h1") string += """
+            
+            $text
+            
+        """
+        else if (unclosedTagList.lastOrNull() == "h2") string += """
+            
+            $text
+            
+        """
+        else if (unclosedTagList.lastOrNull() == "h3") string += """
+            
+            $text
+            
+        """
+        else if (unclosedTagList.lastOrNull() == "h4") string += """
+            
+            $text
+            
+        """
+        else if (unclosedTagList.lastOrNull() == "h5") string += """
+            
+            $text
+            
+        """
+        else if (unclosedTagList.lastOrNull() == "h6") string += """
+            
+            $text
+            
+            
+        """
         else string += """
             $text
         """.trimIndent()
     }
     .onCloseTag { name, _ ->
+        if (unclosedTagList.lastOrNull() == "section") string += """
+            
+        """
         unclosedTagList.removeLastOrNull();
 
     }
     .build()
 
+@RequiresApi(Build.VERSION_CODES.O)
 fun main() {
     // REPLACE WITH PATH
     // does not replace <i>
-    var htmlstring = readFile("")
+    val path = Paths.get("./app/src/main/assets/book1.html").toAbsolutePath().toString()
+    var list : MutableList<String> = mutableListOf(path)
+    var htmlstring = readFile(list)
     // Create a parser
     val ksoupHtmlParser = KsoupHtmlParser(
         handler = handler,
