@@ -111,26 +111,6 @@ fun main() {
         handler = handler,
     )
 
-    // Pass the HTML to the parser (It is going to parse the HTML and call the callbacks)
-//    var testString = """
-//    <html>
-//        <head>
-//            <title>My Title</title>
-//        </head>
-//        <body>
-//            <h1>My Heading</h1>
-//            <p>My paragraph.</p>
-//        </body>
-//        <table>
-//          <tr>
-//            <th>Company</th>
-//            <th>Contact</th>
-//            <th>Country</th>
-//          </tr>
-//        </table>
-//    </html>
-//""".trimIndent()
-
     ksoupHtmlParser.write(htmlstring)
 
     // Close the parser when you are done
