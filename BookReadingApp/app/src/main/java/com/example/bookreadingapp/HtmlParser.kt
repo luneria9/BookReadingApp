@@ -1,4 +1,3 @@
-import android.content.Context
 import android.os.Build
 import androidx.annotation.RequiresApi
 import com.mohamedrejeb.ksoup.html.parser.KsoupHtmlHandler
@@ -12,12 +11,12 @@ var html = StringBuilder()
 fun readFile(paths: MutableList<String>) :String {
     var data = ""
     for (path in paths){
-        var myObj = File(path)
-        var myReader = Scanner(myObj)
+        val myObj = File(path)
+        val myReader = Scanner(myObj)
         while (myReader.hasNextLine()) {
             data += myReader.nextLine()
         }
-        myReader.close();
+        myReader.close()
     }
     return data
 }
@@ -88,11 +87,11 @@ val handler = KsoupHtmlHandler
             $text
         """.trimIndent()
     }
-    .onCloseTag { name, _ ->
+    .onCloseTag { _, _ ->
         if (unclosedTagList.lastOrNull() == "section") string += """
             
         """
-        unclosedTagList.removeLastOrNull();
+        unclosedTagList.removeLastOrNull()
 
     }
     .build()
@@ -103,8 +102,8 @@ fun main() {
     // does not replace <i>
     val path = Paths.get("./app/src/main/assets/book1.html").toAbsolutePath().toString()
     val path2 = Paths.get("./app/src/main/assets/book2.html").toAbsolutePath().toString()
-    var list : MutableList<String> = mutableListOf(path, path2)
-    var htmlstring = readFile(list)
+    val list : MutableList<String> = mutableListOf(path, path2)
+    val htmlstring = readFile(list)
     // Create a parser
     val ksoupHtmlParser = KsoupHtmlParser(
         handler = handler,
