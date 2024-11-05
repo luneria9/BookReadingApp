@@ -7,8 +7,6 @@ import java.io.File
 import java.nio.file.Paths
 import java.util.Scanner
 
-// extract content from html
-// multiple html books
 
 var html = StringBuilder()
 fun readFile(paths: MutableList<String>) :String {
@@ -104,32 +102,13 @@ fun main() {
     // REPLACE WITH PATH
     // does not replace <i>
     val path = Paths.get("./app/src/main/assets/book1.html").toAbsolutePath().toString()
-    var list : MutableList<String> = mutableListOf(path)
+    val path2 = Paths.get("./app/src/main/assets/book2.html").toAbsolutePath().toString()
+    var list : MutableList<String> = mutableListOf(path, path2)
     var htmlstring = readFile(list)
     // Create a parser
     val ksoupHtmlParser = KsoupHtmlParser(
         handler = handler,
     )
-
-    // Pass the HTML to the parser (It is going to parse the HTML and call the callbacks)
-//    var testString = """
-//    <html>
-//        <head>
-//            <title>My Title</title>
-//        </head>
-//        <body>
-//            <h1>My Heading</h1>
-//            <p>My paragraph.</p>
-//        </body>
-//        <table>
-//          <tr>
-//            <th>Company</th>
-//            <th>Contact</th>
-//            <th>Country</th>
-//          </tr>
-//        </table>
-//    </html>
-//""".trimIndent()
 
     ksoupHtmlParser.write(htmlstring)
 
