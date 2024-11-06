@@ -51,7 +51,13 @@ fun LibraryScreen(navController: NavController) {
             .padding(dimensionResource(R.dimen.padding_medium)),
         contentAlignment = Alignment.TopCenter
     ) {
-        Column () {
+        Column (
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(top = dimensionResource(R.dimen.padding_medium)), // Add top padding to ensure the books don't overlap with buttons
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
             // Vertical grid layout for displaying books
             LazyVerticalGrid(
                 columns = GridCells.Fixed(3),
