@@ -7,6 +7,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Text
@@ -40,6 +41,7 @@ import com.example.bookreadingapp.ui.utils.AdaptiveNavigationType
 import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass as calculateWindowSizeClass1
 import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -181,7 +183,12 @@ fun BookReadingContent(
 //referenced from https://gitlab.com/crdavis/adaptivenavigationegcode/-/tree/master?ref_type=heads
 @Composable
 fun BottomNavigationBar(navController: NavHostController) {
-    NavigationBar {
+    NavigationBar (
+        Modifier.clickable(
+            onClickLabel = stringResource(R.string.bottom_nav_bar),
+            onClick = {}
+        )
+    ){
         val backStackEntry by navController.currentBackStackEntryAsState()
         val currentRoutes = backStackEntry?.destination?.route
         NavBarItems.BarItems.forEach { navItem ->
@@ -210,7 +217,12 @@ fun BottomNavigationBar(navController: NavHostController) {
 //referenced from https://gitlab.com/crdavis/adaptivenavigationegcode/-/tree/master?ref_type=heads
 @Composable
 fun NavigationRailComponent(navController: NavHostController) {
-    NavigationRail {
+    NavigationRail (
+        Modifier.clickable(
+            onClickLabel = stringResource(R.string.side_nav_rail),
+            onClick = {}
+        )
+    ){
         val backStackEntry by navController.currentBackStackEntryAsState()
         val currentRoutes = backStackEntry?.destination?.route
         NavBarItems.BarItems.forEach { navItem ->
@@ -256,11 +268,12 @@ fun DrawerContent(viewModel: ReadingAppViewModel, navController: NavHostControll
 @Composable
 fun PermanentNavigationDrawerComponent(
     viewModel: ReadingAppViewModel,
-    navController: NavHostController
+    navController: NavHostController,
 ) {
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentRoutes = backStackEntry?.destination?.route
     PermanentNavigationDrawer(
+        modifier = Modifier.testTag("perm nav"),
         drawerContent = {
             DrawerContent(viewModel = viewModel, navController = navController, currentRoutes = currentRoutes)
         },
