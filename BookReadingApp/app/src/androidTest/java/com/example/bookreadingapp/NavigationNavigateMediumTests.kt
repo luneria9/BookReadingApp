@@ -1,13 +1,14 @@
 package com.example.bookreadingapp
 
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.SemanticsActions
 import androidx.compose.ui.semantics.getOrNull
 import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.junit4.createComposeRule
-import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onChildren
-import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.navigation.compose.NavHost
@@ -22,7 +23,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
-class NavigationNavigateTests {
+class NavigationNavigateMediumTests {
     @get:Rule
     val composeTestRule = createComposeRule()
 
@@ -33,6 +34,7 @@ class NavigationNavigateTests {
         )?.label == label
     }
 
+    @OptIn(ExperimentalMaterial3Api::class)
     @Before
     fun setUp() {
         composeTestRule.setContent {
@@ -49,6 +51,7 @@ class NavigationNavigateTests {
                         HomeScreen(navController)
                     }
                 }
+                BookReadingApp(windowSizeClass = WindowWidthSizeClass.Medium, modifier = Modifier)
             }
         }
     }
@@ -57,7 +60,21 @@ class NavigationNavigateTests {
     @OptIn(ExperimentalMaterial3Api::class)
     @Test
     fun validateNavBarNavigateLibrary() {
-        composeTestRule.onNode(hasClickLabel("bottom nav bar")).onChildren()[1]
+        composeTestRule.onNode(hasClickLabel("side nav rail")).onChildren()[1].performClick()
         composeTestRule.onNodeWithText("Read")
+    }
+
+    @OptIn(ExperimentalMaterial3Api::class)
+    @Test
+    fun validateNavBarNavigateSearch() {
+        composeTestRule.onNode(hasClickLabel("side nav rail")).onChildren()[2].performClick()
+        composeTestRule.onNodeWithText("Search for books").assertExists()
+    }
+
+    @OptIn(ExperimentalMaterial3Api::class)
+    @Test
+    fun validateNavBarNavigateHome() {
+        composeTestRule.onNode(hasClickLabel("side nav rail")).onChildren()[1].performClick()
+        composeTestRule.onNode(hasClickLabel("side nav rail")).onChildren()[0].performClick()
     }
 }

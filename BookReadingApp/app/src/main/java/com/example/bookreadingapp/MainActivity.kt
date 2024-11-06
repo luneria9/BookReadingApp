@@ -222,14 +222,16 @@ fun PermanentNavigationDrawerComponent(
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentRoutes = backStackEntry?.destination?.route
     PermanentNavigationDrawer(
-        modifier = Modifier.testTag("perm nav"),
         drawerContent = {
             if (!viewModel.readingMode) {
-                PermanentDrawerSheet {
+                PermanentDrawerSheet (
+                    modifier = Modifier.testTag("perm nav"),
+                ){
                     Column {
                         Spacer(Modifier.height(dimensionResource(R.dimen.spacer_medium)))
                         NavBarItems.BarItems.forEach { navItem ->
                             NavigationDrawerItem(
+                                modifier = Modifier.testTag("drawer item"),
                                 selected = currentRoutes == navItem.route,
                                 onClick = {
                                     navController.navigate(navItem.route)
