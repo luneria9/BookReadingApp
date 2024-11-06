@@ -162,6 +162,7 @@ fun BottomNavigationBar(navController: NavHostController) {
         val currentRoutes = backStackEntry?.destination?.route
         NavBarItems.BarItems.forEach { navItem ->
             NavigationBarItem(
+                modifier = Modifier.testTag(stringResource(R.string.nav_bar_item)),
                 selected = currentRoutes == navItem.route,
                 onClick = {
                     navController.navigate(navItem.route) {
