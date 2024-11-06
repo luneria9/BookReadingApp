@@ -44,36 +44,41 @@ fun LibraryScreen(navController: NavController) {
         R.drawable.ic_launcher_foreground,
         R.drawable.ic_launcher_foreground
     )
-
     Box(
         modifier = Modifier
             .fillMaxSize()
             .padding(dimensionResource(R.dimen.padding_medium)),
         contentAlignment = Alignment.TopCenter
     ) {
-        Column (
+        Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(top = dimensionResource(R.dimen.padding_medium)), // Add top padding to ensure the books don't overlap with buttons
+                .padding(top = dimensionResource(R.dimen.padding_medium)),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            // Vertical grid layout for displaying books
-            LazyVerticalGrid(
-                columns = GridCells.Fixed(3),
-                contentPadding = PaddingValues(dimensionResource(R.dimen.padding_medium))
-            ) {
-                items(sampleBooks) {
-                    BookItem(it) {
-                        navController.navigate(NavRoutes.Reading.route)
-                    }
-                }
-            }
+            BookGrid(sampleBooks, navController)
             Book(navController = navController)
         }
     }
 }
 
+// Function to display the grid of books
+@Composable
+fun BookGrid(sampleBooks: List<Int>, navController: NavController) {
+    LazyVerticalGrid(
+        columns = GridCells.Fixed(3),
+        contentPadding = PaddingValues(dimensionResource(R.dimen.padding_medium))
+    ) {
+        items(sampleBooks) {
+            BookItem(it) {
+                navController.navigate(NavRoutes.Reading.route)
+            }
+        }
+    }
+}
+
+// Composable function to display buttons for navigation
 @Composable
 fun Book(navController: NavController) {
     Column (
@@ -84,6 +89,8 @@ fun Book(navController: NavController) {
         ReadingButton(navController = navController)
     }
 }
+
+// Button for navigating to the reading screen
 @Composable
 fun ReadingButton(navController: NavController) {
     Button(
@@ -97,6 +104,7 @@ fun ReadingButton(navController: NavController) {
     }
 }
 
+// Button for navigating to the contents screen
 @Composable
 fun ContentsButton(navController: NavController) {
     Button(
