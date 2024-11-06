@@ -37,37 +37,44 @@ fun ContentsScreen() {
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
     ) {
-        Text(
-            text = stringResource(R.string.contents),
-            fontSize = dimensionResource(R.dimen.font_big).value.sp,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier
-                .padding(dimensionResource(R.dimen.padding_medium))
-        )
+        TitleText()
+        ChapterContents()
+    }
+}
 
-        // THIS IS ALL PLACEHOLDER
-        Column(
-            modifier = Modifier
-        ) {
-            ChapterRow("Introduction", "I")
+@Composable
+fun TitleText() {
+    Text(
+        text = stringResource(R.string.contents),
+        fontSize = dimensionResource(R.dimen.font_big).value.sp,
+        fontWeight = FontWeight.Bold,
+        modifier = Modifier
+            .padding(dimensionResource(R.dimen.padding_medium))
+    )
+}
 
-            ChapterRow("Chapter 1", "1")
-            SubChapterRow(subchapter = "Subchapter 1", page = "2")
-            SubChapterRow(subchapter = "Subchapter 2", page = "5")
-            SubChapterRow(subchapter = "Subchapter 3", page = "12")
+@Composable
+fun ChapterContents() {
+    // THIS IS ALL PLACEHOLDER
+    Column {
+        ChapterRow("Introduction", "I")
 
-            ChapterRow("Chapter 2", "15")
-            SubChapterRow(subchapter = "Subchapter 1", page = "16")
-            SubChapterRow(subchapter = "Subchapter 2", page = "25")
-            SubChapterRow(subchapter = "Subchapter 3", page = "29")
+        ChapterRow("Chapter 1", "1")
+        SubChapterRow(subchapter = "Subchapter 1", page = "2")
+        SubChapterRow(subchapter = "Subchapter 2", page = "5")
+        SubChapterRow(subchapter = "Subchapter 3", page = "12")
 
-            ChapterRow("Chapter 3", "36")
-            SubChapterRow(subchapter = "Subchapter 1", page = "37")
-            SubChapterRow(subchapter = "Subchapter 2", page = "45")
-            SubChapterRow(subchapter = "Subchapter 3", page = "53")
+        ChapterRow("Chapter 2", "15")
+        SubChapterRow(subchapter = "Subchapter 1", page = "16")
+        SubChapterRow(subchapter = "Subchapter 2", page = "25")
+        SubChapterRow(subchapter = "Subchapter 3", page = "29")
 
-            ChapterRow("Conclusion", "54")
-        }
+        ChapterRow("Chapter 3", "36")
+        SubChapterRow(subchapter = "Subchapter 1", page = "37")
+        SubChapterRow(subchapter = "Subchapter 2", page = "45")
+        SubChapterRow(subchapter = "Subchapter 3", page = "53")
+
+        ChapterRow("Conclusion", "54")
     }
 }
 
