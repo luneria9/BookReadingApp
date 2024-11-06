@@ -193,6 +193,7 @@ fun BottomNavigationBar(navController: NavHostController) {
         val currentRoutes = backStackEntry?.destination?.route
         NavBarItems.BarItems.forEach { navItem ->
             NavigationBarItem(
+                modifier = Modifier.testTag(stringResource(R.string.nav_bar_item)),
                 selected = currentRoutes == navItem.route,
                 onClick = {
                     navController.navigate(navItem.route) {
@@ -244,11 +245,14 @@ fun NavigationRailComponent(navController: NavHostController) {
 @Composable
 fun DrawerContent(viewModel: ReadingAppViewModel, navController: NavHostController, currentRoutes: String?) {
     if (!viewModel.readingMode) {
-        PermanentDrawerSheet {
+        PermanentDrawerSheet(
+            modifier = Modifier.testTag(stringResource(R.string.perm_nav)),
+        ) {
             Column {
                 Spacer(Modifier.height(dimensionResource(R.dimen.spacer_medium)))
                 NavBarItems.BarItems.forEach { navItem ->
                     NavigationDrawerItem(
+                        modifier = Modifier.testTag(stringResource(R.string.drawer_item)),
                         selected = currentRoutes == navItem.route,
                         onClick = {
                             navController.navigate(navItem.route)
@@ -273,7 +277,6 @@ fun PermanentNavigationDrawerComponent(
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentRoutes = backStackEntry?.destination?.route
     PermanentNavigationDrawer(
-        modifier = Modifier.testTag("perm nav"),
         drawerContent = {
             DrawerContent(viewModel = viewModel, navController = navController, currentRoutes = currentRoutes)
         },
