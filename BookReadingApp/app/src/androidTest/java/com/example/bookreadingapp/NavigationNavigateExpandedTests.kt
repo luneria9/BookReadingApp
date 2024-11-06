@@ -72,7 +72,7 @@ class NavigationNavigateExpandedTests {
     @Test
     fun validateNavBarNavigateSearch() {
         composeTestRule.onAllNodesWithTag("drawer item")[2].performClick()
-        composeTestRule.onAllNodesWithText("Search for books")[0].assertExists()
+        composeTestRule.onNodeWithText("Search for books").assertExists()
     }
 
     @OptIn(ExperimentalMaterial3Api::class)

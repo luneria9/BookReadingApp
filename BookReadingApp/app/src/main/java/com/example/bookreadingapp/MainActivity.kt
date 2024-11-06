@@ -165,17 +165,18 @@ fun BookReadingContent(
     Row(modifier = Modifier.padding(paddingValues)) {
         if (adaptiveNavigationType == AdaptiveNavigationType.PERMANENT_NAVIGATION_DRAWER) {
             PermanentNavigationDrawerComponent(viewModel, navController)
-        }
-        if (adaptiveNavigationType == AdaptiveNavigationType.NAVIGATION_RAIL && !viewModel.readingMode) {
-            NavigationRailComponent(navController = navController)
-        }
+        } else {
+            if (adaptiveNavigationType == AdaptiveNavigationType.NAVIGATION_RAIL && !viewModel.readingMode) {
+                NavigationRailComponent(navController = navController)
+            }
 
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-        ) {
-            NavigationHost(navController = navController, viewModel = viewModel)
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues)
+            ) {
+                NavigationHost(navController = navController, viewModel = viewModel)
+            }
         }
     }
 }
