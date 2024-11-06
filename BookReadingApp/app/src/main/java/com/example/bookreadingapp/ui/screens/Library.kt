@@ -52,7 +52,7 @@ fun LibraryScreen(navController: NavController) {
         ) {
             items(sampleBooks) {
                 BookItem(it) {
-                    navController.navigate(NavRoutes.Reading.route)
+                    navController.navigate(NavRoutes.Contents.route)
                 }
             }
         }
