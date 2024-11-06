@@ -19,6 +19,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -81,7 +82,8 @@ fun ReadingMode(
         Spacer(Modifier.width(dimensionResource(R.dimen.spacer_medium)))
         Switch(
             checked = readingMode,
-            onCheckedChange = onReadingCheck
+            onCheckedChange = onReadingCheck,
+            modifier = Modifier.testTag("readingModeSwitch")
         )
     }
 }
