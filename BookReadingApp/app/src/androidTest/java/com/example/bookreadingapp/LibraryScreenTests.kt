@@ -1,4 +1,7 @@
 package com.example.bookreadingapp
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -22,6 +25,7 @@ class LibraryScreenTests {
     val composeTestRule = createComposeRule()
 
     // Set up the content before each test
+    @OptIn(ExperimentalMaterial3Api::class)
     @Before
     fun setUp() {
         composeTestRule.setContent {
@@ -35,6 +39,7 @@ class LibraryScreenTests {
                         ContentsScreen()
                     }
                 }
+                BookReadingApp(windowSizeClass = WindowWidthSizeClass.Expanded, modifier = Modifier)
             }
         }
     }
