@@ -16,4 +16,6 @@
     <string name="side_nav_rail">side nav rail</string>
     <string name="permanent_nav_drawer">side permanent nav drawer</string>
     <string name="nav_bar_item">nav bar item</string>
+    <string name="perm_nav">perm nav</string>
+    <string name="drawer_item">drawer item</string>
 </resources>

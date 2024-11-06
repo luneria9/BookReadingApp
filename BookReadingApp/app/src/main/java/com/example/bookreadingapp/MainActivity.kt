@@ -245,12 +245,14 @@ fun NavigationRailComponent(navController: NavHostController) {
 @Composable
 fun DrawerContent(viewModel: ReadingAppViewModel, navController: NavHostController, currentRoutes: String?) {
     if (!viewModel.readingMode) {
-        PermanentDrawerSheet {
+        PermanentDrawerSheet(
+            modifier = Modifier.testTag(stringResource(R.string.perm_nav)),
+        ) {
             Column {
                 Spacer(Modifier.height(dimensionResource(R.dimen.spacer_medium)))
                 NavBarItems.BarItems.forEach { navItem ->
                     NavigationDrawerItem(
-                        modifier = Modifier.testTag("drawer item"),
+                        modifier = Modifier.testTag(stringResource(R.string.drawer_item)),
                         selected = currentRoutes == navItem.route,
                         onClick = {
                             navController.navigate(navItem.route)
