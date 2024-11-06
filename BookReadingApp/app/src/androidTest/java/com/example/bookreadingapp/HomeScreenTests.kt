@@ -38,18 +38,21 @@ class HomeScreenTests {
         }
     }
 
+    // Verify welcome card is displayed
     @Test
     fun welcomeCardIsDisplayed() {
         composeTestRule.onNodeWithText("Welcome to Book Reader").assertExists().assertIsDisplayed()
         composeTestRule.onNodeWithText("Explore freely available textbooks with images and tables. Enjoy seamless navigation across different screen sizes!").assertExists().assertIsDisplayed()
     }
 
+    // Test button navigation to Library screen
     @Test
     fun buttonNavigatesToLibrary() {
         composeTestRule.onNodeWithText("Go to Library").assertIsDisplayed()
         composeTestRule.onNodeWithText("Go to Library").performClick()
     }
 
+    // Verify image is displayed
     @Test
     fun imageIsDisplayed() {
         composeTestRule.onNodeWithContentDescription("Home Screen Image").assertExists().assertIsDisplayed()

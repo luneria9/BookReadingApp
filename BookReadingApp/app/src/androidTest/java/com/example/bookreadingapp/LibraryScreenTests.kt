@@ -14,6 +14,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
+//Referenced to https://gitlab.com/crdavis/testingexamplecode/-/blob/master/app/src/androidTest/java/com/example/testingexamplecode/MainActivityKtTest.kt?ref_type=heads
 class LibraryScreenTests {
     @get:Rule
     val composeTestRule = createComposeRule()
@@ -28,7 +29,6 @@ class LibraryScreenTests {
                     composable(NavRoutes.Library.route) {
                         LibraryScreen(navController)
                     }
-                    // You should add the Contents route here as well if you are testing navigation
                     composable(NavRoutes.Contents.route) {
                         ContentsScreen()
                     }
@@ -37,11 +37,13 @@ class LibraryScreenTests {
         }
     }
 
+    // Test to ensure that the LibraryScreen displays 6 books
     @Test
     fun validateLibraryScreenDisplaysBooks() {
         composeTestRule.onAllNodesWithContentDescription("Book Item").assertCountEquals(6)
     }
 
+    // Test to verify that clicking on a book item navigates to the ContentsScreen
     @Test
     fun testNavigateToContentsScreen() {
         composeTestRule.onAllNodesWithContentDescription("Book Item")[0].performClick()
