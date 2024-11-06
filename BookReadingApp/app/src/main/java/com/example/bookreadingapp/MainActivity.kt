@@ -69,6 +69,7 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+// Defines navigation routes for the app
 @Composable
 fun NavigationHost(navController: NavHostController, viewModel: ReadingAppViewModel) {
     NavHost(navController = navController, startDestination = NavRoutes.Home.route
@@ -98,6 +99,7 @@ fun NavigationHost(navController: NavHostController, viewModel: ReadingAppViewMo
     }
 }
 
+// Sets navigation type based on window size
 @Composable
 fun getAdaptiveNavigationType(windowSizeClass: WindowWidthSizeClass): AdaptiveNavigationType {
     return when (windowSizeClass) {
@@ -107,6 +109,7 @@ fun getAdaptiveNavigationType(windowSizeClass: WindowWidthSizeClass): AdaptiveNa
     }
 }
 
+// Composable to adapts layout to screen size
 @Composable
 @ExperimentalMaterial3Api
 fun BookReadingApp(
@@ -120,6 +123,7 @@ fun BookReadingApp(
     BookReadingScaffold(navController, adaptiveNavigationType, viewModel)
 }
 
+// Scaffold structure with conditional top and bottom bars
 @Composable
 fun BookReadingScaffold(
     navController: NavHostController,
@@ -148,6 +152,7 @@ fun BookReadingScaffold(
     }
 }
 
+// Displays content with adaptive navigation layout
 @Composable
 fun BookReadingContent(
     navController: NavHostController,
@@ -223,6 +228,7 @@ fun NavigationRailComponent(navController: NavHostController) {
     }
 }
 
+//referenced from https://gitlab.com/crdavis/adaptivenavigationegcode/-/tree/master?ref_type=heads
 @Composable
 fun DrawerContent(viewModel: ReadingAppViewModel, navController: NavHostController, currentRoutes: String?) {
     if (!viewModel.readingMode) {
@@ -266,7 +272,7 @@ fun PermanentNavigationDrawerComponent(
     )
 }
 
-//Got code from code lab https://developer.android.com/codelabs/basic-android-kotlin-compose-material-theming#5
+// Referenced to https://developer.android.com/codelabs/basic-android-kotlin-compose-material-theming#5
 @Composable
 fun BookReadingTopAppBar(modifier: Modifier = Modifier){
     CenterAlignedTopAppBar(
