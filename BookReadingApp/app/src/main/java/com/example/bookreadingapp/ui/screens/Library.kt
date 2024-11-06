@@ -131,7 +131,7 @@ fun BookItem(
     ) {
         Image(
             painter = painterResource(bookImg),
-            contentDescription = null,
+            contentDescription = "Book Item",
             modifier = Modifier
                 .size(100.dp)
                 .clip(RoundedCornerShape(dimensionResource(R.dimen.spacer_small)))
