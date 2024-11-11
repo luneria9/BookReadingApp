@@ -118,3 +118,12 @@ fun PreviewHomeScreen() {
     }
 }
 
+@Composable
+@Preview(showBackground = true, locale = "fr")
+fun PreviewHomeScreenFr() {
+    BookReadingAppTheme {
+        val navController = rememberNavController()
+        HomeScreen(navController = navController)
+    }
+}
+

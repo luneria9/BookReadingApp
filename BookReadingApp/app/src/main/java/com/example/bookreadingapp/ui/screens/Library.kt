@@ -148,3 +148,12 @@ fun PreviewLibraryScreen() {
         LibraryScreen(navController = navController)
     }
 }
+
+@Composable
+@Preview(showBackground = true, locale = "fr")
+fun PreviewLibraryScreenFr() {
+    BookReadingAppTheme {
+        val navController = rememberNavController()
+        LibraryScreen(navController = navController)
+    }
+}

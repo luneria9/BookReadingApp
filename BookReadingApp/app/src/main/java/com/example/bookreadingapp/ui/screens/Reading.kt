@@ -26,6 +26,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.compose.rememberNavController
 import com.example.bookreadingapp.R
 import com.example.bookreadingapp.ui.theme.BookReadingAppTheme
 
@@ -92,6 +93,15 @@ fun ReadingMode(
 @Composable
 fun ReadingScreenPreview() {
     BookReadingAppTheme {
+        ReadingScreen(false, {})
+    }
+}
+
+@Composable
+@Preview(showBackground = true, locale = "fr")
+fun ReadingScreenPreviewFr() {
+    BookReadingAppTheme {
+        val navController = rememberNavController()
         ReadingScreen(false, {})
     }
 }
