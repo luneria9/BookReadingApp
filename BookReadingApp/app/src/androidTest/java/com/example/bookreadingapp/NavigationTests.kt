@@ -9,7 +9,12 @@ import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performClick
+import androidx.navigation.compose.rememberNavController
+import com.example.bookreadingapp.ui.NavBarItems
 import com.example.bookreadingapp.ui.screens.SearchScreen
+import com.example.bookreadingapp.ui.theme.BookReadingAppTheme
+import com.example.bookreadingapp.viewModels.ReadingAppViewModel
 import org.junit.Rule
 import org.junit.Test
 
@@ -58,5 +63,52 @@ internal class NavigationTests {
         composeTestRule.onNode(hasClickLabel("bottom nav bar")).assertDoesNotExist()
         composeTestRule.onNode(hasClickLabel("side nav rail")).assertDoesNotExist()
         composeTestRule.onNodeWithTag("perm nav").assertExists()
+    }
+
+    @OptIn(ExperimentalMaterial3Api::class)
+    @Test
+    fun bottomNavigationBar_isVisibleInCompactMode() {
+        // Set up the composable with Compact mode to trigger the bottom navigation bar
+        composeTestRule.setContent {
+            BookReadingAppTheme {
+                BookReadingApp(
+                    windowSizeClass = WindowWidthSizeClass.Compact,
+                    modifier = Modifier
+                )
+            }
+        }
+
+        // Assert that the bottom navigation bar is displayed
+        composeTestRule.onNode(hasClickLabel("bottom nav bar")).assertExists()
+    }
+
+    @OptIn(ExperimentalMaterial3Api::class)
+    @Test
+    fun bottomNavigationBar_displaysAllNavItems() {
+        composeTestRule.setContent {
+            val navController = rememberNavController()
+            BottomNavigationBar(navController = navController)
+        }
+
+        // Assert that all navigation items are present in the bottom navigation bar
+        NavBarItems.BarItems.forEach { navItem ->
+            composeTestRule.onNodeWithText(navItem.title).assertExists()
+        }
+    }
+
+    @OptIn(ExperimentalMaterial3Api::class)
+    @Test
+    fun bottomNavigationBar_isHiddenInReadingMode() {
+        composeTestRule.setContent {
+            val viewModel = ReadingAppViewModel().apply { toggleReadingMode() }
+            BookReadingApp(
+                windowSizeClass = WindowWidthSizeClass.Compact,
+                viewModel = viewModel,
+                modifier = Modifier
+            )
+        }
+
+        // Assert that the bottom navigation bar is hidden in reading mode
+        composeTestRule.onNode(hasClickLabel("bottom nav bar")).assertDoesNotExist()
     }
 }
