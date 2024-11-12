@@ -47,7 +47,7 @@ android {
 }
 
 dependencies {
-
+    implementation("androidx.compose.material3:material3-window-size-class")
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -56,11 +56,20 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+    implementation ("androidx.navigation:navigation-compose:2.5.3")
+    implementation(libs.androidx.junit.ktx)
     testImplementation(libs.junit)
+    testImplementation(libs.androidx.ui.test.junit4.android)
+    testImplementation(libs.androidx.ui.test.android)
+    testImplementation(libs.androidx.ui.test.android)
+    testImplementation(libs.androidx.ui.test.junit4.android)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+    implementation("com.mohamedrejeb.ksoup:ksoup-html:0.4.0")
+    implementation("com.mohamedrejeb.ksoup:ksoup-entities:0.4.0")
+    implementation("org.jsoup:jsoup:1.14.3")
 }

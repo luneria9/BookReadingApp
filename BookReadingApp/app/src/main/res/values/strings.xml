@@ -1,3 +1,21 @@
 <resources>
     <string name="app_name">BookReadingApp</string>
+    <string name="welcome_title">Welcome to Book Reader</string>
+    <string name="welcome_message">Explore freely available textbooks with images and tables. Enjoy seamless navigation across different screen sizes!</string>
+    <string name="go_to_library">Go to Library</string>
+    <string name="home_screen_image">Home Screen Image</string>
+    <string name="search_for_books">Search for books</string>
+    <string name="search">Search</string>
+    <string name="contents">Table Of Contents</string>
+    <string name="book_title">Book Title</string>
+    <string name="reading_mode">Reading Mode</string>
+    <string name="read">Read</string>
+    <string name="table_of_contents">Table of Contents</string>
+    <string name="title">Literala</string>
+    <string name="bottom_nav_bar">bottom nav bar</string>
+    <string name="side_nav_rail">side nav rail</string>
+    <string name="permanent_nav_drawer">side permanent nav drawer</string>
+    <string name="nav_bar_item">nav bar item</string>
+    <string name="perm_nav">perm nav</string>
+    <string name="drawer_item">drawer item</string>
 </resources>
