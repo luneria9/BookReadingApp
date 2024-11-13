@@ -31,7 +31,9 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.compose.rememberNavController
 import com.example.bookreadingapp.R
+import com.example.bookreadingapp.ui.theme.BookReadingAppTheme
 
 @Composable
 fun SearchScreen() {
@@ -88,4 +90,12 @@ fun SearchBar(modifier: Modifier = Modifier) {
 @Composable
 fun SearchScreenPreview() {
     SearchScreen()
+}
+
+@Composable
+@Preview(showBackground = true, locale = "fr")
+fun SearchScreenPreviewFr() {
+    BookReadingAppTheme {
+        SearchScreen()
+    }
 }

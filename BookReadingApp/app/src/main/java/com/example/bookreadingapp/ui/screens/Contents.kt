@@ -143,3 +143,11 @@ fun PreviewContents() {
         ContentsScreen()
     }
 }
+
+@Preview(showBackground = true, locale = "fr")
+@Composable
+fun PreviewContentsFr() {
+    BookReadingAppTheme {
+        ContentsScreen()
+    }
+}
