@@ -58,6 +58,7 @@ dependencies {
     implementation(libs.androidx.material3)
     implementation ("androidx.navigation:navigation-compose:2.5.3")
     implementation(libs.androidx.junit.ktx)
+    implementation(libs.androidx.runtime.livedata)
     testImplementation(libs.junit)
     testImplementation(libs.androidx.ui.test.junit4.android)
     testImplementation(libs.androidx.ui.test.android)
