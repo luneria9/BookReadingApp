@@ -2,9 +2,9 @@
 <resources>
     <string name="app_name">ApplicationDeLectureDeLivres</string>
     <string name="welcome_title">Bienvenue dans le Lecteur de Livres</string>
-    <string name="welcome_message">Explorez des manuels disponibles gratuitement avec des images et des tableaux. Profitez d'une navigation fluide sur différents écrans !</string>
+    <string name="welcome_message">Explorez des manuels disponibles gratuitement avec des images et des tableaux. Profitez d\'une navigation fluide sur différents écrans !</string>
     <string name="go_to_library">Aller à la Bibliothèque</string>
-    <string name="home_screen_image">Image de l\'Écran d'Accueil</string>
+    <string name="home_screen_image">Image de l\'Écran d\'Accueil</string>
     <string name="search_for_books">Rechercher des livres</string>
     <string name="search">Rechercher</string>
     <string name="contents">Table des Matières</string>
