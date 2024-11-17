@@ -63,4 +63,38 @@ class FileSystemTests {
         assertFalse(file1.exists())
         assertFalse(file2.exists())
     }
+
+    @Test
+    fun createFile() {
+        // Setup
+        val directoryName = "testDirectory"
+        val fileName = "testFile.txt"
+
+        // Call createFile to create the file
+        val file = fileSystem.createFile(directoryName, fileName)
+
+        // Create the file on the filesystem
+        file.createNewFile()
+
+        // Assert that the file was created in the expected directory
+        assertTrue(file.exists())
+        assertEquals(file.name, fileName)
+    }
+
+    //Not working
+    @Test
+    fun downloadFile() {
+        // Setup
+        val directoryName = "testDirectory"
+        val fileName = "downloadedFile.txt"
+        val file = fileSystem.createFile(directoryName, fileName)
+
+        file.createNewFile()
+
+        val testUrl = "https://www.gutenberg.org/cache/epub/74755/pg74755.txt"
+        val result = fileSystem.downloadFile(testUrl, file)
+
+        assertTrue(result)
+        assertTrue(file.exists())
+    }
 }
