@@ -47,6 +47,21 @@ class FileSystem (private val context: Context){
         }
     }
 
+    fun unzipFile(fileName: String, destDirectory: String, zipDirectory: String): Boolean {
+        return try {
+            val zipFilesDirectory = File(context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS), zipDirectory)
+            val unzippedDirectory = File(context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS), destDirectory)
+
+            val zipFile = File(zipFilesDirectory, fileName)
+
+            UnzipUtils.unzip(zipFile, unzippedDirectory.toString())
+            true
+        } catch (e: Exception) {
+            e.printStackTrace()
+            false
+        }
+    }
+
     // Helper method to copy data from input to output stream
     private fun copyStream(input: InputStream, output: FileOutputStream) {
         val buffer = ByteArray(1024)
@@ -55,7 +70,6 @@ class FileSystem (private val context: Context){
             output.write(buffer, 0, length)
         }
     }
-
 
     // Delete directory contents directly without IntentSender
     fun deleteDirectoryContents(directoryName: String) {
