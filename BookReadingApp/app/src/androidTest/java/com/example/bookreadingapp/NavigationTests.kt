@@ -1,5 +1,6 @@
 package com.example.bookreadingapp
 
+import android.content.Context
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.ui.Modifier
@@ -11,6 +12,8 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.navigation.compose.rememberNavController
+import androidx.test.core.app.ApplicationProvider
+import com.example.bookreadingapp.fileSystem.FileSystem
 import com.example.bookreadingapp.ui.NavBarItems
 import com.example.bookreadingapp.ui.screens.SearchScreen
 import com.example.bookreadingapp.ui.theme.BookReadingAppTheme
@@ -99,8 +102,11 @@ internal class NavigationTests {
     @OptIn(ExperimentalMaterial3Api::class)
     @Test
     fun bottomNavigationBar_isHiddenInReadingMode() {
+        val context = ApplicationProvider.getApplicationContext<Context>()
+        val fileSystem = FileSystem(context)
+
         composeTestRule.setContent {
-            val viewModel = ReadingAppViewModel().apply { toggleReadingMode() }
+            val viewModel = ReadingAppViewModel(fileSystem).apply { toggleReadingMode() }
             BookReadingApp(
                 windowSizeClass = WindowWidthSizeClass.Compact,
                 viewModel = viewModel,
