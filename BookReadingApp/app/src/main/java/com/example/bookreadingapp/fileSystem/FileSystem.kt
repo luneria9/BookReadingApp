@@ -10,7 +10,7 @@ import okhttp3.Request
 import java.io.IOException
 
 // referenced from https://gitlab.com/crdavis/networkandfileio/-/tree/master?ref_type=heads
-class FileSystem (private val context: Context){
+open class FileSystem(private val context: Context?){
 
     fun createFile(directoryName: String, fileName: String): File {
         val downloadFolder = File(context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS), directoryName)
@@ -59,7 +59,7 @@ class FileSystem (private val context: Context){
 
     // Delete directory contents directly without IntentSender
     fun deleteDirectoryContents(directoryName: String) {
-        val downloadFolder = File(context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS), directoryName)
+        val downloadFolder = File(context?.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS), directoryName)
         downloadFolder.listFiles()?.forEach { it.delete() }
     }
 
