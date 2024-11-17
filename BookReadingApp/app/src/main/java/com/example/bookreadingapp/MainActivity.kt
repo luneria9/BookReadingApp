@@ -47,6 +47,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
@@ -129,6 +130,21 @@ fun BookReadingApp(
     viewModel: ReadingAppViewModel = viewModel(),
     modifier: Modifier
 ) {
+    val downloadedBooks = viewModel.directoryContents.observeAsState().value
+    val bookUrls = stringArrayResource(R.array.book_urls)
+
+    if (downloadedBooks.isNullOrEmpty()) {
+        bookUrls.forEach {
+            viewModel.setupDownload(it)
+            Log.d("DOWNLOAD", "downloaded $it")
+        }
+    }
+
+    downloadedBooks?.forEach {
+        viewModel.unzipFile(it)
+        Log.d("UNZIP", "unzipped $it")
+    }
+
     val navController = rememberNavController()
     val adaptiveNavigationType = getAdaptiveNavigationType(windowSizeClass)
     BookReadingScaffold(navController, adaptiveNavigationType, viewModel)
