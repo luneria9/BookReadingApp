@@ -55,13 +55,7 @@ class FileSystem (private val context: Context){
 
             val zipFile = File("$zipFilesDirectory/$fileName")
 
-            Log.d("DOWNLOAD", unzippedDirectory.toString())
-
-            if (File("$unzippedDirectory/images").mkdirs()) {
-                Log.d("DOWNLOAD", "Created images directory")
-            } else {
-                Log.d("DOWNLOAD", "Directory not created")
-            }
+            File("$unzippedDirectory/images").mkdirs()
 
             UnzipUtils.unzip(zipFile, "$unzippedDirectory")
             true
