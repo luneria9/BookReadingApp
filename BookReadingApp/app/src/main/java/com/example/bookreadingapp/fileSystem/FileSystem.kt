@@ -10,7 +10,7 @@ import okhttp3.Request
 import java.io.IOException
 
 // referenced from https://gitlab.com/crdavis/networkandfileio/-/tree/master?ref_type=heads
-open class FileSystem(private val context: Context?){
+open class FileSystem(private val context: Context){
 
     fun createFile(directoryName: String, fileName: String): File {
         val downloadFolder = File(context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS), directoryName)

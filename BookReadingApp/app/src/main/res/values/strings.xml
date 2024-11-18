@@ -18,6 +18,7 @@
     <string name="nav_bar_item">nav bar item</string>
     <string name="perm_nav">perm nav</string>
     <string name="drawer_item">drawer item</string>
+    <string name="library">Library</string>
 
     <string-array name="books_url">
         <item>replace me</item>
