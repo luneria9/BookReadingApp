@@ -25,6 +25,7 @@ class FileSystemTests {
         fileSystem = FileSystem(mockContext)
     }
 
+    // Test to ensure that the ListDirectory displays the contents
     @Test
     fun listDirectoryContents() {
         // Setup
@@ -45,6 +46,7 @@ class FileSystemTests {
         assertTrue(fileList.contains("file2.txt"))
     }
 
+    // Test to ensure that the deleteDirectoryContents delete the directory contents
     @Test
     fun deleteDirectoryContents() {
         // Setup
@@ -64,6 +66,7 @@ class FileSystemTests {
         assertFalse(file2.exists())
     }
 
+    // Test to ensure that the createFile creates a new file in the expected directory
     @Test
     fun createFile() {
         // Setup
@@ -82,6 +85,7 @@ class FileSystemTests {
     }
 
     //Not working
+    // Test to ensure that the downloadFile download file from URL and save it in the specified location
     @Test
     fun downloadFile() {
         // Setup

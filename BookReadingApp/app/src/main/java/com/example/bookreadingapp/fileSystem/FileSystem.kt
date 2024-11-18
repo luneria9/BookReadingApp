@@ -59,7 +59,7 @@ open class FileSystem(private val context: Context){
 
     // Delete directory contents directly without IntentSender
     fun deleteDirectoryContents(directoryName: String) {
-        val downloadFolder = File(context?.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS), directoryName)
+        val downloadFolder = File(context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS), directoryName)
         downloadFolder.listFiles()?.forEach { it.delete() }
     }
 

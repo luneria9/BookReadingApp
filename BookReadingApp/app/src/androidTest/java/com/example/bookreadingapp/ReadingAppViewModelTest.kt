@@ -17,6 +17,7 @@ class ReadingAppViewModelTest {
     private val fakeFileSystem = FakeFileSystem(context = null)
     private val viewModel = ReadingAppViewModel(fakeFileSystem)
 
+    // Test to ensure that the ReadingMode toggles correctly
     @Test
     fun readingAppViewModel_ReadingMode_TogglesCorrectly() {
         assertEquals(false, viewModel.readingMode)
