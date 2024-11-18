@@ -2,6 +2,7 @@ package com.example.bookreadingapp.fileSystem
 
 import android.content.Context
 import android.os.Environment
+import android.util.Log
 import java.io.File
 import java.io.FileOutputStream
 import java.io.InputStream
@@ -52,9 +53,17 @@ class FileSystem (private val context: Context){
             val zipFilesDirectory = File(context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS), zipDirectory)
             val unzippedDirectory = File(context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS), destDirectory)
 
-            val zipFile = File(zipFilesDirectory, fileName)
+            val zipFile = File("$zipFilesDirectory/$fileName")
 
-            UnzipUtils.unzip(zipFile, unzippedDirectory.toString())
+            Log.d("DOWNLOAD", unzippedDirectory.toString())
+
+            if (File("$unzippedDirectory/images").mkdirs()) {
+                Log.d("DOWNLOAD", "Created images directory")
+            } else {
+                Log.d("DOWNLOAD", "Directory not created")
+            }
+
+            UnzipUtils.unzip(zipFile, "$unzippedDirectory")
             true
         } catch (e: Exception) {
             e.printStackTrace()

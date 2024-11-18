@@ -140,9 +140,18 @@ fun BookReadingApp(
         }
     }
 
-    downloadedBooks?.forEach {
-        viewModel.unzipFile(it)
-        Log.d("UNZIP", "unzipped $it")
+//    downloadedBooks?.forEach {
+//        viewModel.unzipFile(it)
+//        Log.d("UNZIP", "unzipped $it")
+//    }
+    val book = downloadedBooks?.get(0)
+
+    if (book != null) {
+        Log.d("DOWNLOAD", "unzipping $book")
+        viewModel.unzipFile(book)
+        Log.d("DOWNLOAD", "unzipped $book")
+    } else {
+        Log.d("DOWNLOAD", "book is null")
     }
 
     val navController = rememberNavController()

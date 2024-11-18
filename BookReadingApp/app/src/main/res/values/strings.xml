@@ -21,7 +21,7 @@
 
     <string-array name="book_urls">
         <item>https://www.gutenberg.org/cache/epub/40175/pg40175-h.zip</item>
-        <item>https://www.gutenberg.org/cache/epub/120/pg120-h.zip</item>
-        <item>https://www.gutenberg.org/cache/epub/39272/pg39272-h.zip</item>
+<!--        <item>https://www.gutenberg.org/cache/epub/120/pg120-h.zip</item>-->
+<!--        <item>https://www.gutenberg.org/cache/epub/39272/pg39272-h.zip</item>-->
     </string-array>
 </resources>
