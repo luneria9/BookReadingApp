@@ -8,7 +8,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.junit.Test
 
 // For testing
-class FakeFileSystem(context: Context?) : FileSystem(context) {
+class FakeFileSystem(context: Context?) : FileSystem(context!!) {
 }
 
 // Referred to https://github.com/google-developer-training/basic-android-kotlin-compose-training-unscramble/blob/main/app/src/test/java/com/example/unscramble/ui/test/GameViewModelTest.kt
