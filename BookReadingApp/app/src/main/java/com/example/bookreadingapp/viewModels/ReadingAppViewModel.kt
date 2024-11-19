@@ -38,9 +38,9 @@ class ReadingAppViewModel(private val fileSystem: FileSystem) : ViewModel() {
         }
     }
 
-    fun unzipFile(fileName: String) {
+    fun unzipFile(fileName: String, destDirectory: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            if (fileSystem.unzipFile(fileName, "UnzippedBooks", "DownloadedFiles")) {
+            if (fileSystem.unzipFile(fileName, destDirectory, "DownloadedFiles")) {
                 updateDirectoryContents("UnzippedBooks")
             } else {
                 Log.e("DownloadViewModel", "Failed to unzip $fileName")
