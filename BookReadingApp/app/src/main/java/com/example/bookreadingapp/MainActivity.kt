@@ -92,7 +92,7 @@ fun NavigationHost(navController: NavHostController, viewModel: ReadingAppViewMo
         }
 
         composable(Library.route) {
-            LibraryScreen(navController)
+            LibraryScreen(navController, viewModel)
         }
 
         composable(Search.route) {
@@ -130,30 +130,6 @@ fun BookReadingApp(
     viewModel: ReadingAppViewModel = viewModel(),
     modifier: Modifier
 ) {
-    val downloadedBooks = viewModel.directoryContents.observeAsState().value
-    val bookUrls = stringArrayResource(R.array.book_urls)
-
-    if (downloadedBooks.isNullOrEmpty()) {
-        bookUrls.forEach {
-            viewModel.setupDownload(it)
-            Log.d("DOWNLOAD", "downloaded $it")
-        }
-    }
-
-//    downloadedBooks?.forEach {
-//        viewModel.unzipFile(it)
-//        Log.d("UNZIP", "unzipped $it")
-//    }
-    val book = downloadedBooks?.get(0)
-
-    if (book != null) {
-        Log.d("DOWNLOAD", "unzipping $book")
-        viewModel.unzipFile(book)
-        Log.d("DOWNLOAD", "unzipped $book")
-    } else {
-        Log.d("DOWNLOAD", "book is null")
-    }
-
     val navController = rememberNavController()
     val adaptiveNavigationType = getAdaptiveNavigationType(windowSizeClass)
     BookReadingScaffold(navController, adaptiveNavigationType, viewModel)
