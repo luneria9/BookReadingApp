@@ -1,4 +1,5 @@
 package com.example.bookreadingapp
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
@@ -6,6 +7,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import org.junit.runner.RunWith
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -13,6 +15,8 @@ import com.example.bookreadingapp.ui.NavRoutes
 import com.example.bookreadingapp.ui.screens.HomeScreen
 import com.example.bookreadingapp.ui.screens.LibraryScreen
 import com.example.bookreadingapp.ui.theme.BookReadingAppTheme
+import com.example.bookreadingapp.viewModels.ReadingAppViewModel
+import com.example.bookreadingapp.viewModels.ReadingAppViewModelFactory
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -30,9 +34,11 @@ class HomeScreenTests {
         composeTestRule.setContent {
             BookReadingAppTheme {
                 val navController = rememberNavController()
+                val context = LocalContext.current
+                val viewModel: ReadingAppViewModel = viewModel(factory = ReadingAppViewModelFactory(context))
                 NavHost(navController = navController, startDestination = NavRoutes.Home.route) {
                     composable(NavRoutes.Home.route) { HomeScreen(navController = navController) }
-                    composable(NavRoutes.Library.route) { LibraryScreen(navController = navController) }
+                    composable(NavRoutes.Library.route) { LibraryScreen(navController = navController, viewModel = viewModel) }
                 }
             }
         }

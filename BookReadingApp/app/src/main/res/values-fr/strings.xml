@@ -19,5 +19,6 @@
     <string name="nav_bar_item">élément de la barre de navigation</string>
     <string name="perm_nav">navigation permanente</string>
     <string name="drawer_item">élément du tiroir</string>
+    <string name="library">Bibliothèque</string>
     <string name="download">Télécharger %s</string>
 </resources>

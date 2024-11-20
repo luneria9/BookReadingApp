@@ -1,5 +1,6 @@
 package com.example.bookreadingapp
 
+import android.content.Context
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.ui.Modifier
@@ -9,12 +10,12 @@ import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
-import androidx.compose.ui.test.performClick
 import androidx.navigation.compose.rememberNavController
+import androidx.test.core.app.ApplicationProvider
 import com.example.bookreadingapp.ui.NavBarItems
-import com.example.bookreadingapp.ui.screens.SearchScreen
 import com.example.bookreadingapp.ui.theme.BookReadingAppTheme
 import com.example.bookreadingapp.viewModels.ReadingAppViewModel
+import com.example.bookreadingapp.viewModels.ReadingAppViewModelFactory
 import org.junit.Rule
 import org.junit.Test
 
@@ -32,8 +33,15 @@ internal class NavigationTests {
     @OptIn(ExperimentalMaterial3Api::class)
     @Test
     fun validateNavBar() {
+        val context = ApplicationProvider.getApplicationContext<Context>()
+        val viewModel = ReadingAppViewModelFactory(context).create(ReadingAppViewModel::class.java)
+
         composeTestRule.setContent {
-            BookReadingApp(windowSizeClass = WindowWidthSizeClass.Compact, modifier = Modifier)
+            BookReadingApp(
+                windowSizeClass = WindowWidthSizeClass.Compact,
+                viewModel = viewModel,
+                modifier = Modifier
+            )
         }
 
         composeTestRule.onNode(hasClickLabel("bottom nav bar")).assertExists()
@@ -44,8 +52,15 @@ internal class NavigationTests {
     @OptIn(ExperimentalMaterial3Api::class)
     @Test
     fun validateNavRail() {
+        val context = ApplicationProvider.getApplicationContext<Context>()
+        val viewModel = ReadingAppViewModelFactory(context).create(ReadingAppViewModel::class.java)
+
         composeTestRule.setContent {
-            BookReadingApp(windowSizeClass = WindowWidthSizeClass.Medium, modifier = Modifier)
+            BookReadingApp(
+                windowSizeClass = WindowWidthSizeClass.Medium,
+                viewModel = viewModel,
+                modifier = Modifier
+            )
         }
 
         composeTestRule.onNode(hasClickLabel("bottom nav bar")).assertDoesNotExist()
@@ -56,8 +71,15 @@ internal class NavigationTests {
     @OptIn(ExperimentalMaterial3Api::class)
     @Test
     fun validateNavDrawer() {
+        val context = ApplicationProvider.getApplicationContext<Context>()
+        val viewModel = ReadingAppViewModelFactory(context).create(ReadingAppViewModel::class.java)
+
         composeTestRule.setContent {
-            BookReadingApp(windowSizeClass = WindowWidthSizeClass.Expanded, modifier = Modifier)
+            BookReadingApp(
+                windowSizeClass = WindowWidthSizeClass.Expanded,
+                viewModel = viewModel,
+                modifier = Modifier
+            )
         }
 
         composeTestRule.onNode(hasClickLabel("bottom nav bar")).assertDoesNotExist()
@@ -68,11 +90,14 @@ internal class NavigationTests {
     @OptIn(ExperimentalMaterial3Api::class)
     @Test
     fun bottomNavigationBar_isVisibleInCompactMode() {
-        // Set up the composable with Compact mode to trigger the bottom navigation bar
+        val context = ApplicationProvider.getApplicationContext<Context>()
+        val viewModel = ReadingAppViewModelFactory(context).create(ReadingAppViewModel::class.java)
+
         composeTestRule.setContent {
             BookReadingAppTheme {
                 BookReadingApp(
                     windowSizeClass = WindowWidthSizeClass.Compact,
+                    viewModel = viewModel,
                     modifier = Modifier
                 )
             }
@@ -99,8 +124,12 @@ internal class NavigationTests {
     @OptIn(ExperimentalMaterial3Api::class)
     @Test
     fun bottomNavigationBar_isHiddenInReadingMode() {
+        val context = ApplicationProvider.getApplicationContext<Context>()
+        val viewModel = ReadingAppViewModelFactory(context).create(ReadingAppViewModel::class.java).apply {
+            toggleReadingMode() // Toggle reading mode to hide the bottom nav bar
+        }
+
         composeTestRule.setContent {
-            val viewModel = ReadingAppViewModel().apply { toggleReadingMode() }
             BookReadingApp(
                 windowSizeClass = WindowWidthSizeClass.Compact,
                 viewModel = viewModel,
