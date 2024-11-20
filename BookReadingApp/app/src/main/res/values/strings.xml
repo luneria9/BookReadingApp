@@ -19,8 +19,18 @@
     <string name="perm_nav">perm nav</string>
     <string name="drawer_item">drawer item</string>
     <string name="library">Library</string>
+    <string name="download">Download %s</string>
 
-    <string-array name="books_url">
-        <item>replace me</item>
+    <string-array name="book_urls">
+        <item>https://www.gutenberg.org/cache/epub/40175/pg40175-h.zip</item>
+        <item>https://www.gutenberg.org/cache/epub/120/pg120-h.zip</item>
+        <item>https://www.gutenberg.org/cache/epub/39272/pg39272-h.zip</item>
+    </string-array>
+
+    <!-- Placeholder list of book titles -->
+    <string-array name="book_titles">
+        <item>Physics</item>
+        <item>Treasure Island</item>
+        <item>The inventions, researches and writings of Nikola Tesla</item>
     </string-array>
 </resources>

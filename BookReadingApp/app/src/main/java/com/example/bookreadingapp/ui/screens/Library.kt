@@ -24,29 +24,33 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.bookreadingapp.R
 import com.example.bookreadingapp.ui.NavRoutes
 import com.example.bookreadingapp.ui.theme.BookReadingAppTheme
 import com.example.bookreadingapp.ui.theme.Typography
+import com.example.bookreadingapp.viewModels.ReadingAppViewModel
 
 // Referred to https://developer.android.com/codelabs/basic-android-kotlin-compose-material-theming#6
 @Composable
-fun LibraryScreen(navController: NavController) {
+fun LibraryScreen(navController: NavController, viewModel: ReadingAppViewModel) {
     // Sample list of book images
     val sampleBooks = listOf(
         R.drawable.ic_launcher_foreground,
         R.drawable.ic_launcher_foreground,
-        R.drawable.ic_launcher_foreground,
-        R.drawable.ic_launcher_foreground,
-        R.drawable.ic_launcher_foreground,
         R.drawable.ic_launcher_foreground
     )
+
+    val bookTitles = stringArrayResource(R.array.book_titles)
+    val bookUrls = stringArrayResource(R.array.book_urls)
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -62,6 +66,14 @@ fun LibraryScreen(navController: NavController) {
         ) {
             LibraryTitle()
             BookGrid(sampleBooks, navController)
+
+            for (i in bookTitles.indices) {
+                DownloadButton(
+                    bookTitle = bookTitles[i],
+                    onClick = { downloadBook(bookUrls[i], bookTitles[i], viewModel = viewModel) }
+                )
+            }
+
             Book(navController = navController)
         }
     }
@@ -155,13 +167,30 @@ fun BookItem(
     }
 }
 
+@Composable
+fun DownloadButton(
+    bookTitle: String,
+    onClick: () -> Unit
+) {
+    Button(
+        onClick = onClick
+    ) {
+        Text(text = stringResource(R.string.download, bookTitle))
+    }
+}
+
+private fun downloadBook(url: String, fileName: String, viewModel: ReadingAppViewModel) {
+    val zipFileName = url.substringAfterLast("/")
+
+    viewModel.downloadUnzip(url, zipFileName, fileName)
+}
 
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun PreviewLibraryScreen() {
     BookReadingAppTheme {
         val navController = rememberNavController()
-        LibraryScreen(navController = navController)
+        LibraryScreen(navController = navController, viewModel = viewModel())
     }
 }
 
@@ -170,6 +199,6 @@ fun PreviewLibraryScreen() {
 fun PreviewLibraryScreenFr() {
     BookReadingAppTheme {
         val navController = rememberNavController()
-        LibraryScreen(navController = navController)
+        LibraryScreen(navController = navController, viewModel = viewModel())
     }
 }

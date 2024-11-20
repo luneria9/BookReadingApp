@@ -47,6 +47,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
@@ -91,7 +92,7 @@ fun NavigationHost(navController: NavHostController, viewModel: ReadingAppViewMo
         }
 
         composable(Library.route) {
-            LibraryScreen(navController)
+            LibraryScreen(navController, viewModel)
         }
 
         composable(Search.route) {
