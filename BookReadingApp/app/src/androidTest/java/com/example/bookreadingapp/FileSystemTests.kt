@@ -2,6 +2,8 @@ package com.example.bookreadingapp
 
 import android.content.Context
 import android.os.Environment
+import android.util.Log
+import androidx.lifecycle.MutableLiveData
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.example.bookreadingapp.fileSystem.FileSystem
@@ -89,7 +91,6 @@ class FileSystemTests {
         assertEquals(file.name, fileName)
     }
 
-    //Not working
     // Test to ensure that the downloadFile download file from URL and save it in the specified location
     @Test
     fun downloadFile() {

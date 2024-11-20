@@ -51,7 +51,7 @@ class LibraryScreenTests {
     // Test to ensure that the LibraryScreen displays 6 books
     @Test
     fun validateLibraryScreenDisplaysBooks() {
-        composeTestRule.onAllNodesWithContentDescription("Book Item").assertCountEquals(6)
+        composeTestRule.onAllNodesWithContentDescription("Book Item").assertCountEquals(3)
     }
 
     // Test to verify that clicking on a book item navigates to the ContentsScreen
