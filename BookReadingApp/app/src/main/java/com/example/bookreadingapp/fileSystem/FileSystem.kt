@@ -2,6 +2,7 @@ package com.example.bookreadingapp.fileSystem
 
 import android.content.Context
 import android.os.Environment
+import android.util.Log
 import java.io.File
 import java.io.FileOutputStream
 import java.io.InputStream
@@ -47,6 +48,23 @@ class FileSystem (private val context: Context){
         }
     }
 
+    fun unzipFile(fileName: String, destDirectory: String, zipDirectory: String): Boolean {
+        return try {
+            val zipFilesDirectory = File(context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS), zipDirectory)
+            val unzippedDirectory = File(context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS), destDirectory)
+
+            val zipFile = File("$zipFilesDirectory/$fileName")
+
+            File("$unzippedDirectory/images").mkdirs()
+
+            UnzipUtils.unzip(zipFile, "$unzippedDirectory")
+            true
+        } catch (e: Exception) {
+            e.printStackTrace()
+            false
+        }
+    }
+
     // Helper method to copy data from input to output stream
     private fun copyStream(input: InputStream, output: FileOutputStream) {
         val buffer = ByteArray(1024)
@@ -55,7 +73,6 @@ class FileSystem (private val context: Context){
             output.write(buffer, 0, length)
         }
     }
-
 
     // Delete directory contents directly without IntentSender
     fun deleteDirectoryContents(directoryName: String) {
