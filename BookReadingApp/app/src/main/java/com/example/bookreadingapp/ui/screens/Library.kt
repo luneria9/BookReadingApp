@@ -166,8 +166,7 @@ fun DownloadButton(
 private fun downloadBook(url: String, fileName: String, viewModel: ReadingAppViewModel) {
     val zipFileName = url.substringAfterLast("/")
 
-    viewModel.setupDownload(url)
-    viewModel.unzipFile(zipFileName, fileName)
+    viewModel.downloadUnzip(url, zipFileName, fileName)
 }
 
 @Preview(showBackground = true, showSystemUi = true)
