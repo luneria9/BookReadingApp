@@ -2,10 +2,12 @@ package com.example.bookreadingapp
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onAllNodesWithContentDescription
 import androidx.compose.ui.test.performClick
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -13,6 +15,8 @@ import com.example.bookreadingapp.ui.NavRoutes
 import com.example.bookreadingapp.ui.screens.ContentsScreen
 import com.example.bookreadingapp.ui.screens.LibraryScreen
 import com.example.bookreadingapp.ui.theme.BookReadingAppTheme
+import com.example.bookreadingapp.viewModels.ReadingAppViewModel
+import com.example.bookreadingapp.viewModels.ReadingAppViewModelFactory
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -29,9 +33,11 @@ class LibraryScreenTests {
         composeTestRule.setContent {
             BookReadingAppTheme {
                 val navController = rememberNavController()
+                val context = LocalContext.current
+                val viewModel: ReadingAppViewModel = viewModel(factory = ReadingAppViewModelFactory(context))
                 NavHost(navController = navController, startDestination = NavRoutes.Library.route) {
                     composable(NavRoutes.Library.route) {
-                        LibraryScreen(navController)
+                        LibraryScreen(navController = navController, viewModel = viewModel)
                     }
                     composable(NavRoutes.Contents.route) {
                         ContentsScreen()
