@@ -12,7 +12,6 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.navigation.compose.rememberNavController
 import androidx.test.core.app.ApplicationProvider
-import com.example.bookreadingapp.fileSystem.FileSystem
 import com.example.bookreadingapp.ui.NavBarItems
 import com.example.bookreadingapp.ui.theme.BookReadingAppTheme
 import com.example.bookreadingapp.viewModels.ReadingAppViewModel
