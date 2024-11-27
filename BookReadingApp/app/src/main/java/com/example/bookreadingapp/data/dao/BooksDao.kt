@@ -1,0 +1,19 @@
+package com.example.bookreadingapp.data.dao
+
+import androidx.lifecycle.LiveData
+import androidx.room.Dao
+import androidx.room.Insert
+import androidx.room.Query
+import com.example.bookreadingapp.data.entities.Books
+
+@Dao
+interface BooksDao {
+    @Insert
+    fun insertBook(book: Books)
+
+    @Query("SELECT * FROM books WHERE book_id = :bookId")
+    fun findBook(bookId: Int): List<Books>
+
+    @Query("SELECT * FROM books")
+    fun getAllBooks(): LiveData<List<Books>>
+}
