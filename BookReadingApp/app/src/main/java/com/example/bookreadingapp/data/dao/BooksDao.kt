@@ -12,7 +12,10 @@ interface BooksDao {
     fun insertBook(book: Books)
 
     @Query("SELECT * FROM books WHERE book_id = :bookId")
-    fun findBook(bookId: Int): List<Books>
+    fun findBookId(bookId: Int): List<Books>
+
+    @Query("SELECT DISTINCT * FROM books WHERE title = :bookTitle")
+    fun findBookTitle(bookTitle: String): List<Books>
 
     @Query("SELECT * FROM books")
     fun getAllBooks(): LiveData<List<Books>>
