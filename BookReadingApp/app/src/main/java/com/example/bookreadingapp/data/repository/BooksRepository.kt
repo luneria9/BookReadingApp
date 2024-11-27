@@ -21,12 +21,24 @@ class BooksRepository (private val dao: BooksDao){
         }
     }
 
-    fun findBookId(bookId: Int): Deferred<List<Books>> =
+    fun findBookId(bookId: Int) {
+        coroutineScope.launch(Dispatchers.Main) {
+            searchResults.value = asyncfindBookId(bookId).await()
+        }
+    }
+
+    fun findBookTitle(bookTitle: String) {
+        coroutineScope.launch(Dispatchers.Main) {
+            searchResults.value = asyncfindBookTitle(bookTitle).await()
+        }
+    }
+
+    private fun asyncfindBookId(bookId: Int): Deferred<List<Books>> =
         coroutineScope.async(Dispatchers.IO) {
             return@async dao.findBookId(bookId)
         }
 
-    fun findBookTitle(bookTitle: String): Deferred<List<Books>> =
+    private fun asyncfindBookTitle(bookTitle: String): Deferred<List<Books>> =
         coroutineScope.async(Dispatchers.IO) {
             return@async dao.findBookTitle(bookTitle)
         }

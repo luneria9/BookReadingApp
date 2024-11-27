@@ -18,5 +18,5 @@ interface SubChaptersDao {
     fun findSubChapterTitle(subChapterTitle: String): List<SubChapters>
 
     @Query("SELECT * FROM subchapters WHERE chapter_id = :chapterId")
-    fun getAllSubChapters(chapterId: Int): LiveData<List<SubChapters>>
+    fun getAllSubChapters(chapterId: Int): List<SubChapters>
 }

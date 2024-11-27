@@ -19,5 +19,5 @@ interface PagesDao {
     fun findPageNumber(pageNumber: Int): List<Pages>
 
     @Query("SELECT * FROM pages WHERE subchapter_id = :subChapterId")
-    fun getAllPages(subChapterId: Int): LiveData<List<Pages>>
+    fun getAllPages(subChapterId: Int): List<Pages>
 }

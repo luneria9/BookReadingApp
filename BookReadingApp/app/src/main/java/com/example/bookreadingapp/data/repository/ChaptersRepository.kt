@@ -20,17 +20,35 @@ class ChaptersRepository(private val dao: ChaptersDao) {
         }
     }
 
-    fun findChapterId(chapterId: Int): Deferred<List<Chapters>> =
+    fun findChapterId(id: Int) {
+        coroutineScope.launch(Dispatchers.Main) {
+            searchResults.value = asyncfindChapterId(id).await()
+        }
+    }
+
+    fun findChapterTitle(chapterTitle: String) {
+        coroutineScope.launch(Dispatchers.Main) {
+            searchResults.value = asyncfindChapterTitle(chapterTitle).await()
+        }
+    }
+
+    fun findChaptersOfBook(id: Int) {
+        coroutineScope.launch(Dispatchers.Main) {
+            searchResults.value = asyncfindChaptersOfBook(id).await()
+        }
+    }
+
+    private fun asyncfindChapterId(chapterId: Int): Deferred<List<Chapters>> =
         coroutineScope.async(Dispatchers.IO) {
             return@async dao.findChapterId(chapterId)
         }
 
-    fun findChapterTitle(chapterTitle: String): Deferred<List<Chapters>> =
+    private fun asyncfindChapterTitle(chapterTitle: String): Deferred<List<Chapters>> =
         coroutineScope.async(Dispatchers.IO) {
             return@async dao.findChapterTitle(chapterTitle)
         }
 
-    fun findChaptersOfBook(bookId: Int): Deferred<LiveData<List<Chapters>>> =
+    private fun asyncfindChaptersOfBook(bookId: Int): Deferred<List<Chapters>> =
         coroutineScope.async(Dispatchers.IO) {
             return@async dao.getAllChaptersFromBook(bookId)
         }

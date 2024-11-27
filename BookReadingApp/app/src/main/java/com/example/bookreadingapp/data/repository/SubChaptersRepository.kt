@@ -20,17 +20,35 @@ class SubChaptersRepository(private val dao: SubChaptersDao) {
         }
     }
 
-    fun findSubChapterId(subchapterId: Int): Deferred<List<SubChapters>> =
+    fun findSubChapterId(id: Int) {
+        coroutineScope.launch(Dispatchers.Main) {
+            searchResults.value = asyncfindSubChapterId(id).await()
+        }
+    }
+
+    fun findSubChapterTitle(title: String) {
+        coroutineScope.launch(Dispatchers.Main) {
+            searchResults.value = asyncfindSubChapterTitle(title).await()
+        }
+    }
+
+    fun findSubChaptersOfChapter(id: Int) {
+        coroutineScope.launch(Dispatchers.Main) {
+            searchResults.value = asyncfindSubChaptersOfChapter(id).await()
+        }
+    }
+
+    private fun asyncfindSubChapterId(subchapterId: Int): Deferred<List<SubChapters>> =
         coroutineScope.async(Dispatchers.IO) {
             return@async dao.findSubChapterId(subchapterId)
         }
 
-    fun findSubChapterTitle(subchapterTitle: String): Deferred<List<SubChapters>> =
+    private fun asyncfindSubChapterTitle(subchapterTitle: String): Deferred<List<SubChapters>> =
         coroutineScope.async(Dispatchers.IO) {
             return@async dao.findSubChapterTitle(subchapterTitle)
         }
 
-    fun findSubChaptersOfChapter(chapterId: Int): Deferred<LiveData<List<SubChapters>>> =
+    private fun asyncfindSubChaptersOfChapter(chapterId: Int): Deferred<List<SubChapters>> =
         coroutineScope.async(Dispatchers.IO) {
             return@async dao.getAllSubChapters(chapterId)
         }

@@ -7,16 +7,16 @@ import androidx.room.PrimaryKey
 // referenced from https://gitlab.com/crdavis/roomdatabasedemoproject
 @Entity(tableName = "images",
     foreignKeys = [ForeignKey(
-        entity = SubChapters::class,
-        childColumns = ["page_id"],
-        parentColumns = ["page_id"]
+        entity = Pages::class,
+        childColumns = ["pages_id"],
+        parentColumns = ["pages_id"]
     )])
 class Images {
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "image_id")
     var id: Int = 0
 
-    @ColumnInfo(name = "page_id")
+    @ColumnInfo(name = "pages_id")
     var pageId: Int = 0
 
     @ColumnInfo(name = "image_url")

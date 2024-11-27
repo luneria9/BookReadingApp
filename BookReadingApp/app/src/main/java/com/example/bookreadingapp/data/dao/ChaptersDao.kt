@@ -18,5 +18,5 @@ interface ChaptersDao {
     fun findChapterTitle(chapterTitle: String): List<Chapters>
 
     @Query("SELECT * FROM chapters WHERE book_id = :bookId")
-    fun getAllChaptersFromBook(bookId: Int): LiveData<List<Chapters>>
+    fun getAllChaptersFromBook(bookId: Int): List<Chapters>
 }

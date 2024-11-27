@@ -20,17 +20,35 @@ class PageRepository(private val dao: PagesDao) {
         }
     }
 
-    fun findPageId(pageId: Int): Deferred<List<Pages>> =
+    fun findPageId(id: Int) {
+        coroutineScope.launch(Dispatchers.Main) {
+            searchResults.value = asyncfindPageId(id).await()
+        }
+    }
+
+    fun findPageNumber(pageNumber: Int) {
+        coroutineScope.launch(Dispatchers.Main) {
+            searchResults.value = asyncfindPageNumber(pageNumber).await()
+        }
+    }
+
+    fun findPagesOfSubchapter(subchapterId: Int) {
+        coroutineScope.launch(Dispatchers.Main) {
+            searchResults.value = asyncfindPagesOfSubchapter(subchapterId).await()
+        }
+    }
+
+    private fun asyncfindPageId(pageId: Int): Deferred<List<Pages>> =
         coroutineScope.async(Dispatchers.IO) {
             return@async dao.findPageId(pageId)
         }
 
-    fun findPageNumber(pageNumber: Int): Deferred<List<Pages>> =
+    private fun asyncfindPageNumber(pageNumber: Int): Deferred<List<Pages>> =
         coroutineScope.async(Dispatchers.IO) {
             return@async dao.findPageNumber(pageNumber)
         }
 
-    fun findPagesOfSubchapter(subchapterId: Int): Deferred<LiveData<List<Pages>>> =
+    private fun asyncfindPagesOfSubchapter(subchapterId: Int): Deferred<List<Pages>> =
         coroutineScope.async(Dispatchers.IO) {
             return@async dao.getAllPages(subchapterId)
         }
