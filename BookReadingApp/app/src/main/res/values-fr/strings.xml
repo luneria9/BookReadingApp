@@ -9,7 +9,7 @@
     <string name="search">Rechercher</string>
     <string name="contents">Table des Matières</string>
     <string name="book_title">Titre du Livre</string>
-    <string name="reading_mode">Mode de Lecture</string>
+    <string name="reading_mode">Mode Lecture</string>
     <string name="read">Lire</string>
     <string name="table_of_contents">Table des Matières</string>
     <string name="title">Literala</string>
@@ -21,4 +21,6 @@
     <string name="drawer_item">élément du tiroir</string>
     <string name="library">Bibliothèque</string>
     <string name="download">Télécharger %s</string>
+    <string name="previous_chapter">&lt; Précédent</string>
+    <string name="next_chapter">Prochain &gt;</string>
 </resources>
