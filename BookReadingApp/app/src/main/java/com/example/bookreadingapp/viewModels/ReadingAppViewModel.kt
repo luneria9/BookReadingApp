@@ -183,4 +183,41 @@ class ReadingAppViewModel(private val fileSystem: FileSystem, application: Appli
     fun findImagesOfPage(id: Int){
         imagesRepository.findImagesOfPage(id)
     }
+
+//     for testing inserting
+    fun testAll() {
+        viewModelScope.launch(Dispatchers.Default){
+            val insertBook = launch(Dispatchers.IO){ insertBook(Books("test title", "test author", "test subject", "test date"))}
+            insertBook.join()
+            Log.d("insert", "book")
+            val insertChapter = launch(Dispatchers.IO) {insertChapter(Chapters("chapter1", 1))}
+            insertChapter.join()
+            Log.d("insert", "chapter")
+            val insertSubChapter = launch(Dispatchers.IO) {insertSubChapter(SubChapters("test subchapter", 1))}
+            insertSubChapter.join()
+            Log.d("insert", "subchapter")
+            val insertPage = launch(Dispatchers.IO){insertPage(Pages(1, 1, "test content"))}
+            insertPage.join()
+            Log.d("insert", "page")
+            val insertImage = launch(Dispatchers.IO){insertImage(Images(1, "url"))}
+            Log.d("insert", "image")
+        }
+    }
+
+    fun testFindId() {
+        booksRepository.findBookId(1)
+        chaptersRepository.findChapterId(1)
+        subchaptersRepository.findSubChapterId(1)
+        pagesRepository.findPageId(1)
+        imagesRepository.findImageId(1)
+    }
+
+    fun testFindAllOf() {
+        chaptersRepository.findChaptersOfBook(1)
+        subchaptersRepository.findSubChaptersOfChapter(1)
+        pagesRepository.findPagesOfSubchapter(1)
+        imagesRepository.findImagesOfPage(1)
+    }
+
+
 }

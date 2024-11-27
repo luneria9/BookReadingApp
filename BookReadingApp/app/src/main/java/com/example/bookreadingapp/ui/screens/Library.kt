@@ -1,5 +1,6 @@
 package com.example.bookreadingapp.ui.screens
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -19,6 +20,8 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -33,6 +36,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.bookreadingapp.R
+import com.example.bookreadingapp.data.entities.Books
 import com.example.bookreadingapp.ui.NavRoutes
 import com.example.bookreadingapp.ui.theme.BookReadingAppTheme
 import com.example.bookreadingapp.ui.theme.Typography
@@ -50,6 +54,11 @@ fun LibraryScreen(navController: NavController, viewModel: ReadingAppViewModel) 
 
     val bookTitles = stringArrayResource(R.array.book_titles)
     val bookUrls = stringArrayResource(R.array.book_urls)
+    val bookSearchResults by viewModel.searchResultsBooks.observeAsState(listOf())
+    val chapterSearchResults by viewModel.searchResultsChapters.observeAsState(listOf())
+    val subchapterSearchResults by viewModel.searchResultsSubChapters.observeAsState(listOf())
+    val pagesSearchResult by viewModel.searchResultsPages.observeAsState(listOf())
+    val imagesSearchResult by viewModel.searchResultsImages.observeAsState(listOf())
 
     Box(
         modifier = Modifier
@@ -70,9 +79,33 @@ fun LibraryScreen(navController: NavController, viewModel: ReadingAppViewModel) 
             for (i in bookTitles.indices) {
                 DownloadButton(
                     bookTitle = bookTitles[i],
-                    onClick = { downloadBook(bookUrls[i], bookTitles[i], viewModel = viewModel) }
+                    onClick = {
+                        downloadBook(bookUrls[i], bookTitles[i], viewModel = viewModel)
+
+                        // uncomment and also inside viewModel to test
+//                        viewModel.testAll()
+//                        viewModel.testFindId()
+//                        viewModel.testFindAllOf()
+                    }
                 )
             }
+
+            // test button
+//            Button(onClick = {
+////                Log.d("find", bookSearchResults[0].title)
+////                Log.d("find", chapterSearchResults[0].title)
+////                Log.d("find", subchapterSearchResults[0].title)
+////                Log.d("find", pagesSearchResult[0].contents)
+////                Log.d("find", imagesSearchResult[0].imageUrl)
+//
+////                Log.d("find", bookSearchResults.size.toString())
+////                Log.d("find", chapterSearchResults.size.toString())
+////                Log.d("find", subchapterSearchResults.size.toString())
+////                Log.d("find", pagesSearchResult.size.toString())
+////                Log.d("find", imagesSearchResult.size.toString())
+//            }) {
+//                Text(text = "log results")
+//            }
 
             Book(navController = navController)
         }
