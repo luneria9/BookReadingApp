@@ -4,7 +4,7 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
-
+// referenced from https://gitlab.com/crdavis/roomdatabasedemoproject
 @Entity(tableName = "subchapters",
     foreignKeys = [ForeignKey(
         entity = Chapters::class,

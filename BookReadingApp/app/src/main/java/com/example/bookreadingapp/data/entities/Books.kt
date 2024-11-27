@@ -5,7 +5,7 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
 import java.sql.Date
-
+// referenced from https://gitlab.com/crdavis/roomdatabasedemoproject
 @Entity(tableName = "books")
 class Books {
     @PrimaryKey(autoGenerate = true)

@@ -9,7 +9,7 @@ import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
-
+// referenced from https://gitlab.com/crdavis/roomdatabasedemoproject
 class SubChaptersRepository(private val dao: SubChaptersDao) {
     val searchResults = MutableLiveData<List<SubChapters>>()
     private val coroutineScope = CoroutineScope(Dispatchers.Main)

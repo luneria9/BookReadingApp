@@ -9,7 +9,7 @@ import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
-
+// referenced from https://gitlab.com/crdavis/roomdatabasedemoproject
 class BooksRepository (private val dao: BooksDao){
     val allBooks: LiveData<List<Books>> = dao.getAllBooks()
     val searchResults = MutableLiveData<List<Books>>()

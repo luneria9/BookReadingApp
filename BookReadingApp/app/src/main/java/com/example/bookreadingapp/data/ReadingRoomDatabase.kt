@@ -15,6 +15,7 @@ import com.example.bookreadingapp.data.entities.Images
 import com.example.bookreadingapp.data.entities.Pages
 import com.example.bookreadingapp.data.entities.SubChapters
 
+// referenced from https://gitlab.com/crdavis/roomdatabasedemoproject
 @Database (entities = [(Books::class), (Chapters::class), (SubChapters::class), (Pages::class), (Images::class)], version = 1)
 abstract class ReadingRoomDatabase : RoomDatabase(){
     abstract fun booksDao(): BooksDao

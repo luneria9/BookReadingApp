@@ -5,7 +5,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
 import com.example.bookreadingapp.data.entities.Books
-
+// referenced from https://gitlab.com/crdavis/roomdatabasedemoproject
 @Dao
 interface BooksDao {
     @Insert
