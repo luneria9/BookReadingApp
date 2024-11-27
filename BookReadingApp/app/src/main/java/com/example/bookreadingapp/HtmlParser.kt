@@ -25,76 +25,50 @@ fun readFile(paths: MutableList<String>) :String {
 var string = ""
 val unclosedTagList = mutableListOf<String>()
 
-// Create a handler
-val handler = KsoupHtmlHandler
-    .Builder()
-    .onOpenTag { name, _, _ ->
-        unclosedTagList.add(name)
-        if (unclosedTagList.lastOrNull() == "img") string += """
-            IMAGE PLACEHOLDER
-        """
-        if (unclosedTagList.lastOrNull() == "table") string += """
-            TABLE PLACEHOLDER
-        """
+// Function to handle open tags and add placeholders
+fun handleOpenTag(name: String) {
+    unclosedTagList.add(name)
+    when (unclosedTagList.lastOrNull()) {
+        "img" -> string += "\nIMAGE PLACEHOLDER"
+        "table" -> string += "\nTABLE PLACEHOLDER"
     }
-    .onText { text ->
-        if (text.isBlank()) return@onText
-        else if(unclosedTagList.lastOrNull() == "style") return@onText
-        else if (unclosedTagList.lastOrNull() == "script") return@onText
-        else if (unclosedTagList.lastOrNull() == "link") return@onText
-        else if (unclosedTagList.lastOrNull() == "meta") return@onText
-        else if (unclosedTagList.lastOrNull() == "th") return@onText
-        else if (unclosedTagList.lastOrNull() == "tr") return@onText
-        else if (unclosedTagList.lastOrNull() == "td") return@onText
-        else if (unclosedTagList.lastOrNull() == "tbody") return@onText
-        else if (unclosedTagList.lastOrNull() == "h1") string += """
-            
-            $text
-            
-        """
-        else if (unclosedTagList.lastOrNull() == "h1") string += """
-            
-            $text
-            
-        """
-        else if (unclosedTagList.lastOrNull() == "h2") string += """
-            
-            $text
-            
-        """
-        else if (unclosedTagList.lastOrNull() == "h3") string += """
-            
-            $text
-            
-        """
-        else if (unclosedTagList.lastOrNull() == "h4") string += """
-            
-            $text
-            
-        """
-        else if (unclosedTagList.lastOrNull() == "h5") string += """
-            
-            $text
-            
-        """
-        else if (unclosedTagList.lastOrNull() == "h6") string += """
-            
-            $text
-            
-            
-        """
-        else string += """
-            $text
-        """.trimIndent()
-    }
-    .onCloseTag { _, _ ->
-        if (unclosedTagList.lastOrNull() == "section") string += """
-            
-        """
-        unclosedTagList.removeLastOrNull()
+}
 
+// Function to handle text and filter based on tags
+fun handleText(text: String) {
+    if (text.isBlank()) return
+
+    when (unclosedTagList.lastOrNull()) {
+        "style", "script", "link", "meta", "th", "tr", "td", "tbody" -> return
+        else -> appendTextBasedOnTag(text)
     }
-    .build()
+}
+
+// Function to append text based on specific HTML tags
+fun appendTextBasedOnTag(text: String) {
+    when (unclosedTagList.lastOrNull()) {
+        "h1", "h2", "h3", "h4", "h5", "h6" -> string += "\n$text\n"
+        else -> string += "\n$text"
+    }
+}
+
+// Function to handle closing tags
+fun handleCloseTag() {
+    if (unclosedTagList.lastOrNull() == "section") {
+        string += "\n"
+    }
+    unclosedTagList.removeLastOrNull()
+}
+
+// Function to initialize and return the KsoupHtmlHandler
+fun createKsoupHandler(): KsoupHtmlHandler {
+    return KsoupHtmlHandler
+        .Builder()
+        .onOpenTag { name, _, _ -> handleOpenTag(name) }
+        .onText { text -> handleText(text) }
+        .onCloseTag { _, _ -> handleCloseTag() }
+        .build()
+}
 
 @RequiresApi(Build.VERSION_CODES.O)
 fun main() {
@@ -106,7 +80,7 @@ fun main() {
     val htmlstring = readFile(list)
     // Create a parser
     val ksoupHtmlParser = KsoupHtmlParser(
-        handler = handler,
+        handler = createKsoupHandler(),
     )
 
     ksoupHtmlParser.write(htmlstring)
@@ -116,4 +90,3 @@ fun main() {
 
     println(string)
 }
-

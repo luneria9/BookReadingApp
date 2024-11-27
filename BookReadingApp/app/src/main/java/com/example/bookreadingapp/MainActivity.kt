@@ -3,9 +3,11 @@
 package com.example.bookreadingapp
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -40,19 +42,27 @@ import com.example.bookreadingapp.ui.screens.*
 import com.example.bookreadingapp.ui.utils.AdaptiveNavigationType
 import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass as calculateWindowSizeClass1
 import androidx.compose.material3.Scaffold
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import com.example.bookreadingapp.fileSystem.FileSystem
 import com.example.bookreadingapp.ui.NavRoutes
 import com.example.bookreadingapp.ui.theme.BookReadingAppTheme
 import com.example.bookreadingapp.viewModels.ReadingAppViewModel
+import com.example.bookreadingapp.viewModels.ReadingAppViewModelFactory
+import java.nio.file.Paths
 
 
 class MainActivity : ComponentActivity() {
+    private val viewModel: ReadingAppViewModel by viewModels {
+        ReadingAppViewModelFactory(this.applicationContext) // Use application context to prevent memory leaks
+    }
     @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -63,6 +73,7 @@ class MainActivity : ComponentActivity() {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     BookReadingApp(
                         windowSizeClass = windowSize.widthSizeClass,
+                        viewModel = viewModel,
                         modifier = Modifier.padding(innerPadding)
                     )
                 }
@@ -81,7 +92,7 @@ fun NavigationHost(navController: NavHostController, viewModel: ReadingAppViewMo
         }
 
         composable(Library.route) {
-            LibraryScreen(navController)
+            LibraryScreen(navController, viewModel)
         }
 
         composable(Search.route) {
@@ -121,7 +132,6 @@ fun BookReadingApp(
 ) {
     val navController = rememberNavController()
     val adaptiveNavigationType = getAdaptiveNavigationType(windowSizeClass)
-
     BookReadingScaffold(navController, adaptiveNavigationType, viewModel)
 }
 

@@ -6,7 +6,9 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -22,28 +24,33 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.bookreadingapp.R
 import com.example.bookreadingapp.ui.NavRoutes
 import com.example.bookreadingapp.ui.theme.BookReadingAppTheme
 import com.example.bookreadingapp.ui.theme.Typography
+import com.example.bookreadingapp.viewModels.ReadingAppViewModel
 
 // Referred to https://developer.android.com/codelabs/basic-android-kotlin-compose-material-theming#6
 @Composable
-fun LibraryScreen(navController: NavController) {
+fun LibraryScreen(navController: NavController, viewModel: ReadingAppViewModel) {
     // Sample list of book images
     val sampleBooks = listOf(
         R.drawable.ic_launcher_foreground,
         R.drawable.ic_launcher_foreground,
-        R.drawable.ic_launcher_foreground,
-        R.drawable.ic_launcher_foreground,
-        R.drawable.ic_launcher_foreground,
         R.drawable.ic_launcher_foreground
     )
+
+    val bookTitles = stringArrayResource(R.array.book_titles)
+    val bookUrls = stringArrayResource(R.array.book_urls)
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -57,9 +64,30 @@ fun LibraryScreen(navController: NavController) {
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
+            LibraryTitle()
             BookGrid(sampleBooks, navController)
+
+            for (i in bookTitles.indices) {
+                DownloadButton(
+                    bookTitle = bookTitles[i],
+                    onClick = { downloadBook(bookUrls[i], bookTitles[i], viewModel = viewModel) }
+                )
+            }
+
             Book(navController = navController)
         }
+    }
+}
+
+// The header title that displays Library indicating this is the library screen
+@Composable
+fun LibraryTitle(modifier: Modifier = Modifier) {
+    Row(
+        modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center
+    ) {
+        Text(stringResource(R.string.library), fontSize = dimensionResource(R.dimen.font_big).value.sp)
     }
 }
 
@@ -139,12 +167,38 @@ fun BookItem(
     }
 }
 
+@Composable
+fun DownloadButton(
+    bookTitle: String,
+    onClick: () -> Unit
+) {
+    Button(
+        onClick = onClick
+    ) {
+        Text(text = stringResource(R.string.download, bookTitle))
+    }
+}
+
+private fun downloadBook(url: String, fileName: String, viewModel: ReadingAppViewModel) {
+    val zipFileName = url.substringAfterLast("/")
+
+    viewModel.downloadUnzip(url, zipFileName, fileName)
+}
 
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun PreviewLibraryScreen() {
     BookReadingAppTheme {
         val navController = rememberNavController()
-        LibraryScreen(navController = navController)
+        LibraryScreen(navController = navController, viewModel = viewModel())
+    }
+}
+
+@Composable
+@Preview(showBackground = true, locale = "fr")
+fun PreviewLibraryScreenFr() {
+    BookReadingAppTheme {
+        val navController = rememberNavController()
+        LibraryScreen(navController = navController, viewModel = viewModel())
     }
 }

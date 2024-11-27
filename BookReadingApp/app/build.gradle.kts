@@ -5,11 +5,11 @@ plugins {
 
 android {
     namespace = "com.example.bookreadingapp"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.example.bookreadingapp"
-        minSdk = 24
+        minSdk = 30
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
@@ -58,18 +58,24 @@ dependencies {
     implementation(libs.androidx.material3)
     implementation ("androidx.navigation:navigation-compose:2.5.3")
     implementation(libs.androidx.junit.ktx)
+    implementation(libs.androidx.runtime.livedata)
     testImplementation(libs.junit)
     testImplementation(libs.androidx.ui.test.junit4.android)
     testImplementation(libs.androidx.ui.test.android)
     testImplementation(libs.androidx.ui.test.android)
     testImplementation(libs.androidx.ui.test.junit4.android)
+    testImplementation("org.mockito:mockito-core:5.7.0")
+    testImplementation("org.mockito:mockito-inline:5.7.0")
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.ui.test.junit4)
+    androidTestImplementation("org.mockito:mockito-android:5.7.0")
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
     implementation("com.mohamedrejeb.ksoup:ksoup-html:0.4.0")
     implementation("com.mohamedrejeb.ksoup:ksoup-entities:0.4.0")
     implementation("org.jsoup:jsoup:1.14.3")
+    implementation("com.squareup.okhttp3:okhttp:4.11.0")
+
 }

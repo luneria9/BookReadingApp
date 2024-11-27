@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">ApplicationDeLectureDeLivres</string>
+    <string name="welcome_title">Bienvenue dans le Lecteur de Livres</string>
+    <string name="welcome_message">Explorez des manuels disponibles gratuitement avec des images et des tableaux. Profitez d\'une navigation fluide sur différents écrans !</string>
+    <string name="go_to_library">Aller à la Bibliothèque</string>
+    <string name="home_screen_image">Image de l\'Écran d\'Accueil</string>
+    <string name="search_for_books">Rechercher des livres</string>
+    <string name="search">Rechercher</string>
+    <string name="contents">Table des Matières</string>
+    <string name="book_title">Titre du Livre</string>
+    <string name="reading_mode">Mode de Lecture</string>
+    <string name="read">Lire</string>
+    <string name="table_of_contents">Table des Matières</string>
+    <string name="title">Literala</string>
+    <string name="bottom_nav_bar">barre de navigation inférieure</string>
+    <string name="side_nav_rail">rail de navigation latérale</string>
+    <string name="permanent_nav_drawer">tiroir de navigation latéral permanent</string>
+    <string name="nav_bar_item">élément de la barre de navigation</string>
+    <string name="perm_nav">navigation permanente</string>
+    <string name="drawer_item">élément du tiroir</string>
+    <string name="library">Bibliothèque</string>
+    <string name="download">Télécharger %s</string>
+</resources>
