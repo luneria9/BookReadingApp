@@ -51,17 +51,19 @@ import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import com.example.bookreadingapp.data.entities.Books
 import com.example.bookreadingapp.fileSystem.FileSystem
 import com.example.bookreadingapp.ui.NavRoutes
 import com.example.bookreadingapp.ui.theme.BookReadingAppTheme
 import com.example.bookreadingapp.viewModels.ReadingAppViewModel
 import com.example.bookreadingapp.viewModels.ReadingAppViewModelFactory
 import java.nio.file.Paths
+import kotlin.math.log
 
 
 class MainActivity : ComponentActivity() {
     private val viewModel: ReadingAppViewModel by viewModels {
-        ReadingAppViewModelFactory(this.applicationContext) // Use application context to prevent memory leaks
+        ReadingAppViewModelFactory(this.applicationContext, application) // Use application context to prevent memory leaks
     }
     @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
