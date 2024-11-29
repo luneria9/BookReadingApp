@@ -45,20 +45,8 @@ import com.example.bookreadingapp.viewModels.ReadingAppViewModel
 // Referred to https://developer.android.com/codelabs/basic-android-kotlin-compose-material-theming#6
 @Composable
 fun LibraryScreen(navController: NavController, viewModel: ReadingAppViewModel) {
-    // Sample list of book images
-    val sampleBooks = listOf(
-        R.drawable.ic_launcher_foreground,
-        R.drawable.ic_launcher_foreground,
-        R.drawable.ic_launcher_foreground
-    )
-
-    val bookTitles = stringArrayResource(R.array.book_titles)
-    val bookUrls = stringArrayResource(R.array.book_urls)
-    val bookSearchResults by viewModel.searchResultsBooks.observeAsState(listOf())
-    val chapterSearchResults by viewModel.searchResultsChapters.observeAsState(listOf())
-    val subchapterSearchResults by viewModel.searchResultsSubChapters.observeAsState(listOf())
-    val pagesSearchResult by viewModel.searchResultsPages.observeAsState(listOf())
-    val imagesSearchResult by viewModel.searchResultsImages.observeAsState(listOf())
+    // Observe the list of books from the ViewModel
+    val books by viewModel.allBooks.observeAsState(emptyList())
 
     Box(
         modifier = Modifier
@@ -74,39 +62,20 @@ fun LibraryScreen(navController: NavController, viewModel: ReadingAppViewModel) 
             verticalArrangement = Arrangement.Center
         ) {
             LibraryTitle()
-            BookGrid(sampleBooks, navController)
+            BookGrid(books, navController)
+
+            // Sample URLs and Titles for Download Buttons
+            val bookTitles = stringArrayResource(R.array.book_titles)
+            val bookUrls = stringArrayResource(R.array.book_urls)
 
             for (i in bookTitles.indices) {
                 DownloadButton(
                     bookTitle = bookTitles[i],
                     onClick = {
                         downloadBook(bookUrls[i], bookTitles[i], viewModel = viewModel)
-
-                        // uncomment and also inside viewModel to test
-//                        viewModel.testAll()
-//                        viewModel.testFindId()
-//                        viewModel.testFindAllOf()
                     }
                 )
             }
-
-            // test button
-//            Button(onClick = {
-////                Log.d("find", bookSearchResults[0].title)
-////                Log.d("find", chapterSearchResults[0].title)
-////                Log.d("find", subchapterSearchResults[0].title)
-////                Log.d("find", pagesSearchResult[0].contents)
-////                Log.d("find", imagesSearchResult[0].imageUrl)
-//
-////                Log.d("find", bookSearchResults.size.toString())
-////                Log.d("find", chapterSearchResults.size.toString())
-////                Log.d("find", subchapterSearchResults.size.toString())
-////                Log.d("find", pagesSearchResult.size.toString())
-////                Log.d("find", imagesSearchResult.size.toString())
-//            }) {
-//                Text(text = "log results")
-//            }
-
             Book(navController = navController)
         }
     }
@@ -126,14 +95,14 @@ fun LibraryTitle(modifier: Modifier = Modifier) {
 
 // Function to display the grid of books
 @Composable
-fun BookGrid(sampleBooks: List<Int>, navController: NavController) {
+fun BookGrid(books: List<Books>, navController: NavController) {
     LazyVerticalGrid(
         columns = GridCells.Fixed(3),
         contentPadding = PaddingValues(dimensionResource(R.dimen.padding_medium))
     ) {
-        items(sampleBooks) {
+        items(books) {
             BookItem(it) {
-                navController.navigate(NavRoutes.Reading.route)
+                navController.navigate(NavRoutes.Contents.route)
             }
         }
     }
@@ -182,7 +151,7 @@ fun ContentsButton(navController: NavController) {
 // Composable function for individual book items
 @Composable
 fun BookItem(
-    bookImg: Int,
+    book: Books,
     onClick: () -> Unit
 ) {
     Card(
@@ -190,13 +159,12 @@ fun BookItem(
             .padding(dimensionResource(R.dimen.spacer_small))
             .clickable(onClick = onClick)
     ) {
-        Image(
-            painter = painterResource(bookImg),
-            contentDescription = "Book Item",
-            modifier = Modifier
-                .size(100.dp)
-                .clip(RoundedCornerShape(dimensionResource(R.dimen.spacer_small)))
-        )
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Text(text = book.title, style = Typography.labelLarge)
+            Text(text = book.author, style = Typography.labelLarge)
+            Text(text = book.subject, style = Typography.labelMedium)
+            Text(text = book.date, style = Typography.labelSmall)
+        }
     }
 }
 
@@ -221,15 +189,6 @@ private fun downloadBook(url: String, fileName: String, viewModel: ReadingAppVie
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun PreviewLibraryScreen() {
-    BookReadingAppTheme {
-        val navController = rememberNavController()
-        LibraryScreen(navController = navController, viewModel = viewModel())
-    }
-}
-
-@Composable
-@Preview(showBackground = true, locale = "fr")
-fun PreviewLibraryScreenFr() {
     BookReadingAppTheme {
         val navController = rememberNavController()
         LibraryScreen(navController = navController, viewModel = viewModel())
