@@ -3,12 +3,14 @@ package com.example.bookreadingapp.ui.screens
 import android.util.Log
 import coil.compose.rememberImagePainter
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -19,10 +21,13 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -31,24 +36,27 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.example.bookreadingapp.R
 import com.example.bookreadingapp.data.entities.Books
 import com.example.bookreadingapp.ui.NavRoutes
 import com.example.bookreadingapp.ui.theme.BookReadingAppTheme
 import com.example.bookreadingapp.ui.theme.Typography
 import com.example.bookreadingapp.viewModels.ReadingAppViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
+import com.example.bookreadingapp.R
 
 // Referred to https://developer.android.com/codelabs/basic-android-kotlin-compose-material-theming#6
 @Composable
 fun LibraryScreen(navController: NavController, viewModel: ReadingAppViewModel) {
-    // Observe the list of books from the ViewModel
-    val books by viewModel.allBooks.observeAsState(emptyList())
+    val scope = rememberCoroutineScope()
+    val books by viewModel.allBooks.observeAsState(listOf())
 
     Box(
         modifier = Modifier
@@ -61,36 +69,135 @@ fun LibraryScreen(navController: NavController, viewModel: ReadingAppViewModel) 
                 .fillMaxSize()
                 .padding(top = dimensionResource(R.dimen.padding_medium)),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.SpaceBetween
+            verticalArrangement = Arrangement.Top
         ) {
             LibraryTitle()
-            Box(
+
+            // Grid of Books
+            LazyVerticalGrid(
+                columns = GridCells.Fixed(3),
+                contentPadding = PaddingValues(8.dp),
                 modifier = Modifier
-                    .weight(1f)  // Added weight
+                    .weight(1f)
                     .fillMaxWidth()
             ) {
-                BookGrid(books, navController, viewModel)
-            }
-
-            // Wrap buttons section in a Column with padding
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 16.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                val bookTitles = stringArrayResource(R.array.book_titles)
-                val bookUrls = stringArrayResource(R.array.book_urls)
-
-                for (i in bookTitles.indices) {
-                    DownloadButton(
-                        bookTitle = bookTitles[i],
-                        onClick = {
-                            downloadBook(bookUrls[i], bookTitles[i], viewModel = viewModel)
+                items(books) { book ->
+                    BookCard(
+                        book = book,
+                        onBookClick = {
+                            navController.navigate(NavRoutes.Contents.route)
                         }
                     )
                 }
-                Book(navController = navController)
+            }
+
+            DownloadSection(viewModel, scope)
+        }
+    }
+}
+
+@Composable
+fun DownloadSection(viewModel: ReadingAppViewModel, scope: CoroutineScope) {
+    val bookTitles = stringArrayResource(R.array.book_titles)
+    val bookUrls = stringArrayResource(R.array.book_urls)
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        for (i in bookTitles.indices) {
+            DownloadButton(
+                bookTitle = bookTitles[i],
+                onClick = {
+                    scope.launch {
+                        downloadBook(bookUrls[i], bookTitles[i], viewModel)
+                    }
+                },
+                modifier = Modifier.weight(1f)
+            )
+        }
+    }
+}
+
+@Composable
+fun BookCard(
+    book: Books,
+    onBookClick: () -> Unit
+) {
+    Card(
+        modifier = Modifier
+            .padding(8.dp)
+            .fillMaxWidth()
+            .aspectRatio(0.7f)
+            .clickable(onClick = onBookClick),
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = 4.dp
+        )
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(8.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(4.dp)
+        ) {
+            // Book Cover
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth()
+                    .background(
+                        MaterialTheme.colorScheme.secondaryContainer,
+                        RoundedCornerShape(4.dp)
+                    ),
+                contentAlignment = Alignment.Center
+            ) {
+                // Placeholder image if no cover available
+                Image(
+                    painter = painterResource(id = R.drawable.book_icon),
+                    contentDescription = "Book Cover",
+                    modifier = Modifier.size(64.dp)
+                )
+            }
+
+            // Book Information
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = book.title,
+                    style = MaterialTheme.typography.titleMedium,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
+                    textAlign = TextAlign.Center
+                )
+
+                Text(
+                    text = "by ${book.author}",
+                    style = MaterialTheme.typography.bodySmall,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    textAlign = TextAlign.Center
+                )
+
+                Text(
+                    text = book.subject,
+                    style = MaterialTheme.typography.bodySmall,
+                    overflow = TextOverflow.Ellipsis,
+                    color = MaterialTheme.colorScheme.secondary,
+                    textAlign = TextAlign.Center
+                )
+
+                Text(
+                    text = book.date,
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.tertiary,
+                    textAlign = TextAlign.Center
+                )
             }
         }
     }
@@ -116,7 +223,7 @@ fun BookGrid(books: List<Books>, navController: NavController, viewModel: Readin
         contentPadding = PaddingValues(dimensionResource(R.dimen.padding_medium))
     ) {
         items(books) {
-            BookItem(it, viewModel) {
+            BookItem(it) {
                 navController.navigate(NavRoutes.Contents.route)
             }
         }
@@ -167,12 +274,8 @@ fun ContentsButton(navController: NavController) {
 @Composable
 fun BookItem(
     book: Books,
-    viewModel: ReadingAppViewModel,
     onClick: () -> Unit
 ) {
-    val images by viewModel.imagesRepository.searchResults.observeAsState(emptyList())
-    val imageUrl = images.find { it.pageId == book.id }?.imageUrl ?: R.drawable.ic_launcher_foreground
-
     Card(
         modifier = Modifier
             .padding(dimensionResource(R.dimen.spacer_small))
@@ -184,13 +287,6 @@ fun BookItem(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            Image(
-                painter = rememberImagePainter(imageUrl),
-                contentDescription = "Book Cover",
-                modifier = Modifier
-                    .size(100.dp)
-                    .clip(RoundedCornerShape(dimensionResource(R.dimen.spacer_small)))
-            )
             Text(
                 text = book.title,
                 style = Typography.titleMedium,
@@ -213,12 +309,17 @@ fun BookItem(
 @Composable
 fun DownloadButton(
     bookTitle: String,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
     Button(
-        onClick = onClick
+        onClick = onClick,
+        modifier = modifier
     ) {
-        Text(text = stringResource(R.string.download, bookTitle))
+        Text(
+            text = stringResource(R.string.download, bookTitle),
+            overflow = TextOverflow.Ellipsis
+        )
     }
 }
 
