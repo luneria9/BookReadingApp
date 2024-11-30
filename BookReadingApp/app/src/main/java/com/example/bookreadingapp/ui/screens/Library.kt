@@ -72,25 +72,7 @@ fun LibraryScreen(navController: NavController, viewModel: ReadingAppViewModel) 
             verticalArrangement = Arrangement.Top
         ) {
             LibraryTitle()
-
-            // Grid of Books
-            LazyVerticalGrid(
-                columns = GridCells.Fixed(3),
-                contentPadding = PaddingValues(8.dp),
-                modifier = Modifier
-                    .weight(1f)
-                    .fillMaxWidth()
-            ) {
-                items(books) { book ->
-                    BookCard(
-                        book = book,
-                        onBookClick = {
-                            navController.navigate(NavRoutes.Contents.route)
-                        }
-                    )
-                }
-            }
-
+            BookGrid(books = books, navController = navController)
             DownloadSection(viewModel, scope)
         }
     }
@@ -104,7 +86,7 @@ fun DownloadSection(viewModel: ReadingAppViewModel, scope: CoroutineScope) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 8.dp),
+            .padding(dimensionResource(id = R.dimen.padding_small)),
         horizontalArrangement = Arrangement.spacedBy(8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -129,78 +111,100 @@ fun BookCard(
 ) {
     Card(
         modifier = Modifier
-            .padding(8.dp)
+            .padding(dimensionResource(id = R.dimen.padding_small))
             .fillMaxWidth()
             .aspectRatio(0.7f)
             .clickable(onClick = onBookClick),
         elevation = CardDefaults.cardElevation(
-            defaultElevation = 4.dp
+            defaultElevation = dimensionResource(id = R.dimen.spacer_small)
         )
     ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(8.dp),
+                .padding(dimensionResource(id = R.dimen.padding_small)),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(4.dp)
+            verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.spacer_small))
         ) {
-            // Book Cover
-            Box(
-                modifier = Modifier
-                    .weight(1f)
-                    .fillMaxWidth()
-                    .background(
-                        MaterialTheme.colorScheme.secondaryContainer,
-                        RoundedCornerShape(4.dp)
-                    ),
-                contentAlignment = Alignment.Center
-            ) {
-                // Placeholder image if no cover available
-                Image(
-                    painter = painterResource(id = R.drawable.book_icon),
-                    contentDescription = "Book Cover",
-                    modifier = Modifier.size(64.dp)
-                )
-            }
-
-            // Book Information
-            Column(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Text(
-                    text = book.title,
-                    style = MaterialTheme.typography.titleMedium,
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis,
-                    textAlign = TextAlign.Center
-                )
-
-                Text(
-                    text = "by ${book.author}",
-                    style = MaterialTheme.typography.bodySmall,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    textAlign = TextAlign.Center
-                )
-
-                Text(
-                    text = book.subject,
-                    style = MaterialTheme.typography.bodySmall,
-                    overflow = TextOverflow.Ellipsis,
-                    color = MaterialTheme.colorScheme.secondary,
-                    textAlign = TextAlign.Center
-                )
-
-                Text(
-                    text = book.date,
-                    style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.tertiary,
-                    textAlign = TextAlign.Center
-                )
-            }
+            BookCover()
+            BookInformation(book)
         }
     }
+}
+
+@Composable
+fun BookCover() {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(
+                MaterialTheme.colorScheme.secondaryContainer,
+                RoundedCornerShape(dimensionResource(id = R.dimen.spacer_small))
+            ),
+        contentAlignment = Alignment.Center
+    ) {
+        Image(
+            painter = painterResource(id = R.drawable.book_icon),
+            contentDescription = "Book Cover",
+            modifier = Modifier.size(dimensionResource(id = R.dimen.font_big))
+        )
+    }
+}
+
+@Composable
+fun BookInformation(book: Books) {
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        BookDetails(book)
+        BookMetadata(book)
+    }
+}
+
+@Composable
+fun BookDetails(book: Books) {
+    Text(
+        text = book.title,
+        style = MaterialTheme.typography.titleMedium.copy(
+            fontSize = dimensionResource(id = R.dimen.font_medium_small).value.sp
+        ),
+        maxLines = 2,
+        overflow = TextOverflow.Ellipsis,
+        textAlign = TextAlign.Center
+    )
+
+    Text(
+        text = "by ${book.author}",
+        style = MaterialTheme.typography.bodySmall.copy(
+            fontSize = dimensionResource(id = R.dimen.font_small).value.sp
+        ),
+        maxLines = 1,
+        overflow = TextOverflow.Ellipsis,
+        textAlign = TextAlign.Center
+    )
+}
+
+@Composable
+fun BookMetadata(book: Books) {
+    Text(
+        text = book.subject,
+        style = MaterialTheme.typography.bodySmall.copy(
+            fontSize = dimensionResource(id = R.dimen.font_small).value.sp
+        ),
+        overflow = TextOverflow.Ellipsis,
+        color = MaterialTheme.colorScheme.secondary,
+        textAlign = TextAlign.Center
+    )
+
+    Text(
+        text = book.date,
+        style = MaterialTheme.typography.labelSmall.copy(
+            fontSize = dimensionResource(id = R.dimen.font_small).value.sp
+        ),
+        color = MaterialTheme.colorScheme.tertiary,
+        textAlign = TextAlign.Center
+    )
 }
 
 // The header title that displays Library indicating this is the library screen
@@ -217,15 +221,19 @@ fun LibraryTitle(modifier: Modifier = Modifier) {
 
 // Function to display the grid of books
 @Composable
-fun BookGrid(books: List<Books>, navController: NavController, viewModel: ReadingAppViewModel) {
+fun BookGrid(books: List<Books>, navController: NavController) {
     LazyVerticalGrid(
         columns = GridCells.Fixed(3),
-        contentPadding = PaddingValues(dimensionResource(R.dimen.padding_medium))
+        contentPadding = PaddingValues(dimensionResource(R.dimen.padding_medium)),
+        modifier = Modifier.fillMaxWidth()
     ) {
-        items(books) {
-            BookItem(it) {
-                navController.navigate(NavRoutes.Contents.route)
-            }
+        items(books) { book ->
+            BookCard(
+                book = book,
+                onBookClick = {
+                    navController.navigate(NavRoutes.Contents.route)
+                }
+            )
         }
     }
 }
@@ -267,42 +275,6 @@ fun ContentsButton(navController: NavController) {
             text = stringResource(R.string.table_of_contents),
             style = Typography.labelLarge
         )
-    }
-}
-
-// Composable function for individual book items
-@Composable
-fun BookItem(
-    book: Books,
-    onClick: () -> Unit
-) {
-    Card(
-        modifier = Modifier
-            .padding(dimensionResource(R.dimen.spacer_small))
-            .size(150.dp)
-            .clickable(onClick = onClick)
-    ) {
-        Column(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
-            Text(
-                text = book.title,
-                style = Typography.titleMedium,
-                textAlign = TextAlign.Center
-            )
-            Text(
-                text = book.subject,
-                style = Typography.bodyMedium,
-                textAlign = TextAlign.Center
-            )
-            Text(
-                text = book.date,
-                style = Typography.bodySmall,
-                textAlign = TextAlign.Center
-            )
-        }
     }
 }
 
