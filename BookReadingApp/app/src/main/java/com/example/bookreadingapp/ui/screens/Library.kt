@@ -1,5 +1,6 @@
 package com.example.bookreadingapp.ui.screens
 
+import android.os.Environment
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -25,9 +26,12 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringArrayResource
@@ -40,6 +44,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import coil.compose.AsyncImage
 import com.example.bookreadingapp.data.entities.Books
 import com.example.bookreadingapp.ui.NavRoutes
 import com.example.bookreadingapp.ui.theme.BookReadingAppTheme
@@ -48,6 +53,7 @@ import com.example.bookreadingapp.viewModels.ReadingAppViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import com.example.bookreadingapp.R
+import java.io.File
 
 // Referred to https://developer.android.com/codelabs/basic-android-kotlin-compose-material-theming#6
 @Composable
@@ -108,6 +114,17 @@ fun BookCard(
     book: Books,
     onBookClick: () -> Unit
 ) {
+    val context = LocalContext.current
+    val coverPath = remember(book.id) {
+        val bookDir = "${context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS)}/${book.title}"
+        File(bookDir).walkTopDown()
+            .find { file ->
+                file.name.endsWith("-cover.png", ignoreCase = true) ||
+                        file.name.endsWith("-cover.jpg", ignoreCase = true)
+            }
+            ?.absolutePath ?: ""
+    }
+
     Card(
         modifier = Modifier
             .padding(dimensionResource(id = R.dimen.padding_small))
@@ -125,14 +142,14 @@ fun BookCard(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.spacer_small))
         ) {
-            BookCover()
+            BookCover(coverPath)
             BookInformation(book)
         }
     }
 }
 
 @Composable
-fun BookCover() {
+fun BookCover(coverPath: String) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -142,11 +159,22 @@ fun BookCover() {
             ),
         contentAlignment = Alignment.Center
     ) {
-        Image(
-            painter = painterResource(id = R.drawable.book_icon),
-            contentDescription = "Book Cover",
-            modifier = Modifier.size(dimensionResource(id = R.dimen.font_big))
-        )
+        if (coverPath.isNotEmpty() && File(coverPath).exists()) {
+            AsyncImage(
+                model = coverPath,
+                contentDescription = "Book Cover",
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .aspectRatio(0.75f),
+                contentScale = ContentScale.Fit
+            )
+        } else {
+            Image(
+                painter = painterResource(id = R.drawable.book_icon),
+                contentDescription = "Book Cover",
+                modifier = Modifier.size(dimensionResource(id = R.dimen.font_big))
+            )
+        }
     }
 }
 

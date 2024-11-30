@@ -34,6 +34,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
+import java.io.File
 import kotlin.coroutines.resume
 
 class ReadingAppViewModel(private val fileSystem: FileSystem, application: Application) : ViewModel() {
@@ -83,6 +84,15 @@ class ReadingAppViewModel(private val fileSystem: FileSystem, application: Appli
             // Parse and insert the book data
             parseAndInsert(mutableListOf("$unzippedPath/index.html"))
         }
+    }
+
+    private fun getCoverImagePath(bookDirectory: String): String {
+        val dir = File(bookDirectory)
+        return dir.walkTopDown()
+            .find { file ->
+                file.name.endsWith("-cover.png", ignoreCase = true) || file.name.endsWith("-cover.jpg", ignoreCase = true)
+            }
+            ?.absolutePath ?: ""
     }
 
     private fun updateDirectoryContents(directoryName: String) {
