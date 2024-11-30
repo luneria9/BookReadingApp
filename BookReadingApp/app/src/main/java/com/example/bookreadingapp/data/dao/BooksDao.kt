@@ -19,4 +19,7 @@ interface BooksDao {
 
     @Query("SELECT * FROM books")
     fun getAllBooks(): LiveData<List<Books>>
+
+    @Insert
+    fun insertBookAwait(book: Books) : Long
 }

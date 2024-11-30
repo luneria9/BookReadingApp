@@ -20,4 +20,7 @@ interface PagesDao {
 
     @Query("SELECT * FROM pages WHERE subchapter_id = :subChapterId")
     fun getAllPages(subChapterId: Int): List<Pages>
+
+    @Insert
+    fun insertPageAwait(pages: Pages): Long
 }
