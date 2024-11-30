@@ -8,6 +8,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 // referenced from https://gitlab.com/crdavis/roomdatabasedemoproject
 class PageRepository(private val dao: PagesDao) {
@@ -30,6 +31,10 @@ class PageRepository(private val dao: PagesDao) {
         coroutineScope.launch(Dispatchers.Main) {
             searchResults.value = asyncfindPageNumber(pageNumber).await()
         }
+    }
+
+    fun insertPageAsync(page: Pages): Long {
+        return dao.insertPageAwait(page)
     }
 
     fun findPagesOfSubchapter(subchapterId: Int) {

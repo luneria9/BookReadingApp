@@ -38,6 +38,10 @@ class SubChaptersRepository(private val dao: SubChaptersDao) {
         }
     }
 
+    fun insertSubChapterAsync(subChapters: SubChapters): Long {
+        return dao.insertSubChapterAwait(subChapters)
+    }
+
     fun asyncfindSubChapterId(subchapterId: Int): Deferred<List<SubChapters>> =
         coroutineScope.async(Dispatchers.IO) {
             return@async dao.findSubChapterId(subchapterId)

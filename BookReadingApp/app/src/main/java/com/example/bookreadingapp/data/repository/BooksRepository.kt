@@ -40,6 +40,10 @@ class BooksRepository (private val dao: BooksDao){
         }
     }
 
+    fun insertBookAsync(books: Books): Long {
+        return dao.insertBookAwait(books)
+    }
+
     fun asyncfindBookId(bookId: Int): Deferred<List<Books>> =
         coroutineScope.async(Dispatchers.IO) {
             return@async dao.findBookId(bookId)
