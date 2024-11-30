@@ -75,7 +75,15 @@ fun LibraryScreen(navController: NavController, viewModel: ReadingAppViewModel) 
             verticalArrangement = Arrangement.Top
         ) {
             LibraryTitle()
-            BookGrid(books = books, navController = navController)
+
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f)
+                    .padding(vertical = dimensionResource(R.dimen.padding_small))
+            ) {
+                BookGrid(books = books, navController = navController)
+            }
             DownloadSection(viewModel, scope)
         }
     }
@@ -90,8 +98,8 @@ fun DownloadSection(viewModel: ReadingAppViewModel, scope: CoroutineScope) {
         modifier = Modifier
             .fillMaxWidth()
             .padding(dimensionResource(id = R.dimen.padding_small)),
-        verticalArrangement = Arrangement.spacedBy(8.dp), // Spacing between buttons
-        horizontalAlignment = Alignment.CenterHorizontally // Center the buttons
+        verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.spacer_small)),
+        horizontalAlignment = Alignment.CenterHorizontally 
     ) {
         for (i in bookTitles.indices) {
             DownloadButton(
@@ -140,10 +148,26 @@ fun BookCard(
                 .fillMaxSize()
                 .padding(dimensionResource(id = R.dimen.padding_small)),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.spacer_small))
+            verticalArrangement = Arrangement.Top
         ) {
-            BookCover(coverPath)
-            BookInformation(book)
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(0.7f),
+                contentAlignment = Alignment.Center
+            ) {
+                BookCover(coverPath)
+            }
+
+            // Information container - takes 30% of card height
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(0.3f),
+                contentAlignment = Alignment.Center
+            ) {
+                BookInformation(book)
+            }
         }
     }
 }
@@ -153,6 +177,7 @@ fun BookCover(coverPath: String) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
+            .padding(dimensionResource(id = R.dimen.padding_small))
             .background(
                 MaterialTheme.colorScheme.secondaryContainer,
                 RoundedCornerShape(dimensionResource(id = R.dimen.spacer_small))
@@ -165,7 +190,7 @@ fun BookCover(coverPath: String) {
                 contentDescription = "Book Cover",
                 modifier = Modifier
                     .fillMaxWidth()
-                    .aspectRatio(0.75f),
+                    .padding(dimensionResource(id = R.dimen.padding_small)),
                 contentScale = ContentScale.Fit
             )
         } else {
@@ -181,8 +206,11 @@ fun BookCover(coverPath: String) {
 @Composable
 fun BookInformation(book: Books) {
     Column(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalAlignment = Alignment.CenterHorizontally
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = dimensionResource(id = R.dimen.padding_small)),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(2.dp)
     ) {
         BookDetails(book)
         BookMetadata(book)
@@ -194,7 +222,7 @@ fun BookDetails(book: Books) {
     Text(
         text = book.title,
         style = MaterialTheme.typography.titleMedium.copy(
-            fontSize = dimensionResource(id = R.dimen.font_medium_small).value.sp
+            fontSize = dimensionResource(id = R.dimen.font_very_small).value.sp
         ),
         maxLines = 2,
         overflow = TextOverflow.Ellipsis,
@@ -204,7 +232,7 @@ fun BookDetails(book: Books) {
     Text(
         text = "by ${book.author}",
         style = MaterialTheme.typography.bodySmall.copy(
-            fontSize = dimensionResource(id = R.dimen.font_small).value.sp
+            fontSize = dimensionResource(id = R.dimen.font_very_small).value.sp
         ),
         maxLines = 1,
         overflow = TextOverflow.Ellipsis,
@@ -217,7 +245,7 @@ fun BookMetadata(book: Books) {
     Text(
         text = book.subject,
         style = MaterialTheme.typography.bodySmall.copy(
-            fontSize = dimensionResource(id = R.dimen.font_small).value.sp
+            fontSize = dimensionResource(id = R.dimen.font_very_small).value.sp
         ),
         overflow = TextOverflow.Ellipsis,
         color = MaterialTheme.colorScheme.secondary,
@@ -227,7 +255,7 @@ fun BookMetadata(book: Books) {
     Text(
         text = book.date,
         style = MaterialTheme.typography.labelSmall.copy(
-            fontSize = dimensionResource(id = R.dimen.font_small).value.sp
+            fontSize = dimensionResource(id = R.dimen.font_very_small).value.sp
         ),
         color = MaterialTheme.colorScheme.tertiary,
         textAlign = TextAlign.Center
