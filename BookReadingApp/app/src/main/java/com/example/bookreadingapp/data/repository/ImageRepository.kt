@@ -33,12 +33,12 @@ class ImageRepository(private val dao: ImagesDao) {
         }
     }
 
-    private fun asyncfindImageId(imageId: Int): Deferred<List<Images>> =
+    fun asyncfindImageId(imageId: Int): Deferred<List<Images>> =
         coroutineScope.async(Dispatchers.IO) {
             return@async dao.findImage(imageId)
         }
 
-    private fun asyncfindImagesOfPage(pageId: Int): Deferred<List<Images>> =
+    fun asyncfindImagesOfPage(pageId: Int): Deferred<List<Images>> =
         coroutineScope.async(Dispatchers.IO) {
             return@async dao.getAllImages(pageId)
         }
