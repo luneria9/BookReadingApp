@@ -1,7 +1,5 @@
 package com.example.bookreadingapp.ui.screens
 
-import android.util.Log
-import coil.compose.rememberImagePainter
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -30,7 +28,6 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringArrayResource
@@ -83,12 +80,12 @@ fun DownloadSection(viewModel: ReadingAppViewModel, scope: CoroutineScope) {
     val bookTitles = stringArrayResource(R.array.book_titles)
     val bookUrls = stringArrayResource(R.array.book_urls)
 
-    Row(
+    Column(
         modifier = Modifier
             .fillMaxWidth()
             .padding(dimensionResource(id = R.dimen.padding_small)),
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-        verticalAlignment = Alignment.CenterVertically
+        verticalArrangement = Arrangement.spacedBy(8.dp), // Spacing between buttons
+        horizontalAlignment = Alignment.CenterHorizontally // Center the buttons
     ) {
         for (i in bookTitles.indices) {
             DownloadButton(
@@ -98,7 +95,9 @@ fun DownloadSection(viewModel: ReadingAppViewModel, scope: CoroutineScope) {
                         downloadBook(bookUrls[i], bookTitles[i], viewModel)
                     }
                 },
-                modifier = Modifier.weight(1f)
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = dimensionResource(id = R.dimen.padding_medium)),
             )
         }
     }
@@ -295,7 +294,7 @@ fun DownloadButton(
     }
 }
 
-private fun downloadBook(url: String, fileName: String, viewModel: ReadingAppViewModel) {
+private suspend fun downloadBook(url: String, fileName: String, viewModel: ReadingAppViewModel) {
     val zipFileName = url.substringAfterLast("/")
 
     viewModel.downloadUnzip(url, zipFileName, fileName)

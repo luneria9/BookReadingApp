@@ -67,11 +67,21 @@ class ReadingAppViewModel(private val fileSystem: FileSystem, application: Appli
             }
     }
 
-    fun downloadUnzip(url: String, fileName: String, destDirectory: String) {
-        viewModelScope.launch(Dispatchers.Default){
+    suspend fun downloadUnzip(url: String, fileName: String, destDirectory: String) {
+        viewModelScope.launch(Dispatchers.Default) {
+            // Download file
             val downloadJob = launch(Dispatchers.IO) { setupDownload(url) }
             downloadJob.join()
+
+            // Unzip file
             val unzipJob = launch(Dispatchers.Default) { unzipFile(fileName, destDirectory) }
+            unzipJob.join()
+
+            // Get the path of the unzipped HTML file
+            val unzippedPath = "${applicationContext.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS)}/$destDirectory"
+
+            // Parse and insert the book data
+            parseAndInsert(mutableListOf("$unzippedPath/index.html"))
         }
     }
 
@@ -254,7 +264,7 @@ class ReadingAppViewModel(private val fileSystem: FileSystem, application: Appli
         imagesRepository.findImagesOfPage(id)
     }
 
-//     for testing inserting
+    //     for testing inserting
     fun testAll() {
         viewModelScope.launch(Dispatchers.Default){
             val insertBook = launch(Dispatchers.IO){ insertBook(Books("test title", "test author", "test subject", "test date"))}
@@ -288,7 +298,6 @@ class ReadingAppViewModel(private val fileSystem: FileSystem, application: Appli
         pagesRepository.findPagesOfSubchapter(1)
         imagesRepository.findImagesOfPage(1)
     }
-
 
     fun parseAndInsert(listOfPaths: MutableList<String>){
         val directory = this.applicationContext.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS).toString()+"/Physics/pg40175-images.html";
