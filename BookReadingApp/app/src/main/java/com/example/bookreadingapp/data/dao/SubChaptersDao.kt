@@ -19,4 +19,7 @@ interface SubChaptersDao {
 
     @Query("SELECT * FROM subchapters WHERE chapter_id = :chapterId")
     fun getAllSubChapters(chapterId: Int): List<SubChapters>
+
+    @Insert
+    fun insertSubChapterAwait(subChapters: SubChapters): Long
 }

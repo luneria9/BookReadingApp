@@ -8,6 +8,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 // referenced from https://gitlab.com/crdavis/roomdatabasedemoproject
 class PageRepository(private val dao: PagesDao) {
@@ -32,23 +33,27 @@ class PageRepository(private val dao: PagesDao) {
         }
     }
 
+    fun insertPageAsync(page: Pages): Long {
+        return dao.insertPageAwait(page)
+    }
+
     fun findPagesOfSubchapter(subchapterId: Int) {
         coroutineScope.launch(Dispatchers.Main) {
             searchResults.value = asyncfindPagesOfSubchapter(subchapterId).await()
         }
     }
 
-    private fun asyncfindPageId(pageId: Int): Deferred<List<Pages>> =
+    fun asyncfindPageId(pageId: Int): Deferred<List<Pages>> =
         coroutineScope.async(Dispatchers.IO) {
             return@async dao.findPageId(pageId)
         }
 
-    private fun asyncfindPageNumber(pageNumber: Int): Deferred<List<Pages>> =
+    fun asyncfindPageNumber(pageNumber: Int): Deferred<List<Pages>> =
         coroutineScope.async(Dispatchers.IO) {
             return@async dao.findPageNumber(pageNumber)
         }
 
-    private fun asyncfindPagesOfSubchapter(subchapterId: Int): Deferred<List<Pages>> =
+    fun asyncfindPagesOfSubchapter(subchapterId: Int): Deferred<List<Pages>> =
         coroutineScope.async(Dispatchers.IO) {
             return@async dao.getAllPages(subchapterId)
         }
