@@ -1,6 +1,7 @@
 package com.example.bookreadingapp.ui.screens
 
 import android.util.Log
+import coil.compose.rememberImagePainter
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -29,6 +30,7 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -59,24 +61,37 @@ fun LibraryScreen(navController: NavController, viewModel: ReadingAppViewModel) 
                 .fillMaxSize()
                 .padding(top = dimensionResource(R.dimen.padding_medium)),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+            verticalArrangement = Arrangement.SpaceBetween
         ) {
             LibraryTitle()
-            BookGrid(books, navController)
-
-            // Sample URLs and Titles for Download Buttons
-            val bookTitles = stringArrayResource(R.array.book_titles)
-            val bookUrls = stringArrayResource(R.array.book_urls)
-
-            for (i in bookTitles.indices) {
-                DownloadButton(
-                    bookTitle = bookTitles[i],
-                    onClick = {
-                        downloadBook(bookUrls[i], bookTitles[i], viewModel = viewModel)
-                    }
-                )
+            Box(
+                modifier = Modifier
+                    .weight(1f)  // Added weight
+                    .fillMaxWidth()
+            ) {
+                BookGrid(books, navController, viewModel)
             }
-            Book(navController = navController)
+
+            // Wrap buttons section in a Column with padding
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                val bookTitles = stringArrayResource(R.array.book_titles)
+                val bookUrls = stringArrayResource(R.array.book_urls)
+
+                for (i in bookTitles.indices) {
+                    DownloadButton(
+                        bookTitle = bookTitles[i],
+                        onClick = {
+                            downloadBook(bookUrls[i], bookTitles[i], viewModel = viewModel)
+                        }
+                    )
+                }
+                Book(navController = navController)
+            }
         }
     }
 }
@@ -95,13 +110,13 @@ fun LibraryTitle(modifier: Modifier = Modifier) {
 
 // Function to display the grid of books
 @Composable
-fun BookGrid(books: List<Books>, navController: NavController) {
+fun BookGrid(books: List<Books>, navController: NavController, viewModel: ReadingAppViewModel) {
     LazyVerticalGrid(
         columns = GridCells.Fixed(3),
         contentPadding = PaddingValues(dimensionResource(R.dimen.padding_medium))
     ) {
         items(books) {
-            BookItem(it) {
+            BookItem(it, viewModel) {
                 navController.navigate(NavRoutes.Contents.route)
             }
         }
@@ -152,18 +167,45 @@ fun ContentsButton(navController: NavController) {
 @Composable
 fun BookItem(
     book: Books,
+    viewModel: ReadingAppViewModel,
     onClick: () -> Unit
 ) {
+    val images by viewModel.imagesRepository.searchResults.observeAsState(emptyList())
+    val imageUrl = images.find { it.pageId == book.id }?.imageUrl ?: R.drawable.ic_launcher_foreground
+
     Card(
         modifier = Modifier
             .padding(dimensionResource(R.dimen.spacer_small))
+            .size(150.dp)
             .clickable(onClick = onClick)
     ) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Text(text = book.title, style = Typography.labelLarge)
-            Text(text = book.author, style = Typography.labelLarge)
-            Text(text = book.subject, style = Typography.labelMedium)
-            Text(text = book.date, style = Typography.labelSmall)
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Image(
+                painter = rememberImagePainter(imageUrl),
+                contentDescription = "Book Cover",
+                modifier = Modifier
+                    .size(100.dp)
+                    .clip(RoundedCornerShape(dimensionResource(R.dimen.spacer_small)))
+            )
+            Text(
+                text = book.title,
+                style = Typography.titleMedium,
+                textAlign = TextAlign.Center
+            )
+            Text(
+                text = book.subject,
+                style = Typography.bodyMedium,
+                textAlign = TextAlign.Center
+            )
+            Text(
+                text = book.date,
+                style = Typography.bodySmall,
+                textAlign = TextAlign.Center
+            )
         }
     }
 }

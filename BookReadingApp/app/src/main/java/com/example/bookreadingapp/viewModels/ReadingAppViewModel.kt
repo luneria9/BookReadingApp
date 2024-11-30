@@ -79,7 +79,7 @@ class ReadingAppViewModel(private val fileSystem: FileSystem, application: Appli
     private val chaptersRepository: ChaptersRepository
     private val subchaptersRepository: SubChaptersRepository
     private val pagesRepository: PageRepository
-    private val imagesRepository: ImageRepository
+    val imagesRepository: ImageRepository
     val searchResultsBooks: MutableLiveData<List<Books>>
     val searchResultsChapters: MutableLiveData<List<Chapters>>
     val searchResultsSubChapters: MutableLiveData<List<SubChapters>>
