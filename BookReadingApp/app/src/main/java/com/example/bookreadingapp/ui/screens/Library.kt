@@ -41,6 +41,7 @@ import com.example.bookreadingapp.ui.NavRoutes
 import com.example.bookreadingapp.ui.theme.BookReadingAppTheme
 import com.example.bookreadingapp.ui.theme.Typography
 import com.example.bookreadingapp.viewModels.ReadingAppViewModel
+import java.nio.file.Paths
 
 // Referred to https://developer.android.com/codelabs/basic-android-kotlin-compose-material-theming#6
 @Composable
@@ -91,7 +92,7 @@ fun LibraryScreen(navController: NavController, viewModel: ReadingAppViewModel) 
             }
 
             // test button
-//            Button(onClick = {
+            Button(onClick = {
 ////                Log.d("find", bookSearchResults[0].title)
 ////                Log.d("find", chapterSearchResults[0].title)
 ////                Log.d("find", subchapterSearchResults[0].title)
@@ -103,9 +104,13 @@ fun LibraryScreen(navController: NavController, viewModel: ReadingAppViewModel) 
 ////                Log.d("find", subchapterSearchResults.size.toString())
 ////                Log.d("find", pagesSearchResult.size.toString())
 ////                Log.d("find", imagesSearchResult.size.toString())
-//            }) {
-//                Text(text = "log results")
-//            }
+
+                // this is app path change
+//                Log.d("directory", viewModel.directoryContents.toString())
+                viewModel.parseAndInsert(mutableListOf(), )
+            }) {
+                Text(text = "log results")
+            }
 
             Book(navController = navController)
         }

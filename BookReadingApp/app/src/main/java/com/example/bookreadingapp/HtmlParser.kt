@@ -1,16 +1,25 @@
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import com.example.bookreadingapp.data.entities.Books
 import com.example.bookreadingapp.data.entities.Chapters
+import com.example.bookreadingapp.data.entities.Images
 import com.example.bookreadingapp.data.entities.Pages
 import com.example.bookreadingapp.data.entities.SubChapters
+import com.example.bookreadingapp.viewModels.ReadingAppViewModel
+import com.example.bookreadingapp.viewModels.ReadingAppViewModelFactory
 import com.mohamedrejeb.ksoup.html.parser.KsoupHtmlHandler
 import com.mohamedrejeb.ksoup.html.parser.KsoupHtmlParser
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import java.io.File
 import java.nio.file.Paths
 import java.util.Scanner
 
-class HtmlParser () {
+class HtmlParser (viewModel: ReadingAppViewModel) {
     var html = StringBuilder()
     var string = ""
     private fun readFile(paths: MutableList<String>) :String {
@@ -47,9 +56,12 @@ class HtmlParser () {
     private var currentSubChapter = SubChapters()
     private var currentPage = Pages()
     private var imageUrl = ""
+    private var numOfPages = 1
+    private var identifier = 0
+
 
     // Function to handle open tags and add placeholders
-    private fun handleOpenTag(name: String, attributes: Map<String, String>) {
+    private fun handleOpenTag(name: String, attributes: Map<String, String>, viewModel: ReadingAppViewModel) {
         unclosedTagList.add(name)
         // getting the title, authors, data and subject
         if (unclosedTagList.lastOrNull() == "meta"){
@@ -71,13 +83,27 @@ class HtmlParser () {
         if (bookStarted == false){
             if (attributes["id"] == "pg-start-separator"){
                 bookStarted = true
+
+                // gets all the author names puts in a string with commas seperating except last
+                var authorsString = ""
+                for (author in authors) {
+                    authorsString += "$author,"
+                }
+                authorsString.dropLast(1)
+
+
+                // add job to insert and then get retrieve the book
+                val result = runBlocking {
+                    viewModel.asyncInsertAndReturnBook(Books(title, authorsString, subject, release))
+                }
+                currentBook = result
             }
         }
 
         when (unclosedTagList.lastOrNull()) {
-            "img" -> string += {
+            "img" -> {
+                string += "\nIMAGE PLACEHOLDER"
                 imageUrl = attributes["src"].toString()
-                "\nIMAGE PLACEHOLDER"
             }
             "table" -> {
                 string += "\n<TABLE>"
@@ -112,102 +138,169 @@ class HtmlParser () {
     }
 
     // Function to handle closing tags
-    private fun handleCloseTag() {
-        if (unclosedTagList.lastOrNull() == "section") {
-            string += "\n"
-        }
-        if (unclosedTagList.lastOrNull() == "section") {
-            string += "</TABLE>"
-            content += "</TABLE>"
-        }
-        // add item to database depending on what is closing
-        // close on image or header or section or table
+    private fun handleCloseTag(viewModel: ReadingAppViewModel) {
 
-        when (unclosedTagList.lastOrNull()) {
-            "h1", "h2", "h3" -> {
-                // TODO add Chapter and while loop until job is finished
+        if (bookStarted) {
+            if (unclosedTagList.lastOrNull() == "section") {
+                string += "\n"
             }
-        }
-        when (unclosedTagList.lastOrNull()) {
-            "h4", "h5", "h6" -> {
-                // TODO add SubChapter
+            if (unclosedTagList.lastOrNull() == "section") {
+                string += "</TABLE>"
+                content += "</TABLE>"
             }
-        }
-        when (unclosedTagList.lastOrNull()) {
-            "section", "div", "p" -> {
-                // TODO add Pages
-            }
-        }
-        when (unclosedTagList.lastOrNull()) {
-            "image" -> {
-                // TODO add Image ref to page
-            }
-        }
+            // add item to database depending on what is closing
+            // close on image or header or section or table
 
+            when (unclosedTagList.lastOrNull()) {
+                "h1", "h2" -> {
+                    // add chapter
+                    val result = runBlocking {
+                        viewModel.asyncInsertAndReturnChapter(Chapters(itemTitle, currentBook.id)
+                        )
+                    }
+                    // set reference to chapter so subchapter can use it
+                    currentChapter = result
+
+                    // resets subchapter and pages so we don't write to another chapter
+                    currentSubChapter = SubChapters()
+                    currentPage = Pages()
+                }
+            }
+            when (unclosedTagList.lastOrNull()) {
+                "h3", "h4", "h5", "h6" -> {
+                    // check if there is no previous chapter if so add placeholder to database
+                    if(currentChapter.title == "") {
+                        val result = runBlocking {
+                            viewModel.asyncInsertAndReturnChapter(
+                                Chapters("PLACEHOLDER CHAPTER$identifier", currentBook.id)
+                            )
+                        }
+                        identifier++
+                        currentChapter = result
+                    }
+                    // add subchapter
+                    val result = runBlocking {
+                        viewModel.asyncInsertAndReturnSubChapter(
+                            SubChapters(itemTitle, currentChapter.id)
+                        )
+                    }
+                    // add reference to subchapter for pages
+                    currentSubChapter = result
+
+                    // reset pages so we don't write to another subchapter
+                    currentPage = Pages()
+                }
+            }
+            when (unclosedTagList.lastOrNull()) {
+                "section", "div", "p" -> {
+                    // check if chapter and subchapter are empty if so add placeholders so database respect format
+                    if(currentChapter.title == "") {
+                        val result = runBlocking {
+                            viewModel.asyncInsertAndReturnChapter(
+                                Chapters("PLACEHOLDER CHAPTER$identifier", currentBook.id))
+                        }
+                        identifier++
+                        currentChapter = result
+                    }
+                    if(currentSubChapter.title == "") {
+                        val result = runBlocking {
+                            viewModel.asyncInsertAndReturnSubChapter(
+                                SubChapters("PLACEHOLDER SUBCHAPTER$identifier", currentChapter.id)
+                            )
+                        }
+                        identifier++
+                        currentSubChapter = result
+                    }
+                    // add the page
+                    val result = runBlocking {
+                        viewModel.asyncInsertAndReturnPages(
+                            Pages(currentSubChapter.id, numOfPages, content)
+                        )
+                    }
+
+                    // set reference so image can use id
+                    currentPage = result
+                    content = ""
+                    numOfPages++
+                }
+            }
+            when (unclosedTagList.lastOrNull()) {
+                // images is always going to end up at the end of a page
+                "image" -> {
+                    // check if chapter and subchapter are empty if so add placeholders so database respect format
+                    if(currentChapter.title == "") {
+                        val result = runBlocking {
+                            viewModel.asyncInsertAndReturnChapter(
+                                Chapters("PLACEHOLDER CHAPTER$identifier", currentBook.id))
+                        }
+                        identifier++
+                        currentChapter = result
+                    }
+                    if(currentSubChapter.title == "") {
+                        val result = runBlocking {
+                            viewModel.asyncInsertAndReturnSubChapter(
+                                SubChapters("PLACEHOLDER SUBCHAPTER$identifier", currentChapter.id)
+                            )
+                        }
+                        identifier++
+                        currentSubChapter = result
+                    }
+                    if(currentPage.pageNumber == 0) {
+                        val result = runBlocking {
+                            viewModel.asyncInsertAndReturnPages(
+                                Pages(currentSubChapter.id, numOfPages, "PLACEHOLDER$identifier",)
+                            )
+                        }
+                        identifier++
+                        content = ""
+                        currentPage = result
+                        numOfPages++
+                    }
+                    viewModel.insertImage(Images(currentPage.id, imageUrl))
+                }
+            }
+        }
         unclosedTagList.removeLastOrNull()
 
 
     }
 
     // Function to initialize and return the KsoupHtmlHandler
-    private fun createKsoupHandler(): KsoupHtmlHandler {
+    private fun createKsoupHandler(viewModel: ReadingAppViewModel): KsoupHtmlHandler {
         return KsoupHtmlHandler
             .Builder()
-            .onOpenTag { name, attributes, _ -> handleOpenTag(name, attributes) }
+            .onOpenTag { name, attributes, _ -> handleOpenTag(name, attributes, viewModel = viewModel) }
             .onText { text -> handleText(text) }
-            .onCloseTag { _, _ -> handleCloseTag() }
+            .onCloseTag { _, _ -> handleCloseTag(viewModel = viewModel) }
             .build()
     }
 
-    fun parse(listOfPaths: MutableList<String>): String {
-//        val htmlstring = readFile(listOfPaths)
-        val htmlstring = "" +
-                "<meta name=\"dc.title\" content=\"Physics\">\n" +
-                "<meta name=\"dc.language\" content=\"en\">\n" +
-                "<meta name=\"dcterms.source\" content=\"https://www.gutenberg.org/files/40175/40175-h/40175-h.htm\">\n" +
-                "<meta name=\"dcterms.modified\" content=\"2024-11-17T09:41:45.035897+00:00\">\n" +
-                "<meta name=\"dc.rights\" content=\"Public domain in the USA.\">\n" +
-                "<link rel=\"dcterms.isFormatOf\" href=\"http://www.gutenberg.org/ebooks/40175\">\n" +
-                "<meta name=\"dc.creator\" content=\"Tower, Willis E. (Willis Eugene), 1871-\">\n" +
-                "<meta name=\"dc.creator\" content=\"Cope, Thomas D. (Thomas Darlington), 1880-1964\">\n" +
-                "<meta name=\"dc.creator\" content=\"Smith, Charles H. (Charles Henry), 1861-1926\">\n" +
-                "<meta name=\"dc.creator\" content=\"Turton, Charles M. (Charles Mark), 1861-1937\">\n" +
-                "<meta name=\"dc.subject\" content=\"Physics\">\n" +
-                "<meta name=\"dcterms.created\" content=\"2012-07-09\">\n" +
-                "<meta name=\"generator\" content=\"Ebookmaker 0.12.47 by Project Gutenberg\">\n" +
-                "<meta property=\"og:title\" content=\"Physics\">\n" +
-                "<meta property=\"og:type\" content=\"Text\">\n" +
-                "<meta property=\"og:url\" content=\"https://www.gutenberg.org/cache/epub/40175/pg40175-images.html\">\n" +
-                "<meta property=\"og:image\" content=\"https://www.gutenberg.org/cache/epub/40175/pg40175.cover.medium.jpg\">"
+    fun parse(listOfPaths: MutableList<String>, viewModel: ReadingAppViewModel): String {
+        val htmlString = readFile(listOfPaths)
         string = ""
         unclosedTagList.clear()
         // Create a parser
         val ksoupHtmlParser = KsoupHtmlParser(
-            handler = createKsoupHandler(),
+            handler = createKsoupHandler(viewModel),
         )
 
-        ksoupHtmlParser.write(htmlstring)
+        ksoupHtmlParser.write(htmlString)
 
         // Close the parser when you are done
         ksoupHtmlParser.end()
-
-        println(title)
-        println(subject)
-        println(release)
-        println(authors)
         return string
     }
 }
 
-fun main() {
-    // REPLACE WITH PATH
-    // does not replace <i>
-    val path = Paths.get("./app/src/main/assets/book1.html").toAbsolutePath().toString()
-    val path2 = Paths.get("./app/src/main/assets/book2.html").toAbsolutePath().toString()
-    val list : MutableList<String> = mutableListOf(path, path2)
-    val parser = HtmlParser()
-
-    var string = parser.parse(list)
-
-    println(string)
-}
+//fun main() {
+//    // REPLACE WITH PATH
+//    // does not replace <i>
+//    val path = Paths.get("./app/src/main/assets/book1.html").toAbsolutePath().toString()
+//    val path2 = Paths.get("./app/src/main/assets/book2.html").toAbsolutePath().toString()
+//    val list : MutableList<String> = mutableListOf(path, path2)
+//    val parser = HtmlParser(ReadingAppViewModelFactory)
+//
+//    var string = parser.parse(list)
+//
+//    println(string)
+//}
