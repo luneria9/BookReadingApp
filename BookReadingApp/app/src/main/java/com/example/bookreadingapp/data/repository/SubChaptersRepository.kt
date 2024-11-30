@@ -38,17 +38,21 @@ class SubChaptersRepository(private val dao: SubChaptersDao) {
         }
     }
 
-    private fun asyncfindSubChapterId(subchapterId: Int): Deferred<List<SubChapters>> =
+    fun insertSubChapterAsync(subChapters: SubChapters): Long {
+        return dao.insertSubChapterAwait(subChapters)
+    }
+
+    fun asyncfindSubChapterId(subchapterId: Int): Deferred<List<SubChapters>> =
         coroutineScope.async(Dispatchers.IO) {
             return@async dao.findSubChapterId(subchapterId)
         }
 
-    private fun asyncfindSubChapterTitle(subchapterTitle: String): Deferred<List<SubChapters>> =
+    fun asyncfindSubChapterTitle(subchapterTitle: String): Deferred<List<SubChapters>> =
         coroutineScope.async(Dispatchers.IO) {
             return@async dao.findSubChapterTitle(subchapterTitle)
         }
 
-    private fun asyncfindSubChaptersOfChapter(chapterId: Int): Deferred<List<SubChapters>> =
+    fun asyncfindSubChaptersOfChapter(chapterId: Int): Deferred<List<SubChapters>> =
         coroutineScope.async(Dispatchers.IO) {
             return@async dao.getAllSubChapters(chapterId)
         }

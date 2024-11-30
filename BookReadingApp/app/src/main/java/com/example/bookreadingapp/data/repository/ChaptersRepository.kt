@@ -38,17 +38,21 @@ class ChaptersRepository(private val dao: ChaptersDao) {
         }
     }
 
-    private fun asyncfindChapterId(chapterId: Int): Deferred<List<Chapters>> =
+    fun insertChapterAsync(chapters: Chapters): Long {
+        return dao.insertChapterAwait(chapters)
+    }
+
+    fun asyncfindChapterId(chapterId: Int): Deferred<List<Chapters>> =
         coroutineScope.async(Dispatchers.IO) {
             return@async dao.findChapterId(chapterId)
         }
 
-    private fun asyncfindChapterTitle(chapterTitle: String): Deferred<List<Chapters>> =
+    fun asyncfindChapterTitle(chapterTitle: String): Deferred<List<Chapters>> =
         coroutineScope.async(Dispatchers.IO) {
             return@async dao.findChapterTitle(chapterTitle)
         }
 
-    private fun asyncfindChaptersOfBook(bookId: Int): Deferred<List<Chapters>> =
+    fun asyncfindChaptersOfBook(bookId: Int): Deferred<List<Chapters>> =
         coroutineScope.async(Dispatchers.IO) {
             return@async dao.getAllChaptersFromBook(bookId)
         }

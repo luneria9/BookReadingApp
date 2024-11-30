@@ -1,5 +1,6 @@
 package com.example.bookreadingapp.data.repository
 
+import android.media.Image
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.example.bookreadingapp.data.dao.ImagesDao
@@ -27,18 +28,22 @@ class ImageRepository(private val dao: ImagesDao) {
         }
     }
 
+    fun insertImageAsync(image: Images): Long {
+        return dao.insertImageAwait(image)
+    }
+
     fun findImagesOfPage(id: Int) {
         coroutineScope.launch(Dispatchers.Main) {
             searchResults.value = asyncfindImagesOfPage(id).await()
         }
     }
 
-    private fun asyncfindImageId(imageId: Int): Deferred<List<Images>> =
+    fun asyncfindImageId(imageId: Int): Deferred<List<Images>> =
         coroutineScope.async(Dispatchers.IO) {
             return@async dao.findImage(imageId)
         }
 
-    private fun asyncfindImagesOfPage(pageId: Int): Deferred<List<Images>> =
+    fun asyncfindImagesOfPage(pageId: Int): Deferred<List<Images>> =
         coroutineScope.async(Dispatchers.IO) {
             return@async dao.getAllImages(pageId)
         }

@@ -17,4 +17,7 @@ interface ImagesDao {
 
     @Query("SELECT * FROM images WHERE pages_id = :pageId")
     fun getAllImages(pageId: Int): List<Images>
+
+    @Insert
+    fun insertImageAwait(images: Images): Long
 }

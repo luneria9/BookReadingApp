@@ -1,12 +1,16 @@
 package com.example.bookreadingapp.viewModels
 
+import HtmlParser
 import android.app.Application
+import android.content.Context
+import android.os.Environment
 import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.bookreadingapp.data.ReadingRoomDatabase
@@ -23,12 +27,19 @@ import com.example.bookreadingapp.data.repository.SubChaptersRepository
 import com.example.bookreadingapp.fileSystem.FileSystem
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.withContext
+import kotlin.coroutines.resume
 
 class ReadingAppViewModel(private val fileSystem: FileSystem, application: Application) : ViewModel() {
     private val _directoryContents = MutableLiveData<List<String>>()
+    private val applicationContext = application
     val directoryContents: LiveData<List<String>> = _directoryContents
-
     var readingMode by mutableStateOf(false)
 
     fun toggleReadingMode() {
@@ -120,6 +131,21 @@ class ReadingAppViewModel(private val fileSystem: FileSystem, application: Appli
         booksRepository.findBookTitle(title)
     }
 
+
+    suspend fun asyncInsertAndReturnBook(book: Books): Books {
+        val insertGetBook = runBlocking {
+            withContext(Dispatchers.IO) {
+                val insert = booksRepository.insertBookAsync(book)
+                val getBook = async(Dispatchers.IO) {
+                    val result = booksRepository.asyncfindBookId(insert.toInt())
+                    return@async result.await()[0]
+                }
+                return@withContext getBook.await()
+            }
+        }
+        return insertGetBook
+    }
+
     // chapters
     fun insertChapter(chapters: Chapters){
         chaptersRepository.insertChapter(chapters)
@@ -135,6 +161,20 @@ class ReadingAppViewModel(private val fileSystem: FileSystem, application: Appli
 
     fun findChaptersFromBook(id: Int){
         chaptersRepository.findChaptersOfBook(id)
+    }
+
+    suspend fun asyncInsertAndReturnChapter(chapter: Chapters): Chapters {
+        val insertGet = runBlocking {
+            withContext(Dispatchers.IO) {
+                val insert = chaptersRepository.insertChapterAsync(chapter)
+                val get = async(Dispatchers.IO) {
+                    val result = chaptersRepository.asyncfindChapterId(insert.toInt())
+                    return@async result.await()[0]
+                }
+                return@withContext get.await()
+            }
+        }
+        return insertGet
     }
 
     // subchapters
@@ -154,6 +194,20 @@ class ReadingAppViewModel(private val fileSystem: FileSystem, application: Appli
         subchaptersRepository.findSubChaptersOfChapter(id)
     }
 
+    suspend fun asyncInsertAndReturnSubChapter(subChapter: SubChapters): SubChapters {
+        val insertGet = runBlocking {
+            withContext(Dispatchers.IO) {
+                val insert = subchaptersRepository.insertSubChapterAsync(subChapter)
+                val get = async(Dispatchers.IO) {
+                    val result = subchaptersRepository.asyncfindSubChapterId(insert.toInt())
+                    return@async result.await()[0]
+                }
+                return@withContext get.await()
+            }
+        }
+        return insertGet
+    }
+
     // pages
     fun insertPage(pages: Pages){
         pagesRepository.insertPage(pages)
@@ -169,6 +223,22 @@ class ReadingAppViewModel(private val fileSystem: FileSystem, application: Appli
 
     fun findPageOfSubChapter(id: Int){
         pagesRepository.findPagesOfSubchapter(id)
+    }
+
+    suspend fun asyncInsertAndReturnPages(page: Pages): Pages {
+        val insertGet = runBlocking {
+            withContext(Dispatchers.IO) {
+                val insert = pagesRepository.insertPageAsync(page)
+                delay(page.contents.length.toLong())
+                Log.d("length" , page.contents.length.toString())
+                val get = async(Dispatchers.IO) {
+                    val result = pagesRepository.asyncfindPageId(insert.toInt())
+                    return@async result.await()[0]
+                }
+                return@withContext get.await()
+            }
+        }
+        return insertGet
     }
 
     // images
@@ -220,4 +290,13 @@ class ReadingAppViewModel(private val fileSystem: FileSystem, application: Appli
     }
 
 
+    fun parseAndInsert(listOfPaths: MutableList<String>){
+        val directory = this.applicationContext.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS).toString()+"/Physics/pg40175-images.html";
+        val viewModel = this
+        viewModelScope.launch(Dispatchers.Default) {
+            val parser = HtmlParser(viewModel = viewModel);
+            parser.parse(mutableListOf(directory), viewModel);
+        }
+
+    }
 }
