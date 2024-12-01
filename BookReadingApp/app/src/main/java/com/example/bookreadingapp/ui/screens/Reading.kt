@@ -22,6 +22,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.bookreadingapp.R
 import com.example.bookreadingapp.ui.theme.BookReadingAppTheme
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.getValue
@@ -71,7 +72,7 @@ fun ReadingScreen(
 }
 
 @Composable
-private fun ChapterContent(
+fun ChapterContent(
     subChapters: List<SubChapters>,
     viewModel: ReadingAppViewModel,
     readingMode: Boolean
@@ -93,7 +94,7 @@ private fun ChapterContent(
 }
 
 @Composable
-private fun SubChapterSection(
+fun SubChapterSection(
     subChapter: SubChapters,
     pages: List<Pages>,
     viewModel: ReadingAppViewModel,
@@ -105,8 +106,41 @@ private fun SubChapterSection(
         fontWeight = FontWeight.Bold,
         modifier = Modifier.padding(vertical = dimensionResource(R.dimen.padding_medium))
     )
+
+    pages.forEach { page ->
+        PageContent(
+            page = page,
+            viewModel = viewModel,
+            readingMode = readingMode
+        )
+    }
 }
 
+@Composable
+fun PageContent(
+    page: Pages,
+    viewModel: ReadingAppViewModel,
+    readingMode: Boolean
+) {
+    // Apply reading mode styles
+    val textSize = if (readingMode) {
+        dimensionResource(R.dimen.font_big).value.sp
+    } else {
+        dimensionResource(R.dimen.font_medium).value.sp
+    }
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = dimensionResource(R.dimen.padding_small))
+    ) {
+        Text(
+            text = page.contents,
+            fontSize = textSize,
+            modifier = Modifier.padding(bottom = dimensionResource(R.dimen.padding_small))
+        )
+    }
+}
 
 @Composable
 fun ReadingMode(

@@ -73,7 +73,7 @@ fun LibraryScreen(navController: NavController, viewModel: ReadingAppViewModel) 
 
 // Displays the content of the Library Screen including book list and download section
 @Composable
-private fun LibraryScreenContent(
+fun LibraryScreenContent(
     books: List<Books>,
     navController: NavController,
     viewModel: ReadingAppViewModel,
@@ -96,7 +96,7 @@ private fun LibraryScreenContent(
 
 // Lays out the main components of the Library Screen
 @Composable
-private fun LibraryLayout(
+fun LibraryLayout(
     books: List<Books>,
     navController: NavController,
     viewModel: ReadingAppViewModel,
@@ -119,7 +119,7 @@ private fun LibraryLayout(
 
 // Displays the library content with title and grid of books
 @Composable
-private fun LibraryContent(
+fun LibraryContent(
     books: List<Books>,
     navController: NavController,
     modifier: Modifier = Modifier,
@@ -161,7 +161,7 @@ fun BookCard(
 
 // Displays the content inside a book card: cover and book info sections
 @Composable
-private fun BookCardContent(book: Books, viewModel: ReadingAppViewModel) {
+fun BookCardContent(book: Books, viewModel: ReadingAppViewModel) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -176,7 +176,7 @@ private fun BookCardContent(book: Books, viewModel: ReadingAppViewModel) {
 
 // Displays the book cover image section
 @Composable
-private fun BookCoverSection(book: Books, modifier: Modifier = Modifier, viewModel: ReadingAppViewModel) {
+fun BookCoverSection(book: Books, modifier: Modifier = Modifier, viewModel: ReadingAppViewModel) {
     val context = LocalContext.current
     val bookDir = "${context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS)}/${book.title}"
     val coverPath = viewModel.getCoverImagePath(bookDir)
@@ -191,7 +191,7 @@ private fun BookCoverSection(book: Books, modifier: Modifier = Modifier, viewMod
 
 // Displays the section with book information
 @Composable
-private fun BookInfoSection(book: Books, modifier: Modifier = Modifier) {
+fun BookInfoSection(book: Books, modifier: Modifier = Modifier) {
     Box(
         modifier = modifier.fillMaxWidth(),
         contentAlignment = Alignment.Center
@@ -202,7 +202,7 @@ private fun BookInfoSection(book: Books, modifier: Modifier = Modifier) {
 
 // Displays detailed information about the book
 @Composable
-private fun BookInformation(book: Books) {
+fun BookInformation(book: Books) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -219,7 +219,7 @@ private fun BookInformation(book: Books) {
 
 // Displays the book title
 @Composable
-private fun BookTitle(title: String) {
+fun BookTitle(title: String) {
     Text(
         text = title,
         style = Typography.titleMedium.copy(
@@ -233,7 +233,7 @@ private fun BookTitle(title: String) {
 
 // Displays the author of the book
 @Composable
-private fun BookAuthor(author: String) {
+fun BookAuthor(author: String) {
     Text(
         text = "by $author",
         style = Typography.bodySmall.copy(
@@ -247,7 +247,7 @@ private fun BookAuthor(author: String) {
 
 // Displays the book's subject
 @Composable
-private fun BookSubject(subject: String) {
+fun BookSubject(subject: String) {
     Text(
         text = subject,
         style = Typography.bodySmall.copy(
@@ -261,7 +261,7 @@ private fun BookSubject(subject: String) {
 
 // Displays the book's publication date
 @Composable
-private fun BookDate(date: String) {
+fun BookDate(date: String) {
     Text(
         text = date,
         style = Typography.labelSmall.copy(
