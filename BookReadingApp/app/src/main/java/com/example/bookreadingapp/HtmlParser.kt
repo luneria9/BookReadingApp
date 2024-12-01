@@ -47,6 +47,7 @@ class HtmlParser (viewModel: ReadingAppViewModel) {
 
     // variables for adding to other database items
     private var bookStarted = false
+    private var isChapter = false
     private var content = ""
     private var itemTitle = ""
 
@@ -101,6 +102,11 @@ class HtmlParser (viewModel: ReadingAppViewModel) {
         }
 
         when (unclosedTagList.lastOrNull()) {
+            "h1", "h2", "h3", "h4", "h5", "h6" -> {
+                isChapter = true
+            }
+        }
+        when (unclosedTagList.lastOrNull()) {
             "img" -> {
                 string += "\nIMAGE PLACEHOLDER"
                 imageUrl = attributes["src"].toString()
@@ -127,11 +133,17 @@ class HtmlParser (viewModel: ReadingAppViewModel) {
         when (unclosedTagList.lastOrNull()) {
             "h1", "h2", "h3", "h4", "h5", "h6" -> {
                 string += "\n$text\n"
-                itemTitle = text
+                itemTitle += text
             }
+            // if it's a chapter append to title
             else -> {
-                string += "\n$text"
-                content += text
+                if (isChapter) {
+                    itemTitle += text
+                }
+                else {
+                    string += "\n$text"
+                    content += text
+                }
             }
 
         }
@@ -148,9 +160,6 @@ class HtmlParser (viewModel: ReadingAppViewModel) {
                 string += "</TABLE>"
                 content += "</TABLE>"
             }
-            // add item to database depending on what is closing
-            // close on image or header or section or table
-
             when (unclosedTagList.lastOrNull()) {
                 "h1", "h2" -> {
                     // add chapter
@@ -164,6 +173,8 @@ class HtmlParser (viewModel: ReadingAppViewModel) {
                     // resets subchapter and pages so we don't write to another chapter
                     currentSubChapter = SubChapters()
                     currentPage = Pages()
+                    isChapter = false
+                    itemTitle = ""
                 }
             }
             when (unclosedTagList.lastOrNull()) {
@@ -186,6 +197,10 @@ class HtmlParser (viewModel: ReadingAppViewModel) {
                     }
                     // add reference to subchapter for pages
                     currentSubChapter = result
+
+                    // reset chapter and title
+                    isChapter = false
+                    itemTitle = ""
 
                     // reset pages so we don't write to another subchapter
                     currentPage = Pages()
@@ -226,7 +241,7 @@ class HtmlParser (viewModel: ReadingAppViewModel) {
             }
             when (unclosedTagList.lastOrNull()) {
                 // images is always going to end up at the end of a page
-                "image" -> {
+                "img" -> {
                     // check if chapter and subchapter are empty if so add placeholders so database respect format
                     if(currentChapter.title == "") {
                         val result = runBlocking {
