@@ -86,7 +86,7 @@ class ReadingAppViewModel(private val fileSystem: FileSystem, application: Appli
         }
     }
 
-    private fun getCoverImagePath(bookDirectory: String): String {
+    fun getCoverImagePath(bookDirectory: String): String {
         val dir = File(bookDirectory)
         return dir.walkTopDown()
             .find { file ->

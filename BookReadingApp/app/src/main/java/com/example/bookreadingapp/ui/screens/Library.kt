@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -61,78 +62,84 @@ fun LibraryScreen(navController: NavController, viewModel: ReadingAppViewModel) 
     val scope = rememberCoroutineScope()
     val books by viewModel.allBooks.observeAsState(listOf())
 
+    LibraryScreenContent(
+        books = books,
+        navController = navController,
+        viewModel = viewModel,
+        scope = scope
+    )
+}
+
+@Composable
+private fun LibraryScreenContent(
+    books: List<Books>,
+    navController: NavController,
+    viewModel: ReadingAppViewModel,
+    scope: CoroutineScope
+) {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .padding(dimensionResource(R.dimen.padding_medium)),
+            .padding(dimensionResource(R.dimen.padding_small)),
         contentAlignment = Alignment.TopCenter
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(top = dimensionResource(R.dimen.padding_medium)),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Top
-        ) {
-            LibraryTitle()
-
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f)
-                    .padding(vertical = dimensionResource(R.dimen.padding_small))
-            ) {
-                BookGrid(books = books, navController = navController)
-            }
-            DownloadSection(viewModel, scope)
-        }
+        LibraryLayout(
+            books = books,
+            navController = navController,
+            viewModel = viewModel,
+            scope = scope
+        )
     }
 }
 
 @Composable
-fun DownloadSection(viewModel: ReadingAppViewModel, scope: CoroutineScope) {
-    val bookTitles = stringArrayResource(R.array.book_titles)
-    val bookUrls = stringArrayResource(R.array.book_urls)
-
+private fun LibraryLayout(
+    books: List<Books>,
+    navController: NavController,
+    viewModel: ReadingAppViewModel,
+    scope: CoroutineScope
+) {
     Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(dimensionResource(id = R.dimen.padding_small)),
-        verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.spacer_small)),
-        horizontalAlignment = Alignment.CenterHorizontally 
+        modifier = Modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.SpaceBetween
     ) {
-        for (i in bookTitles.indices) {
-            DownloadButton(
-                bookTitle = bookTitles[i],
-                onClick = {
-                    scope.launch {
-                        downloadBook(bookUrls[i], bookTitles[i], viewModel)
-                    }
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = dimensionResource(id = R.dimen.padding_medium)),
-            )
-        }
+        LibraryContent(
+            books = books,
+            navController = navController,
+            modifier = Modifier.weight(1f),
+            viewModel = viewModel
+        )
+        DownloadSection(viewModel, scope)
+    }
+}
+
+@Composable
+private fun LibraryContent(
+    books: List<Books>,
+    navController: NavController,
+    modifier: Modifier = Modifier,
+    viewModel: ReadingAppViewModel
+) {
+    Column(
+        modifier = modifier,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        LibraryTitle()
+        BookGrid(
+            books = books,
+            navController = navController,
+            viewModel = viewModel
+        )
     }
 }
 
 @Composable
 fun BookCard(
     book: Books,
-    onBookClick: () -> Unit
+    onBookClick: () -> Unit,
+    viewModel: ReadingAppViewModel
 ) {
-    val context = LocalContext.current
-    val coverPath = remember(book.id) {
-        val bookDir = "${context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS)}/${book.title}"
-        File(bookDir).walkTopDown()
-            .find { file ->
-                file.name.endsWith("-cover.png", ignoreCase = true) ||
-                        file.name.endsWith("-cover.jpg", ignoreCase = true)
-            }
-            ?.absolutePath ?: ""
-    }
-
     Card(
         modifier = Modifier
             .padding(dimensionResource(id = R.dimen.padding_small))
@@ -143,32 +150,155 @@ fun BookCard(
             defaultElevation = dimensionResource(id = R.dimen.spacer_small)
         )
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(dimensionResource(id = R.dimen.padding_small)),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Top
-        ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(0.7f),
-                contentAlignment = Alignment.Center
-            ) {
-                BookCover(coverPath)
-            }
+        BookCardContent(book, viewModel)
+    }
+}
 
-            // Information container - takes 30% of card height
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(0.3f),
-                contentAlignment = Alignment.Center
-            ) {
-                BookInformation(book)
-            }
+@Composable
+private fun BookCardContent(book: Books, viewModel: ReadingAppViewModel) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(dimensionResource(id = R.dimen.padding_small)),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Top
+    ) {
+        BookCoverSection(book, Modifier.weight(0.7f), viewModel)
+        BookInfoSection(book, Modifier.weight(0.3f))
+    }
+}
+
+@Composable
+private fun BookCoverSection(book: Books, modifier: Modifier = Modifier, viewModel: ReadingAppViewModel) {
+    val context = LocalContext.current
+    val bookDir = "${context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS)}/${book.title}"
+    val coverPath = viewModel.getCoverImagePath(bookDir)
+
+    Box(
+        modifier = modifier.fillMaxWidth(),
+        contentAlignment = Alignment.Center
+    ) {
+        BookCover(coverPath)
+    }
+}
+
+@Composable
+private fun BookInfoSection(book: Books, modifier: Modifier = Modifier) {
+    Box(
+        modifier = modifier.fillMaxWidth(),
+        contentAlignment = Alignment.Center
+    ) {
+        BookInformation(book)
+    }
+}
+
+@Composable
+private fun BookInformation(book: Books) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = dimensionResource(id = R.dimen.padding_small)),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.spacer_small))
+    ) {
+        BookTitle(book.title)
+        BookAuthor(book.author)
+        BookSubject(book.subject)
+        BookDate(book.date)
+    }
+}
+
+@Composable
+private fun BookTitle(title: String) {
+    Text(
+        text = title,
+        style = MaterialTheme.typography.titleMedium.copy(
+            fontSize = dimensionResource(id = R.dimen.font_very_small).value.sp
+        ),
+        maxLines = 2,
+        overflow = TextOverflow.Ellipsis,
+        textAlign = TextAlign.Center
+    )
+}
+
+@Composable
+private fun BookAuthor(author: String) {
+    Text(
+        text = "by $author",
+        style = MaterialTheme.typography.bodySmall.copy(
+            fontSize = dimensionResource(id = R.dimen.font_very_small).value.sp
+        ),
+        maxLines = 1,
+        overflow = TextOverflow.Ellipsis,
+        textAlign = TextAlign.Center
+    )
+}
+
+@Composable
+private fun BookSubject(subject: String) {
+    Text(
+        text = subject,
+        style = MaterialTheme.typography.bodySmall.copy(
+            fontSize = dimensionResource(id = R.dimen.font_very_small).value.sp
+        ),
+        overflow = TextOverflow.Ellipsis,
+        color = MaterialTheme.colorScheme.secondary,
+        textAlign = TextAlign.Center
+    )
+}
+
+@Composable
+private fun BookDate(date: String) {
+    Text(
+        text = date,
+        style = MaterialTheme.typography.labelSmall.copy(
+            fontSize = dimensionResource(id = R.dimen.font_very_small).value.sp
+        ),
+        color = MaterialTheme.colorScheme.tertiary,
+        textAlign = TextAlign.Center
+    )
+}
+
+@Composable
+fun DownloadSection(viewModel: ReadingAppViewModel, scope: CoroutineScope) {
+    val bookTitles = stringArrayResource(R.array.book_titles)
+    val bookUrls = stringArrayResource(R.array.book_urls)
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp)
+            .background(MaterialTheme.colorScheme.background),
+        verticalArrangement = Arrangement.Bottom,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        bookTitles.forEachIndexed { index, title ->
+            DownloadButton(
+                title = title,
+                url = bookUrls[index],
+                scope = scope,
+                viewModel = viewModel
+            )
         }
+        Spacer(modifier = Modifier.size(dimensionResource(id = R.dimen.spacer_medium)))
+    }
+}
+
+@Composable
+fun DownloadButton(title: String, url: String, scope: CoroutineScope, viewModel: ReadingAppViewModel) {
+    Button(
+        onClick = { scope.launch { downloadBook(url, title, viewModel) } },
+        modifier = Modifier
+            .fillMaxWidth(0.8f)
+            .padding(vertical = dimensionResource(id = R.dimen.spacer_small)),
+        shape = RoundedCornerShape(dimensionResource(id = R.dimen.spacer_small))
+    ) {
+        Text(
+            text = stringResource(R.string.download, title),
+            fontSize = dimensionResource(id = R.dimen.font_small).value.sp,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
+        )
     }
 }
 
@@ -203,70 +333,10 @@ fun BookCover(coverPath: String) {
     }
 }
 
-@Composable
-fun BookInformation(book: Books) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = dimensionResource(id = R.dimen.padding_small)),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(2.dp)
-    ) {
-        BookDetails(book)
-        BookMetadata(book)
-    }
-}
-
-@Composable
-fun BookDetails(book: Books) {
-    Text(
-        text = book.title,
-        style = MaterialTheme.typography.titleMedium.copy(
-            fontSize = dimensionResource(id = R.dimen.font_very_small).value.sp
-        ),
-        maxLines = 2,
-        overflow = TextOverflow.Ellipsis,
-        textAlign = TextAlign.Center
-    )
-
-    Text(
-        text = "by ${book.author}",
-        style = MaterialTheme.typography.bodySmall.copy(
-            fontSize = dimensionResource(id = R.dimen.font_very_small).value.sp
-        ),
-        maxLines = 1,
-        overflow = TextOverflow.Ellipsis,
-        textAlign = TextAlign.Center
-    )
-}
-
-@Composable
-fun BookMetadata(book: Books) {
-    Text(
-        text = book.subject,
-        style = MaterialTheme.typography.bodySmall.copy(
-            fontSize = dimensionResource(id = R.dimen.font_very_small).value.sp
-        ),
-        overflow = TextOverflow.Ellipsis,
-        color = MaterialTheme.colorScheme.secondary,
-        textAlign = TextAlign.Center
-    )
-
-    Text(
-        text = book.date,
-        style = MaterialTheme.typography.labelSmall.copy(
-            fontSize = dimensionResource(id = R.dimen.font_very_small).value.sp
-        ),
-        color = MaterialTheme.colorScheme.tertiary,
-        textAlign = TextAlign.Center
-    )
-}
-
 // The header title that displays Library indicating this is the library screen
 @Composable
 fun LibraryTitle(modifier: Modifier = Modifier) {
     Row(
-        modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Center
     ) {
@@ -276,7 +346,7 @@ fun LibraryTitle(modifier: Modifier = Modifier) {
 
 // Function to display the grid of books
 @Composable
-fun BookGrid(books: List<Books>, navController: NavController) {
+fun BookGrid(books: List<Books>, navController: NavController, viewModel: ReadingAppViewModel) {
     LazyVerticalGrid(
         columns = GridCells.Fixed(3),
         contentPadding = PaddingValues(dimensionResource(R.dimen.padding_medium)),
@@ -287,7 +357,8 @@ fun BookGrid(books: List<Books>, navController: NavController) {
                 book = book,
                 onBookClick = {
                     navController.navigate(NavRoutes.Contents.route)
-                }
+                },
+                viewModel = viewModel
             )
         }
     }
