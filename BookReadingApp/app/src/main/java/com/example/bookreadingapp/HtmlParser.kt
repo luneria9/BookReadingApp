@@ -241,7 +241,7 @@ class HtmlParser (viewModel: ReadingAppViewModel) {
             }
             when (unclosedTagList.lastOrNull()) {
                 // images is always going to end up at the end of a page
-                "image" -> {
+                "img" -> {
                     // check if chapter and subchapter are empty if so add placeholders so database respect format
                     if(currentChapter.title == "") {
                         val result = runBlocking {
