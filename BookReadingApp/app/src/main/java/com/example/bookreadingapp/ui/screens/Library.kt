@@ -362,7 +362,11 @@ fun LibraryTitle(modifier: Modifier = Modifier) {
 
 // Function to display the grid of books
 @Composable
-fun BookGrid(books: List<Books>, navController: NavController, viewModel: ReadingAppViewModel) {
+fun BookGrid(
+    books: List<Books>,
+    navController: NavController,
+    viewModel: ReadingAppViewModel
+) {
     LazyVerticalGrid(
         columns = GridCells.Fixed(3),
         contentPadding = PaddingValues(dimensionResource(R.dimen.padding_medium)),
@@ -372,7 +376,7 @@ fun BookGrid(books: List<Books>, navController: NavController, viewModel: Readin
             BookCard(
                 book = book,
                 onBookClick = {
-                    navController.navigate(NavRoutes.Contents.route)
+                    navController.navigate(NavRoutes.Contents.createRoute(book.id))
                 },
                 viewModel = viewModel
             )
