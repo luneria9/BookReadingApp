@@ -57,6 +57,7 @@ import com.example.bookreadingapp.R
 import java.io.File
 
 // Referred to https://developer.android.com/codelabs/basic-android-kotlin-compose-material-theming#6
+// Displays the main library screen with a list of books
 @Composable
 fun LibraryScreen(navController: NavController, viewModel: ReadingAppViewModel) {
     val scope = rememberCoroutineScope()
@@ -70,6 +71,7 @@ fun LibraryScreen(navController: NavController, viewModel: ReadingAppViewModel) 
     )
 }
 
+// Displays the content of the Library Screen including book list and download section
 @Composable
 private fun LibraryScreenContent(
     books: List<Books>,
@@ -92,6 +94,7 @@ private fun LibraryScreenContent(
     }
 }
 
+// Lays out the main components of the Library Screen
 @Composable
 private fun LibraryLayout(
     books: List<Books>,
@@ -114,6 +117,7 @@ private fun LibraryLayout(
     }
 }
 
+// Displays the library content with title and grid of books
 @Composable
 private fun LibraryContent(
     books: List<Books>,
@@ -134,6 +138,7 @@ private fun LibraryContent(
     }
 }
 
+// Displays a book card with title, author, and cover image
 @Composable
 fun BookCard(
     book: Books,
@@ -154,6 +159,7 @@ fun BookCard(
     }
 }
 
+// Displays the content inside a book card: cover and book info sections
 @Composable
 private fun BookCardContent(book: Books, viewModel: ReadingAppViewModel) {
     Column(
@@ -168,6 +174,7 @@ private fun BookCardContent(book: Books, viewModel: ReadingAppViewModel) {
     }
 }
 
+// Displays the book cover image section
 @Composable
 private fun BookCoverSection(book: Books, modifier: Modifier = Modifier, viewModel: ReadingAppViewModel) {
     val context = LocalContext.current
@@ -182,6 +189,7 @@ private fun BookCoverSection(book: Books, modifier: Modifier = Modifier, viewMod
     }
 }
 
+// Displays the section with book information
 @Composable
 private fun BookInfoSection(book: Books, modifier: Modifier = Modifier) {
     Box(
@@ -192,6 +200,7 @@ private fun BookInfoSection(book: Books, modifier: Modifier = Modifier) {
     }
 }
 
+// Displays detailed information about the book
 @Composable
 private fun BookInformation(book: Books) {
     Column(
@@ -208,11 +217,12 @@ private fun BookInformation(book: Books) {
     }
 }
 
+// Displays the book title
 @Composable
 private fun BookTitle(title: String) {
     Text(
         text = title,
-        style = MaterialTheme.typography.titleMedium.copy(
+        style = Typography.titleMedium.copy(
             fontSize = dimensionResource(id = R.dimen.font_very_small).value.sp
         ),
         maxLines = 2,
@@ -221,11 +231,12 @@ private fun BookTitle(title: String) {
     )
 }
 
+// Displays the author of the book
 @Composable
 private fun BookAuthor(author: String) {
     Text(
         text = "by $author",
-        style = MaterialTheme.typography.bodySmall.copy(
+        style = Typography.bodySmall.copy(
             fontSize = dimensionResource(id = R.dimen.font_very_small).value.sp
         ),
         maxLines = 1,
@@ -234,11 +245,12 @@ private fun BookAuthor(author: String) {
     )
 }
 
+// Displays the book's subject
 @Composable
 private fun BookSubject(subject: String) {
     Text(
         text = subject,
-        style = MaterialTheme.typography.bodySmall.copy(
+        style = Typography.bodySmall.copy(
             fontSize = dimensionResource(id = R.dimen.font_very_small).value.sp
         ),
         overflow = TextOverflow.Ellipsis,
@@ -247,11 +259,12 @@ private fun BookSubject(subject: String) {
     )
 }
 
+// Displays the book's publication date
 @Composable
 private fun BookDate(date: String) {
     Text(
         text = date,
-        style = MaterialTheme.typography.labelSmall.copy(
+        style = Typography.labelSmall.copy(
             fontSize = dimensionResource(id = R.dimen.font_very_small).value.sp
         ),
         color = MaterialTheme.colorScheme.tertiary,
@@ -259,6 +272,7 @@ private fun BookDate(date: String) {
     )
 }
 
+// Section with buttons to download books
 @Composable
 fun DownloadSection(viewModel: ReadingAppViewModel, scope: CoroutineScope) {
     val bookTitles = stringArrayResource(R.array.book_titles)
@@ -284,6 +298,7 @@ fun DownloadSection(viewModel: ReadingAppViewModel, scope: CoroutineScope) {
     }
 }
 
+// Button to download a specific book
 @Composable
 fun DownloadButton(title: String, url: String, scope: CoroutineScope, viewModel: ReadingAppViewModel) {
     Button(
@@ -302,6 +317,7 @@ fun DownloadButton(title: String, url: String, scope: CoroutineScope, viewModel:
     }
 }
 
+// Displays the book cover image
 @Composable
 fun BookCover(coverPath: String) {
     Box(
@@ -404,23 +420,7 @@ fun ContentsButton(navController: NavController) {
     }
 }
 
-@Composable
-fun DownloadButton(
-    bookTitle: String,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    Button(
-        onClick = onClick,
-        modifier = modifier
-    ) {
-        Text(
-            text = stringResource(R.string.download, bookTitle),
-            overflow = TextOverflow.Ellipsis
-        )
-    }
-}
-
+// Created book download function for downloading book files
 private suspend fun downloadBook(url: String, fileName: String, viewModel: ReadingAppViewModel) {
     val zipFileName = url.substringAfterLast("/")
 

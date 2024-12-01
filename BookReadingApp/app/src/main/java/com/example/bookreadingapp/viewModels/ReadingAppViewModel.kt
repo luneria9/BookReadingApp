@@ -86,12 +86,14 @@ class ReadingAppViewModel(private val fileSystem: FileSystem, application: Appli
         }
     }
 
+    // Returns the path of the cover image for a given book directory
     fun getCoverImagePath(bookDirectory: String): String {
         val dir = File(bookDirectory)
         return dir.walkTopDown()
             .find { file ->
                 file.name.endsWith("-cover.png", ignoreCase = true) || file.name.endsWith("-cover.jpg", ignoreCase = true)
             }
+            // If no cover image is found, it returns an empty string.
             ?.absolutePath ?: ""
     }
 
