@@ -38,9 +38,6 @@ fun ContentsScreen(
         viewModel.searchResultsChapters
     }.observeAsState(initial = emptyList())
 
-    // State to track expanded chapters
-    val expandedChapters = remember { mutableStateOf(emptySet<Int>()) }
-
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
@@ -50,11 +47,9 @@ fun ContentsScreen(
         TitleText()
         ChapterList(
             chapters = chapters,
-            expandedChapters = expandedChapters.value,
             onChapterClick = { chapterId ->
                 viewModel.toggleChapterExpansion(chapterId)
-            },
-            viewModel = viewModel
+            }
         )
     }
 }
@@ -62,17 +57,12 @@ fun ContentsScreen(
 @Composable
 fun ChapterList(
     chapters: List<Chapters>,
-    expandedChapters: Set<Int>,
     onChapterClick: (Int) -> Unit,
-    viewModel: ReadingAppViewModel
 ) {
     chapters.forEach { chapter ->
-        val isExpanded = expandedChapters.contains(chapter.id)
         ChapterWithSubChapters(
             chapter = chapter,
-            isExpanded = isExpanded,
-            onChapterClick = onChapterClick,
-            viewModel = viewModel
+            onChapterClick = onChapterClick
         )
     }
 }
@@ -80,37 +70,13 @@ fun ChapterList(
 @Composable
 fun ChapterWithSubChapters(
     chapter: Chapters,
-    isExpanded: Boolean,
     onChapterClick: (Int) -> Unit,
-    viewModel: ReadingAppViewModel
 ) {
     ChapterRow(
         chapter = chapter.title,
         page = chapter.id.toString(),
         onClick = { onChapterClick(chapter.id) }
     )
-
-    if (isExpanded) {
-        SubChapterList(chapterId = chapter.id, viewModel = viewModel)
-    }
-}
-
-@Composable
-fun SubChapterList(
-    chapterId: Int,
-    viewModel: ReadingAppViewModel
-) {
-    val subChapters by remember(chapterId) {
-        viewModel.findSubChaptersOfChapter(chapterId)
-        viewModel.searchResultsSubChapters
-    }.observeAsState(initial = emptyList())
-
-    subChapters.forEach { subChapter ->
-        SubChapterRow(
-            subchapter = subChapter.title,
-            page = subChapter.id.toString()
-        )
-    }
 }
 
 @Composable
