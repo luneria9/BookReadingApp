@@ -79,5 +79,4 @@ open class FileSystem(private val context: Context){
         val downloadFolder = File(context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS), directoryName)
         downloadFolder.listFiles()?.forEach { it.delete() }
     }
-
 }

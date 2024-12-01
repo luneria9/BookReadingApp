@@ -34,6 +34,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
+import java.io.File
 import kotlin.coroutines.resume
 
 class ReadingAppViewModel(private val fileSystem: FileSystem, application: Application) : ViewModel() {
@@ -67,12 +68,33 @@ class ReadingAppViewModel(private val fileSystem: FileSystem, application: Appli
             }
     }
 
-    fun downloadUnzip(url: String, fileName: String, destDirectory: String) {
-        viewModelScope.launch(Dispatchers.Default){
+    suspend fun downloadUnzip(url: String, fileName: String, destDirectory: String) {
+        viewModelScope.launch(Dispatchers.Default) {
+            // Download file
             val downloadJob = launch(Dispatchers.IO) { setupDownload(url) }
             downloadJob.join()
+
+            // Unzip file
             val unzipJob = launch(Dispatchers.Default) { unzipFile(fileName, destDirectory) }
+            unzipJob.join()
+
+            // Get the path of the unzipped HTML file
+            val unzippedPath = "${applicationContext.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS)}/$destDirectory"
+
+            // Parse and insert the book data
+            parseAndInsert(mutableListOf("$unzippedPath/index.html"))
         }
+    }
+
+    // Returns the path of the cover image for a given book directory
+    fun getCoverImagePath(bookDirectory: String): String {
+        val dir = File(bookDirectory)
+        return dir.walkTopDown()
+            .find { file ->
+                file.name.endsWith("-cover.png", ignoreCase = true) || file.name.endsWith("-cover.jpg", ignoreCase = true)
+            }
+            // If no cover image is found, it returns an empty string.
+            ?.absolutePath ?: ""
     }
 
     private fun updateDirectoryContents(directoryName: String) {
@@ -90,7 +112,7 @@ class ReadingAppViewModel(private val fileSystem: FileSystem, application: Appli
     private val chaptersRepository: ChaptersRepository
     private val subchaptersRepository: SubChaptersRepository
     private val pagesRepository: PageRepository
-    private val imagesRepository: ImageRepository
+    val imagesRepository: ImageRepository
     val searchResultsBooks: MutableLiveData<List<Books>>
     val searchResultsChapters: MutableLiveData<List<Chapters>>
     val searchResultsSubChapters: MutableLiveData<List<SubChapters>>
@@ -254,7 +276,7 @@ class ReadingAppViewModel(private val fileSystem: FileSystem, application: Appli
         imagesRepository.findImagesOfPage(id)
     }
 
-//     for testing inserting
+    //     for testing inserting
     fun testAll() {
         viewModelScope.launch(Dispatchers.Default){
             val insertBook = launch(Dispatchers.IO){ insertBook(Books("test title", "test author", "test subject", "test date"))}
@@ -288,7 +310,6 @@ class ReadingAppViewModel(private val fileSystem: FileSystem, application: Appli
         pagesRepository.findPagesOfSubchapter(1)
         imagesRepository.findImagesOfPage(1)
     }
-
 
     fun parseAndInsert(listOfPaths: MutableList<String>){
         val directory = this.applicationContext.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS).toString()+"/Physics/pg40175-images.html";
