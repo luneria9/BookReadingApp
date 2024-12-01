@@ -8,5 +8,7 @@ sealed class NavRoutes(val route: String) {
     object Contents : NavRoutes("contents/{bookId}") {
         fun createRoute(bookId: Int) = "contents/$bookId"
     }
-    object Reading : NavRoutes("reading")
+    object Reading : NavRoutes("reading/{bookId}/{chapterId}") {
+        fun createRoute(bookId: Int, chapterId: Int) = "reading/$bookId/$chapterId"
+    }
 }

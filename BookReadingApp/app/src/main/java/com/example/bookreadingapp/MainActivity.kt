@@ -108,13 +108,26 @@ fun NavigationHost(navController: NavHostController, viewModel: ReadingAppViewMo
             arguments = listOf(navArgument("bookId") { type = NavType.IntType })
         ) { backStackEntry ->
             val bookId = backStackEntry.arguments?.getInt("bookId") ?: 0
-            ContentsScreen(bookId = bookId, viewModel = viewModel)
+            ContentsScreen(
+                bookId = bookId,
+                navController = navController,
+                viewModel = viewModel
+            )
         }
 
-        composable(Reading.route) {
+        composable(
+            route = Reading.route,
+            arguments = listOf(
+                navArgument("bookId") { type = NavType.IntType },
+                navArgument("chapterId") { type = NavType.IntType }
+            )
+        ) { backStackEntry ->
+            val bookId = backStackEntry.arguments?.getInt("bookId") ?: 0
+            val chapterId = backStackEntry.arguments?.getInt("chapterId") ?: 0
             ReadingScreen(
-                readingMode = viewModel.readingMode,
-                onReadingCheck = { viewModel.toggleReadingMode() }
+                bookId = bookId,
+                chapterId = chapterId,
+                viewModel = viewModel
             )
         }
     }
