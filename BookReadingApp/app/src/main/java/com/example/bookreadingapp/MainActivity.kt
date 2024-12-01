@@ -51,6 +51,8 @@ import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
+import androidx.navigation.navArgument
 import com.example.bookreadingapp.data.entities.Books
 import com.example.bookreadingapp.fileSystem.FileSystem
 import com.example.bookreadingapp.ui.NavRoutes
@@ -101,8 +103,12 @@ fun NavigationHost(navController: NavHostController, viewModel: ReadingAppViewMo
             SearchScreen()
         }
 
-        composable(Contents.route) {
-            ContentsScreen()
+        composable(
+            route = Contents.route,
+            arguments = listOf(navArgument("bookId") { type = NavType.IntType })
+        ) { backStackEntry ->
+            val bookId = backStackEntry.arguments?.getInt("bookId") ?: 0
+            ContentsScreen(bookId = bookId, viewModel = viewModel)
         }
 
         composable(Reading.route) {
