@@ -42,6 +42,7 @@ class ReadingAppViewModel(private val fileSystem: FileSystem, application: Appli
     private val applicationContext = application
     val directoryContents: LiveData<List<String>> = _directoryContents
     var readingMode by mutableStateOf(false)
+    val expandedChapters = MutableLiveData<Set<Int>>(emptySet())
 
     fun toggleReadingMode() {
         readingMode = !readingMode
@@ -214,6 +215,15 @@ class ReadingAppViewModel(private val fileSystem: FileSystem, application: Appli
 
     fun findSubChaptersOfChapter(id: Int){
         subchaptersRepository.findSubChaptersOfChapter(id)
+    }
+
+    fun toggleChapterExpansion(chapterId: Int) {
+        val currentSet = expandedChapters.value ?: emptySet()
+        expandedChapters.value = if (currentSet.contains(chapterId)) {
+            currentSet - chapterId
+        } else {
+            currentSet + chapterId
+        }
     }
 
     suspend fun asyncInsertAndReturnSubChapter(subChapter: SubChapters): SubChapters {

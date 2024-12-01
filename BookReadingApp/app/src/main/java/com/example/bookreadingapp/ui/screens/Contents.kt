@@ -23,6 +23,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
 import com.example.bookreadingapp.R
+import com.example.bookreadingapp.data.entities.Chapters
 import com.example.bookreadingapp.ui.theme.BookReadingAppTheme
 import com.example.bookreadingapp.viewModels.ReadingAppViewModel
 
@@ -31,7 +32,7 @@ fun ContentsScreen(
     bookId: Int,
     viewModel: ReadingAppViewModel
 ) {
-    // Observe chapters and subchapters
+    // Observe chapters
     val chapters by remember(bookId) {
         viewModel.findChaptersFromBook(bookId)
         viewModel.searchResultsChapters
@@ -47,36 +48,68 @@ fun ContentsScreen(
             .verticalScroll(rememberScrollState())
     ) {
         TitleText()
+        ChapterList(
+            chapters = chapters,
+            expandedChapters = expandedChapters.value,
+            onChapterClick = { chapterId ->
+                viewModel.toggleChapterExpansion(chapterId)
+            },
+            viewModel = viewModel
+        )
+    }
+}
 
-        chapters.forEach { chapter ->
-            val isExpanded = expandedChapters.value.contains(chapter.id)
+@Composable
+fun ChapterList(
+    chapters: List<Chapters>,
+    expandedChapters: Set<Int>,
+    onChapterClick: (Int) -> Unit,
+    viewModel: ReadingAppViewModel
+) {
+    chapters.forEach { chapter ->
+        val isExpanded = expandedChapters.contains(chapter.id)
+        ChapterWithSubChapters(
+            chapter = chapter,
+            isExpanded = isExpanded,
+            onChapterClick = onChapterClick,
+            viewModel = viewModel
+        )
+    }
+}
 
-            ChapterRow(
-                chapter = chapter.title,
-                page = chapter.id.toString(),
-                onClick = {
-                    expandedChapters.value = if (isExpanded) {
-                        expandedChapters.value - chapter.id
-                    } else {
-                        expandedChapters.value + chapter.id
-                    }
-                }
-            )
+@Composable
+fun ChapterWithSubChapters(
+    chapter: Chapters,
+    isExpanded: Boolean,
+    onChapterClick: (Int) -> Unit,
+    viewModel: ReadingAppViewModel
+) {
+    ChapterRow(
+        chapter = chapter.title,
+        page = chapter.id.toString(),
+        onClick = { onChapterClick(chapter.id) }
+    )
 
-            if (isExpanded) {
-                val subChapters by remember(chapter.id) {
-                    viewModel.findSubChaptersOfChapter(chapter.id)
-                    viewModel.searchResultsSubChapters
-                }.observeAsState(initial = emptyList())
+    if (isExpanded) {
+        SubChapterList(chapterId = chapter.id, viewModel = viewModel)
+    }
+}
 
-                subChapters.forEach { subChapter ->
-                    SubChapterRow(
-                        subchapter = subChapter.title,
-                        page = subChapter.id.toString()
-                    )
-                }
-            }
-        }
+@Composable
+fun SubChapterList(
+    chapterId: Int,
+    viewModel: ReadingAppViewModel
+) {
+    val subChapters by remember(chapterId) {
+        viewModel.findSubChaptersOfChapter(chapterId)
+        viewModel.searchResultsSubChapters
+    }.observeAsState(initial = emptyList())
+
+    subChapters.forEach { subChapter ->
+        SubChapterRow(
+            subchapter = subChapter.title,
+            page = subChapter.id.toString()
+        )
     }
 }
 
