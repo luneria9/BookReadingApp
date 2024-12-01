@@ -1,5 +1,6 @@
 package com.example.bookreadingapp.ui.screens
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -20,41 +21,92 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.compose.rememberNavController
 import com.example.bookreadingapp.R
 import com.example.bookreadingapp.ui.theme.BookReadingAppTheme
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import com.example.bookreadingapp.data.entities.Pages
+import com.example.bookreadingapp.data.entities.SubChapters
+import com.example.bookreadingapp.viewModels.ReadingAppViewModel
 
 @Composable
 fun ReadingScreen(
-    readingMode: Boolean,
-    onReadingCheck: (Boolean) -> Unit
+    bookId: Int,
+    chapterId: Int,
+    viewModel: ReadingAppViewModel,
+    modifier: Modifier = Modifier
 ) {
-    Box(
-        modifier = Modifier.fillMaxSize()
-    ) {
-        Text(
-            text = stringResource(R.string.book_title),
-            fontSize = dimensionResource(R.dimen.font_big).value.sp,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier
-                .padding(dimensionResource(R.dimen.padding_medium))
-                .align(Alignment.TopCenter)
-        )
+    // Observe content states
+    val subChapters by remember(chapterId) {
+        viewModel.findSubChaptersOfChapter(chapterId)
+        viewModel.searchResultsSubChapters
+    }.observeAsState(initial = emptyList())
 
-        // PLACEHOLDER TEXT UNTIL BOOK PARSING IS IMPLEMENTED
-        Text(
-            text = " Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras eu maximus urna. Cras luctus nulla in sollicitudin imperdiet. Donec venenatis pharetra felis, et ultricies urna egestas non. Aenean volutpat molestie est," +
-                    " ut semper est aliquam eu. Proin pharetra ligula quis congue hendrerit. Maecenas ut purus nec urna feugiat semper. Sed tempor euismod nunc non vulputate. Donec feugiat urna ac ex pellentesque egestas. Suspendisse faucibus risus eget tortor maximus, in cursus nisl feugiat. Nullam ac lectus magna. Integer ac tempus ante.\n",
-            fontSize = dimensionResource(R.dimen.font_medium_small).value.sp,
-            modifier = Modifier
-                .align(Alignment.Center)
-                .padding(dimensionResource(R.dimen.padding_medium))
-        )
+    // Reading mode state
+    val readingMode by remember { mutableStateOf(viewModel.readingMode) }
 
-        ReadingMode(
-            readingMode = readingMode,
-            onReadingCheck = onReadingCheck,
-            modifier = Modifier.align(Alignment.BottomCenter)
+    Box(modifier = modifier.fillMaxSize()) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+                .padding(dimensionResource(R.dimen.padding_medium))
+        ) {
+            ChapterContent(
+                subChapters = subChapters,
+                viewModel = viewModel,
+                readingMode = readingMode
+            )
+
+            ReadingMode(
+                readingMode = readingMode,
+                onReadingCheck = { viewModel.toggleReadingMode() },
+                modifier = Modifier.align(Alignment.CenterHorizontally)
+            )
+        }
+    }
+}
+
+@Composable
+private fun ChapterContent(
+    subChapters: List<SubChapters>,
+    viewModel: ReadingAppViewModel,
+    readingMode: Boolean
+) {
+    subChapters.forEach { subChapter ->
+        // Observe pages for each subchapter
+        val pages by remember(subChapter.id) {
+            viewModel.findPageOfSubChapter(subChapter.id)
+            viewModel.searchResultsPages
+        }.observeAsState(initial = emptyList())
+
+        SubChapterSection(
+            subChapter = subChapter,
+            pages = pages,
+            viewModel = viewModel,
+            readingMode = readingMode
         )
     }
 }
+
+@Composable
+private fun SubChapterSection(
+    subChapter: SubChapters,
+    pages: List<Pages>,
+    viewModel: ReadingAppViewModel,
+    readingMode: Boolean
+) {
+    Text(
+        text = subChapter.title,
+        fontSize = dimensionResource(R.dimen.font_big).value.sp,
+        fontWeight = FontWeight.Bold,
+        modifier = Modifier.padding(vertical = dimensionResource(R.dimen.padding_medium))
+    )
+}
+
 
 @Composable
 fun ReadingMode(
@@ -80,19 +132,19 @@ fun ReadingMode(
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun ReadingScreenPreview() {
-    BookReadingAppTheme {
-        ReadingScreen(false, {})
-    }
-}
-
-@Composable
-@Preview(showBackground = true, locale = "fr")
-fun ReadingScreenPreviewFr() {
-    BookReadingAppTheme {
-        val navController = rememberNavController()
-        ReadingScreen(false, {})
-    }
-}
+//@Preview(showBackground = true)
+//@Composable
+//fun ReadingScreenPreview() {
+//    BookReadingAppTheme {
+//        ReadingScreen(false, {})
+//    }
+//}
+//
+//@Composable
+//@Preview(showBackground = true, locale = "fr")
+//fun ReadingScreenPreviewFr() {
+//    BookReadingAppTheme {
+//        val navController = rememberNavController()
+//        ReadingScreen(false, {})
+//    }
+//}

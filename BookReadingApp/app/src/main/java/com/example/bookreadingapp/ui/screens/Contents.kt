@@ -22,14 +22,17 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.example.bookreadingapp.R
 import com.example.bookreadingapp.data.entities.Chapters
+import com.example.bookreadingapp.ui.NavRoutes
 import com.example.bookreadingapp.ui.theme.BookReadingAppTheme
 import com.example.bookreadingapp.viewModels.ReadingAppViewModel
 
 @Composable
 fun ContentsScreen(
     bookId: Int,
+    navController: NavController,
     viewModel: ReadingAppViewModel
 ) {
     // Observe chapters
@@ -48,7 +51,8 @@ fun ContentsScreen(
         ChapterList(
             chapters = chapters,
             onChapterClick = { chapterId ->
-                viewModel.toggleChapterExpansion(chapterId)
+                // Navigate to reading screen when chapter is clicked
+                navController.navigate(NavRoutes.Reading.createRoute(bookId, chapterId))
             }
         )
     }
@@ -122,33 +126,6 @@ fun ChapterRow(
     }
 }
 
-@Composable
-fun SubChapterRow(
-    subchapter: String,
-    page: String
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-    ) {
-        Text(
-            text = subchapter,
-            textAlign = TextAlign.Left,
-            fontSize = dimensionResource(R.dimen.font_small).value.sp,
-            modifier = Modifier
-                .padding(start = dimensionResource(R.dimen.padding_big), top = dimensionResource(R.dimen.spacer_medium), bottom = dimensionResource(R.dimen.spacer_medium))
-        )
-
-        Text(
-            text = page,
-            textAlign = TextAlign.Right,
-            fontSize = dimensionResource(R.dimen.font_small).value.sp,
-            modifier = Modifier
-                .padding(end = dimensionResource(R.dimen.padding_big), top = dimensionResource(R.dimen.spacer_medium), bottom = dimensionResource(R.dimen.spacer_medium))
-                .fillMaxWidth()
-        )
-    }
-}
 //
 //@Preview(showBackground = true)
 //@Composable
