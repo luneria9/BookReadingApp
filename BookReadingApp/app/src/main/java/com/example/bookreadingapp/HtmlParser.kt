@@ -42,12 +42,14 @@ class HtmlParser (viewModel: ReadingAppViewModel) {
     private val authors = mutableListOf<String>()
     private var subject = ""
     private var release = ""
+    private var directory = ""
 
     private val unclosedTagList = mutableListOf<String>()
 
     // variables for adding to other database items
     private var bookStarted = false
     private var isChapter = false
+    private var tableOpened = false
     private var content = ""
     private var itemTitle = ""
 
@@ -92,7 +94,6 @@ class HtmlParser (viewModel: ReadingAppViewModel) {
                 }
                 authorsString.dropLast(1)
 
-
                 // add job to insert and then get retrieve the book
                 val result = runBlocking {
                     viewModel.asyncInsertAndReturnBook(Books(title, authorsString, subject, release))
@@ -101,19 +102,32 @@ class HtmlParser (viewModel: ReadingAppViewModel) {
             }
         }
 
-        when (unclosedTagList.lastOrNull()) {
-            "h1", "h2", "h3", "h4", "h5", "h6" -> {
-                isChapter = true
+        if (bookStarted) {
+            when (unclosedTagList.lastOrNull()) {
+                "h1", "h2", "h3", "h4", "h5", "h6" -> {
+                    isChapter = true
+                }
             }
-        }
-        when (unclosedTagList.lastOrNull()) {
-            "img" -> {
-                string += "\nIMAGE PLACEHOLDER"
-                imageUrl = attributes["src"].toString()
-            }
-            "table" -> {
-                string += "\n<TABLE>"
-                content += "<TABLE>"
+            when (unclosedTagList.lastOrNull()) {
+                "img" -> {
+                    imageUrl = attributes["src"].toString()
+                }
+                "table" -> {
+                    content += "<TABLE>"
+                    tableOpened = true
+                }
+                "tbody" -> {
+                    content +="<tbody>"
+                }
+                "tr" -> {
+                    content += "<tr>"
+                }
+                "td" -> {
+                    content += "<td>"
+                }
+                "th" -> {
+                    content += "<th>"
+                }
             }
         }
     }
@@ -123,7 +137,12 @@ class HtmlParser (viewModel: ReadingAppViewModel) {
         if (text.isBlank()) return
 
         when (unclosedTagList.lastOrNull()) {
-            "style", "script", "link", "meta", "i"-> return
+            "style", "script", "link", "meta"-> return
+            "i" -> {
+                if (tableOpened) {
+                    appendTextBasedOnTag(text)
+                }
+            }
             else -> appendTextBasedOnTag(text)
         }
     }
@@ -132,7 +151,6 @@ class HtmlParser (viewModel: ReadingAppViewModel) {
     private fun appendTextBasedOnTag(text: String) {
         when (unclosedTagList.lastOrNull()) {
             "h1", "h2", "h3", "h4", "h5", "h6" -> {
-                string += "\n$text\n"
                 itemTitle += text
             }
             // if it's a chapter append to title
@@ -141,7 +159,6 @@ class HtmlParser (viewModel: ReadingAppViewModel) {
                     itemTitle += text
                 }
                 else {
-                    string += "\n$text"
                     content += text
                 }
             }
@@ -153,12 +170,23 @@ class HtmlParser (viewModel: ReadingAppViewModel) {
     private fun handleCloseTag(viewModel: ReadingAppViewModel) {
 
         if (bookStarted) {
-            if (unclosedTagList.lastOrNull() == "section") {
-                string += "\n"
-            }
-            if (unclosedTagList.lastOrNull() == "section") {
-                string += "</TABLE>"
+            if (unclosedTagList.lastOrNull() == "table") {
                 content += "</TABLE>"
+                tableOpened = false
+            }
+            when (unclosedTagList.lastOrNull()) {
+                "tbody" -> {
+                    content +="<tbody>"
+                }
+                "tr" -> {
+                    content += "<tr>"
+                }
+                "td" -> {
+                    content += "<td>"
+                }
+                "th" -> {
+                    content += "<th>"
+                }
             }
             when (unclosedTagList.lastOrNull()) {
                 "h1", "h2" -> {
@@ -183,10 +211,9 @@ class HtmlParser (viewModel: ReadingAppViewModel) {
                     if(currentChapter.title == "") {
                         val result = runBlocking {
                             viewModel.asyncInsertAndReturnChapter(
-                                Chapters("PLACEHOLDER CHAPTER$identifier", currentBook.id)
+                                Chapters("<PLACEHOLDER>", currentBook.id)
                             )
                         }
-                        identifier++
                         currentChapter = result
                     }
                     // add subchapter
@@ -212,18 +239,16 @@ class HtmlParser (viewModel: ReadingAppViewModel) {
                     if(currentChapter.title == "") {
                         val result = runBlocking {
                             viewModel.asyncInsertAndReturnChapter(
-                                Chapters("PLACEHOLDER CHAPTER$identifier", currentBook.id))
+                                Chapters("<PLACEHOLDER>", currentBook.id))
                         }
-                        identifier++
                         currentChapter = result
                     }
                     if(currentSubChapter.title == "") {
                         val result = runBlocking {
                             viewModel.asyncInsertAndReturnSubChapter(
-                                SubChapters("PLACEHOLDER SUBCHAPTER$identifier", currentChapter.id)
+                                SubChapters("<PLACEHOLDER>", currentChapter.id)
                             )
                         }
-                        identifier++
                         currentSubChapter = result
                     }
                     // add the page
@@ -246,32 +271,31 @@ class HtmlParser (viewModel: ReadingAppViewModel) {
                     if(currentChapter.title == "") {
                         val result = runBlocking {
                             viewModel.asyncInsertAndReturnChapter(
-                                Chapters("PLACEHOLDER CHAPTER$identifier", currentBook.id))
+                                Chapters("<PLACEHOLDER>", currentBook.id))
                         }
-                        identifier++
                         currentChapter = result
                     }
                     if(currentSubChapter.title == "") {
                         val result = runBlocking {
                             viewModel.asyncInsertAndReturnSubChapter(
-                                SubChapters("PLACEHOLDER SUBCHAPTER$identifier", currentChapter.id)
+                                SubChapters("<PLACEHOLDER>", currentChapter.id)
                             )
                         }
-                        identifier++
                         currentSubChapter = result
                     }
                     if(currentPage.pageNumber == 0) {
                         val result = runBlocking {
                             viewModel.asyncInsertAndReturnPages(
-                                Pages(currentSubChapter.id, numOfPages, "PLACEHOLDER$identifier",)
+                                Pages(currentSubChapter.id, numOfPages, "<PLACEHOLDER>",)
                             )
                         }
-                        identifier++
                         content = ""
                         currentPage = result
                         numOfPages++
                     }
-                    viewModel.insertImage(Images(currentPage.id, imageUrl))
+                    content += "<IMAGE>"
+                    // pageid always one behind
+                    viewModel.insertImage(Images(currentPage.id, "$directory/$imageUrl"))
                 }
             }
         }
@@ -291,6 +315,7 @@ class HtmlParser (viewModel: ReadingAppViewModel) {
     }
 
     fun parse(listOfPaths: MutableList<String>, viewModel: ReadingAppViewModel): String {
+        directory = listOfPaths[0].substringBeforeLast("/")
         val htmlString = readFile(listOfPaths)
         string = ""
         unclosedTagList.clear()
