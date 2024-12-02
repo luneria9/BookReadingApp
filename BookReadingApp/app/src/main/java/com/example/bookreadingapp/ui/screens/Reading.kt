@@ -1,5 +1,9 @@
 package com.example.bookreadingapp.ui.screens
 
+import android.app.Activity
+import android.content.Context
+import android.content.SharedPreferences
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -38,11 +42,19 @@ import com.example.bookreadingapp.viewModels.ReadingAppViewModel
 
 @Composable
 fun ReadingScreen(
+    preferences: SharedPreferences,
     bookId: Int,
     chapterId: Int,
     viewModel: ReadingAppViewModel,
     modifier: Modifier = Modifier
 ) {
+    // Store the last book and chapter accessed
+    with (preferences.edit()) {
+        putInt(stringResource(R.string.last_location_book), bookId)
+        putInt(stringResource(R.string.last_location_chapter), chapterId)
+        apply()
+    }
+
     // Observe content states
     val subChapters by remember(chapterId) {
         viewModel.findSubChaptersOfChapter(chapterId)
@@ -203,6 +215,23 @@ fun ReadingMode(
         )
     }
 }
+
+//@Preview(showBackground = true)
+//@Composable
+//fun ReadingScreenPreview() {
+//    BookReadingAppTheme {
+//        ReadingScreen(false, {}, Activity().getPreferences(Context.MODE_PRIVATE))
+//    }
+//}
+//
+//@Composable
+//@Preview(showBackground = true, locale = "fr")
+//fun ReadingScreenPreviewFr() {
+//    BookReadingAppTheme {
+//        val navController = rememberNavController()
+//        ReadingScreen(false, {}, Activity().getPreferences(Context.MODE_PRIVATE))
+//    }
+//}
 
 //@Preview(showBackground = true)
 //@Composable
