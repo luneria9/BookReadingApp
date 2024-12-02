@@ -20,6 +20,8 @@
     <string name="drawer_item">drawer item</string>
     <string name="library">Library</string>
     <string name="download">Download %s</string>
+    <string name="last_location_book" translatable="false">last_location_book</string>
+    <string name="last_location_chapter" translatable="false">last_location_chapter</string>
 
     <string-array name="book_urls">
         <item>https://www.gutenberg.org/cache/epub/40175/pg40175-h.zip</item>

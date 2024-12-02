@@ -1,6 +1,7 @@
 package com.example.bookreadingapp.ui.screens
 
 import androidx.compose.foundation.horizontalScroll
+import android.content.SharedPreferences
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -34,11 +35,19 @@ import com.example.bookreadingapp.viewModels.ReadingAppViewModel
 
 @Composable
 fun ReadingScreen(
+    preferences: SharedPreferences,
     bookId: Int,
     chapterId: Int,
     viewModel: ReadingAppViewModel,
     modifier: Modifier = Modifier
 ) {
+    // Store the last book and chapter accessed
+    with (preferences.edit()) {
+        putInt(stringResource(R.string.last_location_book), bookId)
+        putInt(stringResource(R.string.last_location_chapter), chapterId)
+        apply()
+    }
+
     // Observe content states
     val subChapters by remember(chapterId) {
         viewModel.findSubChaptersOfChapter(chapterId)
