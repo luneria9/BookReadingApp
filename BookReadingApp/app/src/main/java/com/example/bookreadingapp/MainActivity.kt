@@ -2,6 +2,9 @@
 
 package com.example.bookreadingapp
 
+import android.app.Activity
+import android.content.Context
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
@@ -60,7 +63,6 @@ import com.example.bookreadingapp.viewModels.ReadingAppViewModelFactory
 import java.nio.file.Paths
 import kotlin.math.log
 
-
 class MainActivity : ComponentActivity() {
     private val viewModel: ReadingAppViewModel by viewModels {
         ReadingAppViewModelFactory(this.applicationContext, application) // Use application context to prevent memory leaks
@@ -72,10 +74,13 @@ class MainActivity : ComponentActivity() {
         setContent {
             BookReadingAppTheme  {
                 val windowSize = calculateWindowSizeClass1(this)
+                val sharedPref = this.getPreferences(Context.MODE_PRIVATE)
+
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     BookReadingApp(
                         windowSizeClass = windowSize.widthSizeClass,
                         viewModel = viewModel,
+                        preferences = sharedPref,
                         modifier = Modifier.padding(innerPadding)
                     )
                 }
@@ -86,8 +91,12 @@ class MainActivity : ComponentActivity() {
 
 // Defines navigation routes for the app
 @Composable
-fun NavigationHost(navController: NavHostController, viewModel: ReadingAppViewModel) {
-    NavHost(navController = navController, startDestination = NavRoutes.Home.route
+fun NavigationHost(
+    navController: NavHostController,
+    viewModel: ReadingAppViewModel,
+    preferences: SharedPreferences,
+) {
+    NavHost(navController = navController, startDestination = NavRoutes.Reading.route
     ) {
         composable(Home.route) {
             HomeScreen(navController)
@@ -108,7 +117,8 @@ fun NavigationHost(navController: NavHostController, viewModel: ReadingAppViewMo
         composable(Reading.route) {
             ReadingScreen(
                 readingMode = viewModel.readingMode,
-                onReadingCheck = { viewModel.toggleReadingMode() }
+                onReadingCheck = { viewModel.toggleReadingMode() },
+                preferences = preferences
             )
         }
     }
@@ -130,11 +140,12 @@ fun getAdaptiveNavigationType(windowSizeClass: WindowWidthSizeClass): AdaptiveNa
 fun BookReadingApp(
     windowSizeClass: WindowWidthSizeClass,
     viewModel: ReadingAppViewModel = viewModel(),
+    preferences: SharedPreferences,
     modifier: Modifier
 ) {
     val navController = rememberNavController()
     val adaptiveNavigationType = getAdaptiveNavigationType(windowSizeClass)
-    BookReadingScaffold(navController, adaptiveNavigationType, viewModel)
+    BookReadingScaffold(navController, adaptiveNavigationType, viewModel, preferences)
 }
 
 // Scaffold structure with conditional top and bottom bars
@@ -143,6 +154,7 @@ fun BookReadingScaffold(
     navController: NavHostController,
     adaptiveNavigationType: AdaptiveNavigationType,
     viewModel: ReadingAppViewModel,
+    preferences: SharedPreferences,
 ) {
     Scaffold(
         topBar = {
@@ -161,7 +173,8 @@ fun BookReadingScaffold(
             navController = navController,
             adaptiveNavigationType = adaptiveNavigationType,
             viewModel = viewModel,
-            paddingValues = paddingValues
+            paddingValues = paddingValues,
+            preferences = preferences
         )
     }
 }
@@ -172,11 +185,12 @@ fun BookReadingContent(
     navController: NavHostController,
     adaptiveNavigationType: AdaptiveNavigationType,
     viewModel: ReadingAppViewModel,
-    paddingValues: PaddingValues
+    paddingValues: PaddingValues,
+    preferences: SharedPreferences,
 ) {
     Row(modifier = Modifier.padding(paddingValues)) {
         if (adaptiveNavigationType == AdaptiveNavigationType.PERMANENT_NAVIGATION_DRAWER) {
-            PermanentNavigationDrawerComponent(viewModel, navController)
+            PermanentNavigationDrawerComponent(viewModel, navController, preferences)
         } else {
             if (adaptiveNavigationType == AdaptiveNavigationType.NAVIGATION_RAIL && !viewModel.readingMode) {
                 NavigationRailComponent(navController = navController)
@@ -187,7 +201,11 @@ fun BookReadingContent(
                     .fillMaxSize()
                     .padding(paddingValues)
             ) {
-                NavigationHost(navController = navController, viewModel = viewModel)
+                NavigationHost(
+                    navController = navController,
+                    viewModel = viewModel,
+                    preferences = preferences
+                )
             }
         }
     }
@@ -286,6 +304,7 @@ fun DrawerContent(viewModel: ReadingAppViewModel, navController: NavHostControll
 fun PermanentNavigationDrawerComponent(
     viewModel: ReadingAppViewModel,
     navController: NavHostController,
+    preferences: SharedPreferences,
 ) {
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentRoutes = backStackEntry?.destination?.route
@@ -295,7 +314,11 @@ fun PermanentNavigationDrawerComponent(
         },
         content = {
             Box(modifier = Modifier.fillMaxSize()) {
-                NavigationHost(navController = navController, viewModel = viewModel)
+                NavigationHost(
+                    navController = navController,
+                    viewModel = viewModel,
+                    preferences = preferences
+                )
             }
         }
     )
@@ -333,6 +356,6 @@ fun BookReadingTopAppBar(modifier: Modifier = Modifier){
 @Composable
 fun GreetingPreview() {
     BookReadingAppTheme {
-        BookReadingApp(windowSizeClass = Expanded, modifier = Modifier)
+        BookReadingApp(windowSizeClass = Expanded, preferences = Activity().getPreferences(Context.MODE_PRIVATE), modifier = Modifier)
     }
 }
