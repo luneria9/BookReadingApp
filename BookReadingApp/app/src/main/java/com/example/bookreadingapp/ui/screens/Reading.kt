@@ -2,6 +2,7 @@ package com.example.bookreadingapp.ui.screens
 
 import androidx.compose.foundation.horizontalScroll
 import android.content.SharedPreferences
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -56,7 +57,6 @@ fun ReadingScreen(
 
     // Reading mode state
     val readingMode by remember { mutableStateOf(viewModel.readingMode) }
-
     Box(modifier = modifier.fillMaxSize()) {
         Column(
             modifier = Modifier
@@ -69,11 +69,17 @@ fun ReadingScreen(
                 viewModel = viewModel,
                 readingMode = readingMode
             )
-
+        }
+        Column(
+            modifier= Modifier
+                .fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.SpaceBetween
+        ){
             ReadingMode(
                 readingMode = readingMode,
                 onReadingCheck = { viewModel.toggleReadingMode() },
-                modifier = Modifier.align(Alignment.CenterHorizontally)
+                modifier = Modifier
             )
         }
     }
