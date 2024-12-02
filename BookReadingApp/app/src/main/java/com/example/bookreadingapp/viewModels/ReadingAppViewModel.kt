@@ -316,6 +316,7 @@ class ReadingAppViewModel(private val fileSystem: FileSystem, application: Appli
     }
 
     fun parseAndInsert(listOfPaths: MutableList<String>){
+        // TODO use the listOfPaths
         val directory = this.applicationContext.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS).toString()+"/Physics/pg40175-images.html";
         val viewModel = this
         viewModelScope.launch(Dispatchers.Default) {
