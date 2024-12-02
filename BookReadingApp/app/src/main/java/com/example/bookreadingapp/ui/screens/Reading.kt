@@ -37,6 +37,7 @@ import com.example.bookreadingapp.viewModels.ReadingAppViewModel
 @Composable
 fun ReadingScreen(
     preferences: SharedPreferences,
+    readingMode: Boolean,
     onReadingCheck: (Boolean) -> Unit,
     bookId: Int,
     chapterId: Int,
@@ -56,8 +57,6 @@ fun ReadingScreen(
         viewModel.searchResultsSubChapters
     }.observeAsState(initial = emptyList())
 
-    // Reading mode state
-    val readingMode by remember { mutableStateOf(viewModel.readingMode) }
     Box(modifier = modifier.fillMaxSize()) {
         Column(
             modifier = Modifier
