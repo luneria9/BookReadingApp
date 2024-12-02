@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.util.Log
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -29,11 +30,13 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Button
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.bookreadingapp.data.entities.Pages
@@ -81,6 +84,13 @@ fun ReadingScreen(
                 readingMode = readingMode,
                 onReadingCheck = { viewModel.toggleReadingMode() },
                 modifier = Modifier.align(Alignment.CenterHorizontally)
+            )
+
+            ChapterNavigation(
+                modifier = Modifier
+                    .padding(
+                        bottom = dimensionResource(R.dimen.spacer_big)
+                    )
             )
         }
     }
@@ -215,6 +225,35 @@ fun ReadingMode(
         )
     }
 }
+
+@Composable
+fun ChapterNavigation(
+    modifier: Modifier = Modifier
+) {
+    Row (
+        horizontalArrangement = Arrangement.SpaceAround,
+        modifier = modifier
+            .fillMaxWidth()
+    ) {
+        Button(
+            enabled = false,
+            onClick = { /*TODO*/ }
+        ) {
+            Text(
+                text = stringResource(R.string.previous_chapter),
+                fontWeight = FontWeight.ExtraBold
+            )
+        }
+
+        Button(onClick = { /*TODO*/ }) {
+            Text(
+                text = stringResource(R.string.next_chapter),
+                fontWeight = FontWeight.ExtraBold
+            )
+        }
+    }
+}
+
 
 //@Preview(showBackground = true)
 //@Composable
