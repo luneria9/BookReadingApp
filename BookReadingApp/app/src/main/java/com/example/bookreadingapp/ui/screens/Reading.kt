@@ -29,6 +29,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.platform.LocalContext
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import com.example.bookreadingapp.data.entities.Pages
 import com.example.bookreadingapp.data.entities.SubChapters
 import com.example.bookreadingapp.viewModels.ReadingAppViewModel
@@ -122,6 +125,12 @@ fun PageContent(
     viewModel: ReadingAppViewModel,
     readingMode: Boolean
 ) {
+    // Observe images for the page
+    val images by remember(page.id) {
+        viewModel.findImagesOfPage(page.id)
+        viewModel.searchResultsImages
+    }.observeAsState(initial = emptyList())
+
     // Apply reading mode styles
     val textSize = if (readingMode) {
         dimensionResource(R.dimen.font_big).value.sp
@@ -139,9 +148,38 @@ fun PageContent(
             fontSize = textSize,
             modifier = Modifier.padding(bottom = dimensionResource(R.dimen.padding_small))
         )
+
+        images.forEach { image ->
+            ImageContent(
+                imageUrl = image.imageUrl,
+                readingMode = readingMode
+            )
+        }
     }
 }
 
+@Composable
+fun ImageContent(
+    imageUrl: String,
+    readingMode: Boolean
+) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = dimensionResource(R.dimen.padding_medium))
+    ) {
+        AsyncImage(
+            model = ImageRequest.Builder(LocalContext.current)
+                .data(imageUrl)
+                .crossfade(true)
+                .build(),
+            contentDescription = null,
+            modifier = Modifier
+                .fillMaxWidth()
+        )
+    }
+}
 @Composable
 fun ReadingMode(
     readingMode: Boolean,
