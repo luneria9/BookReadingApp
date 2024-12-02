@@ -1,5 +1,9 @@
 package com.example.bookreadingapp.ui.screens
 
+import android.app.Activity
+import android.content.Context
+import android.content.SharedPreferences
+import android.util.Log
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -24,8 +28,17 @@ import com.example.bookreadingapp.ui.theme.BookReadingAppTheme
 @Composable
 fun ReadingScreen(
     readingMode: Boolean,
-    onReadingCheck: (Boolean) -> Unit
+    onReadingCheck: (Boolean) -> Unit,
+    preferences: SharedPreferences,
 ) {
+    val test = preferences.getString("test", "123")
+
+    if (test != null) {
+        Log.d("TEST", test)
+    } else {
+        Log.d("TEST", "NULL2")
+    }
+
     Box(
         modifier = Modifier.fillMaxSize()
     ) {
@@ -84,7 +97,7 @@ fun ReadingMode(
 @Composable
 fun ReadingScreenPreview() {
     BookReadingAppTheme {
-        ReadingScreen(false, {})
+        ReadingScreen(false, {}, Activity().getPreferences(Context.MODE_PRIVATE))
     }
 }
 
@@ -93,6 +106,6 @@ fun ReadingScreenPreview() {
 fun ReadingScreenPreviewFr() {
     BookReadingAppTheme {
         val navController = rememberNavController()
-        ReadingScreen(false, {})
+        ReadingScreen(false, {}, Activity().getPreferences(Context.MODE_PRIVATE))
     }
 }
