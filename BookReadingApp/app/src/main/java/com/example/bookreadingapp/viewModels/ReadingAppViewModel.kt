@@ -2,7 +2,6 @@ package com.example.bookreadingapp.viewModels
 
 import HtmlParser
 import android.app.Application
-import android.content.Context
 import android.os.Environment
 import android.util.Log
 import androidx.compose.runtime.getValue
@@ -10,7 +9,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.bookreadingapp.data.ReadingRoomDatabase
@@ -26,16 +24,12 @@ import com.example.bookreadingapp.data.repository.PageRepository
 import com.example.bookreadingapp.data.repository.SubChaptersRepository
 import com.example.bookreadingapp.fileSystem.FileSystem
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import java.io.File
-import kotlin.coroutines.resume
 
 class ReadingAppViewModel(private val fileSystem: FileSystem, application: Application) : ViewModel() {
     private val _directoryContents = MutableLiveData<List<String>>()

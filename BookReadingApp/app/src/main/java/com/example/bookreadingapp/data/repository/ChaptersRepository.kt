@@ -1,6 +1,5 @@
 package com.example.bookreadingapp.data.repository
 
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.example.bookreadingapp.data.dao.ChaptersDao
 import com.example.bookreadingapp.data.entities.Chapters

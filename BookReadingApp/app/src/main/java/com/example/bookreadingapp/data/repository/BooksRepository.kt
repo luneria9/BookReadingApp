@@ -9,10 +9,6 @@ import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.suspendCancellableCoroutine
-import androidx.lifecycle.Observer
-import kotlinx.coroutines.suspendCancellableCoroutine
-import kotlin.coroutines.resume
 
 // referenced from https://gitlab.com/crdavis/roomdatabasedemoproject
 class BooksRepository (private val dao: BooksDao){

@@ -1,11 +1,8 @@
 package com.example.bookreadingapp.data.repository
 
-import android.media.Image
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.example.bookreadingapp.data.dao.ImagesDao
 import com.example.bookreadingapp.data.entities.Images
-import com.example.bookreadingapp.data.entities.Pages
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
