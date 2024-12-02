@@ -1,6 +1,7 @@
 package com.example.bookreadingapp.ui.screens
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -53,10 +54,10 @@ fun ReadingScreen(
     val readingMode by remember { mutableStateOf(viewModel.readingMode) }
 
     Box(modifier = modifier.fillMaxSize()) {
-        Column(
+        Row(
             modifier = Modifier
                 .fillMaxSize()
-                .verticalScroll(rememberScrollState())
+                .horizontalScroll(rememberScrollState())
                 .padding(dimensionResource(R.dimen.padding_medium))
         ) {
             ChapterContent(
@@ -68,7 +69,7 @@ fun ReadingScreen(
             ReadingMode(
                 readingMode = readingMode,
                 onReadingCheck = { viewModel.toggleReadingMode() },
-                modifier = Modifier.align(Alignment.CenterHorizontally)
+                modifier = Modifier.align(Alignment.CenterVertically)
             )
         }
     }
@@ -138,10 +139,11 @@ fun PageContent(
         dimensionResource(R.dimen.font_medium).value.sp
     }
 
-    Column(
+    Row(
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = dimensionResource(R.dimen.padding_small))
+            .horizontalScroll(rememberScrollState())
     ) {
         Text(
             text = page.contents,
