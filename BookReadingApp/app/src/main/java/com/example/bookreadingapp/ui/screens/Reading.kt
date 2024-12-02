@@ -37,6 +37,7 @@ import com.example.bookreadingapp.viewModels.ReadingAppViewModel
 @Composable
 fun ReadingScreen(
     preferences: SharedPreferences,
+    onReadingCheck: (Boolean) -> Unit,
     bookId: Int,
     chapterId: Int,
     viewModel: ReadingAppViewModel,
@@ -70,18 +71,11 @@ fun ReadingScreen(
                 readingMode = readingMode
             )
         }
-        Column(
-            modifier= Modifier
-                .fillMaxWidth(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.SpaceBetween
-        ){
-            ReadingMode(
-                readingMode = readingMode,
-                onReadingCheck = { viewModel.toggleReadingMode() },
-                modifier = Modifier
-            )
-        }
+        ReadingMode(
+            readingMode = readingMode,
+            onReadingCheck = onReadingCheck,
+            modifier = Modifier.align(Alignment.BottomCenter)
+        )
     }
 }
 

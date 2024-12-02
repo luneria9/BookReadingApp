@@ -149,6 +149,7 @@ fun NavigationHost(
                 preferences = preferences,
                 bookId = bookId,
                 chapterId = chapterId,
+                onReadingCheck = { viewModel.toggleReadingMode() },
                 viewModel = viewModel
             )
         }
