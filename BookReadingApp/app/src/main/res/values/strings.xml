@@ -20,6 +20,8 @@
     <string name="drawer_item">drawer item</string>
     <string name="library">Library</string>
     <string name="download">Download %s</string>
+    <string name="previous_chapter">&lt; Previous</string>
+    <string name="next_chapter">Next &gt;</string>
     <string name="last_location_book" translatable="false">last_location_book</string>
     <string name="last_location_chapter" translatable="false">last_location_chapter</string>
 

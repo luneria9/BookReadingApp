@@ -21,4 +21,6 @@
     <string name="drawer_item">élément du tiroir</string>
     <string name="library">Bibliothèque</string>
     <string name="download">Télécharger %s</string>
+    <string name="previous_chapter">&lt; Précédent</string>
+    <string name="next_chapter">Prochain &gt;</string>
 </resources>
