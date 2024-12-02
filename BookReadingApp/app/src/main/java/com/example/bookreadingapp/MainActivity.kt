@@ -98,8 +98,14 @@ fun NavigationHost(
     viewModel: ReadingAppViewModel,
     preferences: SharedPreferences,
 ) {
-    NavHost(navController = navController, startDestination = NavRoutes.Reading.route
-    ) {
+    var startRoute = Home.route
+    val lastBook = preferences.getInt(stringResource(R.string.last_location_book), -1)
+    val lastChapter = preferences.getInt(stringResource(R.string.last_location_chapter), -1)
+
+    if (lastBook != -1 && lastChapter != -1)
+        startRoute = Reading.route
+
+    NavHost(navController = navController, startDestination = startRoute) {
         composable(Home.route) {
             HomeScreen(navController)
         }
@@ -131,8 +137,14 @@ fun NavigationHost(
                 navArgument("chapterId") { type = NavType.IntType }
             )
         ) { backStackEntry ->
-            val bookId = backStackEntry.arguments?.getInt("bookId") ?: 0
-            val chapterId = backStackEntry.arguments?.getInt("chapterId") ?: 0
+            var bookId = backStackEntry.arguments?.getInt("bookId") ?: 0
+            var chapterId = backStackEntry.arguments?.getInt("chapterId") ?: 0
+
+            if (lastBook != -1 && lastChapter != -1) {
+                bookId = lastBook
+                chapterId = lastChapter
+            }
+
             ReadingScreen(
                 preferences = preferences,
                 bookId = bookId,

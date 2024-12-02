@@ -48,12 +48,11 @@ fun ReadingScreen(
     viewModel: ReadingAppViewModel,
     modifier: Modifier = Modifier
 ) {
-    val test = preferences.getString("test", "123")
-
-    if (test != null) {
-        Log.d("TEST", test)
-    } else {
-        Log.d("TEST", "NULL2")
+    // Store the last book and chapter accessed
+    with (preferences.edit()) {
+        putInt(stringResource(R.string.last_location_book), bookId)
+        putInt(stringResource(R.string.last_location_chapter), chapterId)
+        apply()
     }
 
     // Observe content states
