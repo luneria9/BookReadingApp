@@ -154,8 +154,7 @@ fun PageContent(
 
         images.forEach { image ->
             ImageContent(
-                imageUrl = image.imageUrl,
-                readingMode = readingMode
+                imageUrl = image.imageUrl
             )
         }
     }
@@ -163,8 +162,7 @@ fun PageContent(
 
 @Composable
 fun ImageContent(
-    imageUrl: String,
-    readingMode: Boolean
+    imageUrl: String
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -206,20 +204,3 @@ fun ReadingMode(
         )
     }
 }
-
-//@Preview(showBackground = true)
-//@Composable
-//fun ReadingScreenPreview() {
-//    BookReadingAppTheme {
-//        ReadingScreen(false, {})
-//    }
-//}
-//
-//@Composable
-//@Preview(showBackground = true, locale = "fr")
-//fun ReadingScreenPreviewFr() {
-//    BookReadingAppTheme {
-//        val navController = rememberNavController()
-//        ReadingScreen(false, {})
-//    }
-//}
