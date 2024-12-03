@@ -1,4 +1,6 @@
 package com.example.bookreadingapp
+import android.app.Application
+import android.content.Context
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -11,6 +13,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.test.core.app.ApplicationProvider
 import com.example.bookreadingapp.ui.NavRoutes
 import com.example.bookreadingapp.ui.screens.HomeScreen
 import com.example.bookreadingapp.ui.screens.LibraryScreen
@@ -34,8 +37,9 @@ class HomeScreenTests {
         composeTestRule.setContent {
             BookReadingAppTheme {
                 val navController = rememberNavController()
-                val context = LocalContext.current
-                val viewModel: ReadingAppViewModel = viewModel(factory = ReadingAppViewModelFactory(context))
+                val context = ApplicationProvider.getApplicationContext<Context>()
+                val application = context.applicationContext as Application
+                val viewModel: ReadingAppViewModel = viewModel(factory = ReadingAppViewModelFactory(context, application))
                 NavHost(navController = navController, startDestination = NavRoutes.Home.route) {
                     composable(NavRoutes.Home.route) { HomeScreen(navController = navController) }
                     composable(NavRoutes.Library.route) { LibraryScreen(navController = navController, viewModel = viewModel) }
