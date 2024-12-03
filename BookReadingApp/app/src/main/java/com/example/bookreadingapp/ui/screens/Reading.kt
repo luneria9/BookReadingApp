@@ -24,7 +24,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import coil.compose.AsyncImage
@@ -56,6 +55,7 @@ fun ReadingScreen(
         viewModel.searchResultsSubChapters
     }.observeAsState(initial = emptyList())
 
+    // Main container for the reading screen
     Box(modifier = modifier.fillMaxSize()) {
         Column(
             modifier = Modifier
@@ -63,12 +63,14 @@ fun ReadingScreen(
                 .horizontalScroll(rememberScrollState())
                 .padding(dimensionResource(R.dimen.padding_medium))
         ) {
+            // Render the content of the chapter
             ChapterContent(
                 subChapters = subChapters,
                 viewModel = viewModel,
                 readingMode = readingMode
             )
         }
+        // Display the reading mode toggle at the bottom of the screen
         ReadingMode(
             readingMode = readingMode,
             onReadingCheck = onReadingCheck,
@@ -77,6 +79,7 @@ fun ReadingScreen(
     }
 }
 
+// Composable to display the content of a chapter not working
 @Composable
 fun ChapterContent(
     subChapters: List<SubChapters>,
@@ -99,6 +102,7 @@ fun ChapterContent(
     }
 }
 
+// Composable to display a subchapter and its pages not working
 @Composable
 fun SubChapterSection(
     subChapter: SubChapters,
@@ -122,6 +126,7 @@ fun SubChapterSection(
     }
 }
 
+// Composable to display the content of a page not working
 @Composable
 fun PageContent(
     page: Pages,
@@ -160,6 +165,7 @@ fun PageContent(
     }
 }
 
+// Composable to display an image not working
 @Composable
 fun ImageContent(
     imageUrl: String
@@ -181,6 +187,8 @@ fun ImageContent(
         )
     }
 }
+
+// Composable to display the reading mode toggle
 @Composable
 fun ReadingMode(
     readingMode: Boolean,

@@ -55,6 +55,7 @@ fun ContentsScreen(
     }
 }
 
+// Displays a list of chapters as rows
 @Composable
 fun ChapterList(
     chapters: List<Chapters>,
@@ -68,6 +69,7 @@ fun ChapterList(
     }
 }
 
+// Displays a single chapter
 @Composable
 fun ChapterWithSubChapters(
     chapter: Chapters,
@@ -80,6 +82,7 @@ fun ChapterWithSubChapters(
     )
 }
 
+// Displays the title text for the Contents screen
 @Composable
 fun TitleText() {
     Text(
@@ -91,6 +94,7 @@ fun TitleText() {
     )
 }
 
+// Displays a single chapter row with its title and page
 @Composable
 fun ChapterRow(
     chapter: String,
