@@ -39,6 +39,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import com.example.bookreadingapp.data.entities.Chapters
 import com.example.bookreadingapp.data.entities.Pages
 import com.example.bookreadingapp.data.entities.SubChapters
 import com.example.bookreadingapp.viewModels.ReadingAppViewModel
@@ -51,12 +52,18 @@ fun ReadingScreen(
     viewModel: ReadingAppViewModel,
     modifier: Modifier = Modifier
 ) {
+    Log.d("TEST", chapterId.toString())
     // Store the last book and chapter accessed
     with (preferences.edit()) {
         putInt(stringResource(R.string.last_location_book), bookId)
         putInt(stringResource(R.string.last_location_chapter), chapterId)
         apply()
     }
+
+    val chapters by remember(bookId) {
+        viewModel.findChaptersFromBook(bookId)
+        viewModel.searchResultsChapters
+    }.observeAsState(initial = emptyList())
 
     // Observe content states
     val subChapters by remember(chapterId) {
@@ -86,13 +93,16 @@ fun ReadingScreen(
                 modifier = Modifier.align(Alignment.CenterHorizontally)
             )
 
-            ChapterNavigation(
-                modifier = Modifier
-                    .padding(
-                        bottom = dimensionResource(R.dimen.spacer_big)
-                    )
-            )
         }
+
+        ChapterNavigation(
+            chapterId = chapterId,
+            chapters = chapters,
+            modifier = Modifier
+                .padding(
+                    bottom = dimensionResource(R.dimen.spacer_big)
+                )
+        )
     }
 }
 
@@ -228,15 +238,24 @@ fun ReadingMode(
 
 @Composable
 fun ChapterNavigation(
+    chapterId: Int,
+    chapters: List<Chapters>,
     modifier: Modifier = Modifier
 ) {
+    var previousDisabled = false
+
+    if (chapters.isNotEmpty() && chapterId == chapters[0].id) {
+        previousDisabled = true
+        Log.d("TEST", "size: ${chapters.size}")
+    }
+
     Row (
         horizontalArrangement = Arrangement.SpaceAround,
         modifier = modifier
             .fillMaxWidth()
     ) {
         Button(
-            enabled = false,
+            enabled = previousDisabled,
             onClick = { /*TODO*/ }
         ) {
             Text(
