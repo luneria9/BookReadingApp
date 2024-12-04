@@ -41,6 +41,10 @@ class PageRepository(private val dao: PagesDao) {
         }
     }
 
+    fun searchPages(query: String, bookId: Int): List<Pages> {
+        return dao.searchPages(query, bookId)
+    }
+
     fun asyncfindPageId(pageId: Int): Deferred<List<Pages>> =
         coroutineScope.async(Dispatchers.IO) {
             return@async dao.findPageId(pageId)

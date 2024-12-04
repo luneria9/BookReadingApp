@@ -20,6 +20,9 @@ interface SubChaptersDao {
     @Query("SELECT * FROM subchapters WHERE chapter_id = :chapterId")
     fun getAllSubChapters(chapterId: Int): List<SubChapters>
 
+    @Query("SELECT * FROM subchapters WHERE subchapter_title LIKE '%' || :query || '%' AND chapter_id IN (SELECT chapter_id FROM chapters WHERE book_id = :bookId)")
+    fun searchSubChapters(query: String, bookId: Int): List<SubChapters>
+
     @Insert
     fun insertSubChapterAwait(subChapters: SubChapters): Long
 }

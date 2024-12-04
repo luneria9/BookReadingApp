@@ -37,6 +37,10 @@ class ChaptersRepository(private val dao: ChaptersDao) {
         }
     }
 
+    fun searchChapters(query: String, bookId: Int): List<Chapters> {
+        return dao.searchChapters(query, bookId)
+    }
+
     fun insertChapterAsync(chapters: Chapters): Long {
         return dao.insertChapterAwait(chapters)
     }
