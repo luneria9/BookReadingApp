@@ -312,7 +312,8 @@ fun NavigateBook(
             if (currentBookPosition > 0) {
                 Button(
                     onClick = {
-                        navController.navigate(NavRoutes.Reading.createRoute(bookId, chapterId - 1))
+                        navController.navigate(NavRoutes.Reading.createRoute(bookId,
+                            chapters[currentBookPosition - 1].id))
                     },
                     modifier = Modifier
                         .weight(1f)
@@ -328,7 +329,8 @@ fun NavigateBook(
             if (currentBookPosition < chapters.size - 1) {
                 Button(
                     onClick = {
-                        navController.navigate(NavRoutes.Reading.createRoute(bookId, chapterId + 1))
+                        navController.navigate(NavRoutes.Reading.createRoute(bookId,
+                            chapters[currentBookPosition + 1].id))
                     },
                     modifier = Modifier
                         .weight(1f)
