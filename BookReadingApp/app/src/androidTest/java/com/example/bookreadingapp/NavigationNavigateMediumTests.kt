@@ -1,5 +1,8 @@
 package com.example.bookreadingapp
 
+import android.app.Application
+import android.content.Context
+import android.preference.PreferenceManager
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.ui.Modifier
@@ -15,6 +18,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.test.core.app.ApplicationProvider
 import com.example.bookreadingapp.ui.NavRoutes
 import com.example.bookreadingapp.ui.screens.ContentsScreen
 import com.example.bookreadingapp.ui.screens.HomeScreen
@@ -40,23 +44,30 @@ class NavigationNavigateMediumTests {
     @OptIn(ExperimentalMaterial3Api::class)
     @Before
     fun setUp() {
+        val context = ApplicationProvider.getApplicationContext<Context>()
+        val application = context.applicationContext as Application
+        val preferences = PreferenceManager.getDefaultSharedPreferences(context)
+
         composeTestRule.setContent {
             BookReadingAppTheme {
                 val navController = rememberNavController()
-                val context = LocalContext.current
-                val viewModel: ReadingAppViewModel = viewModel(factory = ReadingAppViewModelFactory(context))
+                val viewModel: ReadingAppViewModel = viewModel(factory = ReadingAppViewModelFactory(context, application))
                 NavHost(navController = navController, startDestination = NavRoutes.Home.route) {
                     composable(NavRoutes.Library.route) {
                         LibraryScreen(navController = navController, viewModel = viewModel)
                     }
                     composable(NavRoutes.Contents.route) {
-                        ContentsScreen()
+                        ContentsScreen(
+                            bookId = 1,
+                            navController = navController,
+                            viewModel = viewModel
+                        )
                     }
                     composable(NavRoutes.Home.route) {
                         HomeScreen(navController)
                     }
                 }
-                BookReadingApp(windowSizeClass = WindowWidthSizeClass.Medium, modifier = Modifier)
+                BookReadingApp(windowSizeClass = WindowWidthSizeClass.Medium, modifier = Modifier, preferences = preferences)
             }
         }
     }

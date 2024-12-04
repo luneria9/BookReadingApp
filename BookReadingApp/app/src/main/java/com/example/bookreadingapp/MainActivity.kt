@@ -43,10 +43,12 @@ import com.example.bookreadingapp.ui.screens.*
 import com.example.bookreadingapp.ui.utils.AdaptiveNavigationType
 import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass as calculateWindowSizeClass1
 import androidx.compose.material3.Scaffold
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
@@ -55,6 +57,13 @@ import androidx.navigation.navArgument
 import com.example.bookreadingapp.ui.theme.BookReadingAppTheme
 import com.example.bookreadingapp.viewModels.ReadingAppViewModel
 import com.example.bookreadingapp.viewModels.ReadingAppViewModelFactory
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.newSingleThreadContext
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 
 class MainActivity : ComponentActivity() {
     private val viewModel: ReadingAppViewModel by viewModels {
@@ -146,7 +155,8 @@ fun NavigationHost(
                 chapterId = chapterId,
                 readingMode = viewModel.readingMode,
                 onReadingCheck = { viewModel.toggleReadingMode() },
-                viewModel = viewModel
+                viewModel = viewModel,
+                navController = navController
             )
         }
     }
@@ -163,6 +173,7 @@ fun getAdaptiveNavigationType(windowSizeClass: WindowWidthSizeClass): AdaptiveNa
 }
 
 // Composable to adapts layout to screen size
+@OptIn(ExperimentalCoroutinesApi::class, DelicateCoroutinesApi::class)
 @Composable
 @ExperimentalMaterial3Api
 fun BookReadingApp(
@@ -174,6 +185,18 @@ fun BookReadingApp(
     val navController = rememberNavController()
     val adaptiveNavigationType = getAdaptiveNavigationType(windowSizeClass)
     BookReadingScaffold(navController, adaptiveNavigationType, viewModel, preferences)
+
+    val booksToDownload = stringArrayResource(R.array.book_urls)
+    val bookTitles = stringArrayResource(R.array.book_titles)
+    val coroutineScope = rememberCoroutineScope()
+    booksToDownload.forEachIndexed { index, url ->
+        if (index < 3) {
+            runBlocking {
+                val fileName = url.substringAfterLast("/")
+                viewModel.downloadUnzip(url, fileName, bookTitles[index])
+            }
+        }
+    }
 }
 
 // Scaffold structure with conditional top and bottom bars
