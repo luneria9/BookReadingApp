@@ -37,11 +37,21 @@ class ReadingAppViewModel(private val fileSystem: FileSystem, application: Appli
     val directoryContents: LiveData<List<String>> = _directoryContents
     var readingMode by mutableStateOf(false)
     val expandedChapters = MutableLiveData<Set<Int>>(emptySet())
+    var selectedBookId: Int? = null
 
     fun toggleReadingMode() {
         readingMode = !readingMode
     }
 
+    fun performSearch(query: String) {
+        if (selectedBookId != null) {
+            viewModelScope.launch {
+                searchResultsChapters.value = chaptersRepository.searchChapters(query, selectedBookId!!)
+                searchResultsSubChapters.value = subchaptersRepository.searchSubChapters(query, selectedBookId!!)
+                searchResultsPages.value = pagesRepository.searchPages(query, selectedBookId!!)
+            }
+        }
+    }
     // from https://gitlab.com/crdavis/networkandfileio/-/tree/master?ref_type=heads
     // Function to set up file download
     fun setupDownload(url: String) {
