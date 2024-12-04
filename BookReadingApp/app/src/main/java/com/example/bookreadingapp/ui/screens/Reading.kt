@@ -169,7 +169,7 @@ fun PageContent(
 
     Column(
         modifier = Modifier
-            .width(300.dp) // Set a fixed width for each page
+            .width(380.dp)
             .padding(vertical = dimensionResource(R.dimen.padding_small))
     ) {
         Text(
