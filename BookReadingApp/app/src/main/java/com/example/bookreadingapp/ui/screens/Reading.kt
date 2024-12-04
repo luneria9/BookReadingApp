@@ -30,6 +30,7 @@ import com.example.bookreadingapp.data.entities.SubChapters
 import com.example.bookreadingapp.ui.NavRoutes
 import com.example.bookreadingapp.viewModels.ReadingAppViewModel
 import androidx.navigation.NavController
+import com.example.bookreadingapp.data.entities.Chapters
 
 @Composable
 fun ReadingScreen(
@@ -55,13 +56,54 @@ fun ReadingScreen(
         viewModel.searchResultsSubChapters
     }.observeAsState(initial = emptyList())
 
+    // Observe chapters
+    val chapters by remember(bookId) {
+        viewModel.findChaptersFromBook(bookId)
+        viewModel.searchResultsChapters
+    }.observeAsState(initial = emptyList())
+
     // Main container for the reading screen
+    ReadingMainContent(
+        modifier,
+        subChapters,
+        viewModel,
+        readingMode,
+        onReadingCheck,
+        navController,
+        bookId,
+        chapterId,
+        chapters
+    )
+}
+
+@Composable
+private fun ReadingMainContent(
+    modifier: Modifier,
+    subChapters: List<SubChapters>,
+    viewModel: ReadingAppViewModel,
+    readingMode: Boolean,
+    onReadingCheck: (Boolean) -> Unit,
+    navController: NavController,
+    bookId: Int,
+    chapterId: Int,
+    chapters: List<Chapters>
+) {
+    val currentChapter = chapters.find { it.id == chapterId}
     Box(modifier = modifier.fillMaxSize()) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(dimensionResource(R.dimen.padding_medium))
         ) {
+            // Display the subchapter title at the top
+            if (currentChapter != null) {
+                Text(
+                    text = currentChapter.title,
+                    fontSize = dimensionResource(R.dimen.font_big).value.sp,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(vertical = dimensionResource(R.dimen.padding_medium))
+                )
+            }
             // Render the content of the chapter
             ChapterContent(
                 subChapters = subChapters,
@@ -81,7 +123,8 @@ fun ReadingScreen(
             navController = navController,
             bookId = bookId,
             chapterId = chapterId,
-            viewModel = viewModel
+            viewModel = viewModel,
+            chapters
         )
     }
 }
@@ -243,20 +286,23 @@ fun NavigateBook(
     navController: NavController,
     bookId: Int,
     chapterId: Int,
-    viewModel: ReadingAppViewModel
+    viewModel: ReadingAppViewModel,
+    chapters: List<Chapters>
 ) {
-    // Observe chapters
-    val chapters by remember(bookId) {
-        viewModel.findChaptersFromBook(bookId)
-        viewModel.searchResultsChapters
-    }.observeAsState(initial = emptyList())
 
+
+    var currentBookPosition = 0;
+    chapters.forEachIndexed { index, chapter ->
+        if (chapter.id == chapterId){
+            currentBookPosition = index
+        }
+    }
     if (readingMode) {
         Row(
             horizontalArrangement = Arrangement.SpaceBetween,
             modifier = Modifier.fillMaxWidth()
         ) {
-            if (chapterId != 1) {
+            if (currentBookPosition > 0) {
                 Button(
                     onClick = {
                         navController.navigate(NavRoutes.Reading.createRoute(bookId, chapterId - 1))
@@ -272,7 +318,7 @@ fun NavigateBook(
                     Text(text = "Previous Page")
                 }
             }
-            if (chapterId < chapters.size) {
+            if (currentBookPosition < chapters.size - 1) {
                 Button(
                     onClick = {
                         navController.navigate(NavRoutes.Reading.createRoute(bookId, chapterId + 1))
