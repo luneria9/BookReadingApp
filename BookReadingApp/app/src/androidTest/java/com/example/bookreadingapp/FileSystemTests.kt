@@ -1,5 +1,6 @@
 package com.example.bookreadingapp
 
+import android.app.Application
 import android.content.Context
 import android.os.Environment
 import androidx.test.core.app.ApplicationProvider
@@ -27,7 +28,8 @@ class FileSystemTests {
     fun setUp() {
         mockContext = ApplicationProvider.getApplicationContext()
         fileSystem = FileSystem(mockContext)
-        viewModel = ReadingAppViewModel(fileSystem)
+        val mockApplication = mockContext.applicationContext as Application
+        viewModel = ReadingAppViewModel(fileSystem, mockApplication)
     }
 
     // Test to ensure that the ListDirectory displays the contents
