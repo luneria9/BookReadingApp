@@ -103,7 +103,7 @@ fun NavigationHost(
     var lastChapter = preferences.getInt(stringResource(R.string.last_location_chapter), -1)
 
     if (lastBook != -1 && lastChapter != -1)
-        startRoute = Reading.route
+        startRoute = Reading.createRoute(lastBook, lastChapter)
 
     NavHost(navController = navController, startDestination = startRoute) {
         composable(Home.route) {
@@ -188,7 +188,6 @@ fun BookReadingApp(
 
     val booksToDownload = stringArrayResource(R.array.book_urls)
     val bookTitles = stringArrayResource(R.array.book_titles)
-    val coroutineScope = rememberCoroutineScope()
     booksToDownload.forEachIndexed { index, url ->
         if (index < 3) {
             runBlocking {
