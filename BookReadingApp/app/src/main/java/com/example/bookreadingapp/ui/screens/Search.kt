@@ -1,5 +1,6 @@
 package com.example.bookreadingapp.ui.screens
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -17,28 +18,58 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.example.bookreadingapp.R
-import com.example.bookreadingapp.ui.theme.BookReadingAppTheme
+import com.example.bookreadingapp.data.entities.Chapters
+import com.example.bookreadingapp.data.entities.Pages
+import com.example.bookreadingapp.data.entities.SubChapters
+import com.example.bookreadingapp.ui.NavRoutes
+import com.example.bookreadingapp.viewModels.ReadingAppViewModel
 
 @Composable
-fun SearchScreen() {
-    Box(
-        modifier = Modifier.fillMaxSize(),
-    ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
+fun SearchScreen(viewModel: ReadingAppViewModel, navController: NavController, isBookSelected: Boolean) {
+    val searchQuery = remember { mutableStateOf("") }
+    val searchResultsChapters by viewModel.searchResultsChapters.observeAsState(emptyList())
+    val searchResultsSubChapters by viewModel.searchResultsSubChapters.observeAsState(emptyList())
+    val searchResultsPages by viewModel.searchResultsPages.observeAsState(emptyList())
+
+    // State to hold the selected result
+    val selectedResult = remember { mutableStateOf<Pair<Int, Int>?>(null) }
+
+    Box(modifier = Modifier.fillMaxSize()) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
             HeaderTitle()
             Spacer(Modifier.height(dimensionResource(R.dimen.spacer_medium)))
-            SearchBar()
+
+            if (!isBookSelected) {
+                Text(text = "No books selected")
+            } else {
+                SearchBar(searchQuery.value, onDone = {
+                    selectedResult.value?.let { (bookId, chapterId) ->
+                        navController.navigate(NavRoutes.Reading.createRoute(bookId, chapterId))
+                    }
+                }) { query ->
+                    searchQuery.value = query
+                    viewModel.performSearch(query)
+                }
+                SearchResultsList(
+                    searchResultsChapters,
+                    searchResultsSubChapters,
+                    searchResultsPages,
+                    selectedResult
+                )
+            }
         }
     }
 }
@@ -57,37 +88,73 @@ fun HeaderTitle(modifier: Modifier = Modifier) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SearchBar(modifier: Modifier = Modifier) {
-    // OutlinedTextField referenced from
-    // https://developer.android.com/codelabs/basic-android-kotlin-compose-viewmodel-and-state#2
+fun SearchBar(query: String, onDone: () -> Unit, onQueryChange: (String) -> Unit) {
     OutlinedTextField(
-        value = "",
+        value = query,
         singleLine = true,
         shape = shapes.large,
         modifier = Modifier.fillMaxWidth(),
         colors = TextFieldDefaults.textFieldColors(containerColor = colorScheme.surface),
-        onValueChange = { },
+        onValueChange = { onQueryChange(it) },
         label = { Text(stringResource(R.string.search_for_books)) },
         isError = false,
-        keyboardOptions = KeyboardOptions.Default.copy(
-            imeAction = ImeAction.Done
-        ),
-        keyboardActions = KeyboardActions(
-            onDone = { }
-        )
+        keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done),
+        keyboardActions = KeyboardActions(onDone = { onDone() })
     )
 }
 
-@Preview(showBackground = true)
 @Composable
-fun SearchScreenPreview() {
-    SearchScreen()
-}
-
-@Composable
-@Preview(showBackground = true, locale = "fr")
-fun SearchScreenPreviewFr() {
-    BookReadingAppTheme {
-        SearchScreen()
+fun SearchResultsList(
+    chapters: List<Chapters>,
+    subChapters: List<SubChapters>,
+    pages: List<Pages>,
+    selectedResult: MutableState<Pair<Int, Int>?>
+) {
+    Column {
+        chapters.forEach { chapter ->
+            Text(
+                text = chapter.title,
+                modifier = Modifier.clickable {
+                    selectedResult.value = Pair(chapter.bookId, chapter.id)
+                }
+            )
+        }
+        subChapters.forEach { subChapter ->
+            val bookId = chapters.find { it.id == subChapter.chapterId }?.bookId
+            if (bookId != null) {
+                Text(
+                    text = subChapter.title,
+                    modifier = Modifier.clickable {
+                        selectedResult.value = Pair(bookId, subChapter.chapterId)
+                    }
+                )
+            }
+        }
+        pages.forEach { page ->
+            val subChapter = subChapters.find { it.id == page.subchapterId }
+            val bookId = chapters.find { it.id == subChapter?.chapterId }?.bookId
+            if (bookId != null) {
+                Text(
+                    text = page.contents,
+                    modifier = Modifier.clickable {
+                        selectedResult.value = Pair(bookId, page.subchapterId) // Set selected result
+                    }
+                )
+            }
+        }
     }
 }
+
+//@Preview(showBackground = true)
+//@Composable
+//fun SearchScreenPreview() {
+//    SearchScreen()
+//}
+//
+//@Composable
+//@Preview(showBackground = true, locale = "fr")
+//fun SearchScreenPreviewFr() {
+//    BookReadingAppTheme {
+//        SearchScreen()
+//    }
+//}
