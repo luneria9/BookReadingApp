@@ -2,6 +2,7 @@ package com.example.bookreadingapp.ui.screens
 
 import androidx.compose.foundation.horizontalScroll
 import android.content.SharedPreferences
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -26,11 +27,20 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.TextUnit
+import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.bookreadingapp.data.entities.Pages
 import com.example.bookreadingapp.data.entities.SubChapters
 import com.example.bookreadingapp.viewModels.ReadingAppViewModel
+import com.mohamedrejeb.ksoup.entities.KsoupEntities
+import com.mohamedrejeb.ksoup.html.parser.KsoupHtmlHandler
+import com.mohamedrejeb.ksoup.html.parser.KsoupHtmlOptions
+import com.mohamedrejeb.ksoup.html.parser.KsoupHtmlParser
+import org.jsoup.Jsoup
+import org.jsoup.nodes.Document
 
 @Composable
 fun ReadingScreen(
@@ -146,6 +156,8 @@ fun PageContent(
         dimensionResource(R.dimen.font_medium).value.sp
     }
 
+    val tableHTML = getTableHTML(page.contents)
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -162,7 +174,26 @@ fun PageContent(
                 imageUrl = image.imageUrl
             )
         }
+
+        Table(
+            tableString = tableHTML,
+            fontSize = textSize
+        )
     }
+}
+
+/**
+ * Finds table tags in HTML and returns the entire table element and its children.
+ *
+ * @param string HTML string.
+ */
+private fun getTableHTML(string: String): String {
+    val startIndex = string.lowercase().indexOf("<table>")
+    val endIndex = string.lowercase().indexOf("</table>") + "<table>".length
+
+    return if (startIndex != -1 && endIndex != -1) {
+        string.substring(startIndex, endIndex)
+    } else { "" }
 }
 
 // Composable to display an image not working
@@ -211,4 +242,42 @@ fun ReadingMode(
             modifier = Modifier.testTag("readingModeSwitch")
         )
     }
+}
+
+@Composable
+fun Table(tableString: String, fontSize: TextUnit) {
+    val doc: Document = Jsoup.parse(tableString)
+    val rows = doc.select("tr")
+
+    Column(
+        modifier = Modifier
+            .padding(dimensionResource(R.dimen.padding_medium))
+    ) {
+        rows.forEach {
+            Row (
+                horizontalArrangement = Arrangement.spacedBy(
+                    dimensionResource(R.dimen.spacer_medium)
+                )
+            ) {
+                val cells = it.select("td, th")
+                cells.forEach { cell ->
+                    Text(
+                        text = cell.text(),
+                        fontSize = fontSize,
+                        modifier = Modifier
+                            .padding(dimensionResource(R.dimen.spacer_small))
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun TablePreview() {
+    Table(
+        tableString = "<table><tr><td>test</td><td>test2</td></tr><tr><td>test</td><td>test2</td><td>test3</td></tr><tr><td>test</td><td>test2</td></tr></table>",
+        fontSize = dimensionResource(R.dimen.font_medium).value.sp
+    )
 }
