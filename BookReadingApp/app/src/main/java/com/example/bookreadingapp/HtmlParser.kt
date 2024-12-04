@@ -176,16 +176,16 @@ class HtmlParser (viewModel: ReadingAppViewModel) {
             }
             when (unclosedTagList.lastOrNull()) {
                 "tbody" -> {
-                    content +="<tbody>"
+                    content +="</tbody>"
                 }
                 "tr" -> {
-                    content += "<tr>"
+                    content += "</tr>"
                 }
                 "td" -> {
-                    content += "<td>"
+                    content += "</td>"
                 }
                 "th" -> {
-                    content += "<th>"
+                    content += "</th>"
                 }
             }
             when (unclosedTagList.lastOrNull()) {
