@@ -146,7 +146,8 @@ fun NavigationHost(
                 chapterId = chapterId,
                 readingMode = viewModel.readingMode,
                 onReadingCheck = { viewModel.toggleReadingMode() },
-                viewModel = viewModel
+                viewModel = viewModel,
+                navController = navController
             )
         }
     }
