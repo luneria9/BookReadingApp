@@ -32,6 +32,7 @@ import com.example.bookreadingapp.viewModels.ReadingAppViewModel
 import androidx.navigation.NavController
 import com.example.bookreadingapp.data.entities.Chapters
 
+// the main reading screen function
 @Composable
 fun ReadingScreen(
     preferences: SharedPreferences,
@@ -76,6 +77,7 @@ fun ReadingScreen(
     )
 }
 
+// contains all the main content for ReadingScreen
 @Composable
 private fun ReadingMainContent(
     modifier: Modifier,
