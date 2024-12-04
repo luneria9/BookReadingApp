@@ -1,7 +1,10 @@
 package com.example.bookreadingapp
 
+import android.app.Application
 import android.content.Context
+import android.preference.PreferenceManager
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsOff
 import androidx.compose.ui.test.assertIsOn
@@ -9,6 +12,7 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.test.core.app.ApplicationProvider
 import com.example.bookreadingapp.ui.screens.ReadingScreen
 import com.example.bookreadingapp.ui.theme.BookReadingAppTheme
 import com.example.bookreadingapp.viewModels.ReadingAppViewModel
@@ -24,20 +28,33 @@ class ReadingUITests {
 
     private lateinit var context: Context
     private lateinit var viewModel: ReadingAppViewModel
+    private lateinit var application: Application
+
+    // Test constants
+    private val testBookId = 1
+    private val testChapterId = 1
 
     @Before
     fun setup() {
-        context = mock(Context::class.java)
+        context = ApplicationProvider.getApplicationContext()
+        application = context.applicationContext as Application
+
+        val preferences = PreferenceManager.getDefaultSharedPreferences(context)
 
         // Use the factory to get the viewModel
-        val viewModelFactory = ReadingAppViewModelFactory(context)
+        val viewModelFactory = ReadingAppViewModelFactory(context, application)
         composeTestRule.setContent {
             BookReadingAppTheme {
                 viewModel = viewModel(factory = viewModelFactory)
 
                 ReadingScreen(
+                    preferences = preferences,
                     readingMode = viewModel.readingMode,
-                    onReadingCheck = { viewModel.toggleReadingMode() }
+                    onReadingCheck = { viewModel.toggleReadingMode() },
+                    bookId = testBookId,
+                    chapterId = testChapterId,
+                    viewModel = viewModel,
+                    modifier = Modifier
                 )
             }
         }

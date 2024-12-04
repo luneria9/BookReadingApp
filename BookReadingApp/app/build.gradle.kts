@@ -73,6 +73,7 @@ dependencies {
     implementation("androidx.compose.runtime:runtime-livedata:1.5.4")
     implementation("androidx.compose.foundation:foundation-layout-android:1.5.4")
     implementation(libs.androidx.foundation.android)
+    implementation(libs.androidx.navigation.testing)
     annotationProcessor("androidx.room:room-compiler:2.6.0")
     kapt("androidx.room:room-compiler:2.6.0")
     testImplementation(libs.junit)
