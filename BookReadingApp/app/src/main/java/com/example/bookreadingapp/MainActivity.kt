@@ -90,8 +90,8 @@ fun NavigationHost(
     preferences: SharedPreferences,
 ) {
     var startRoute = Home.route
-    val lastBook = preferences.getInt(stringResource(R.string.last_location_book), -1)
-    val lastChapter = preferences.getInt(stringResource(R.string.last_location_chapter), -1)
+    var lastBook = preferences.getInt(stringResource(R.string.last_location_book), -1)
+    var lastChapter = preferences.getInt(stringResource(R.string.last_location_chapter), -1)
 
     if (lastBook != -1 && lastChapter != -1)
         startRoute = Reading.route
@@ -135,6 +135,10 @@ fun NavigationHost(
                 bookId = lastBook
                 chapterId = lastChapter
             }
+
+            // Reset location
+            lastBook = -1
+            lastChapter = -1
 
             ReadingScreen(
                 preferences = preferences,
