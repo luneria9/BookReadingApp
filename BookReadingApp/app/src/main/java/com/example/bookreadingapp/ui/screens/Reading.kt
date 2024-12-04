@@ -4,6 +4,7 @@ import androidx.compose.foundation.horizontalScroll
 import android.content.SharedPreferences
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
@@ -64,17 +65,20 @@ fun ReadingScreen(
     }.observeAsState(initial = emptyList())
 
     // Main container for the reading screen
-    ReadingMainContent(
-        modifier,
-        subChapters,
-        viewModel,
-        readingMode,
-        onReadingCheck,
-        navController,
-        bookId,
-        chapterId,
-        chapters
-    )
+    Column(Modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally) {
+        ReadingMainContent(
+            modifier,
+            subChapters,
+            viewModel,
+            readingMode,
+            onReadingCheck,
+            navController,
+            bookId,
+            chapterId,
+            chapters
+        )
+    }
 }
 
 // contains all the main content for ReadingScreen
@@ -91,35 +95,37 @@ private fun ReadingMainContent(
     chapters: List<Chapters>
 ) {
     val currentChapter = chapters.find { it.id == chapterId}
-    Box(modifier = modifier.fillMaxSize()) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(dimensionResource(R.dimen.padding_medium))
-        ) {
-            // Display the subchapter title at the top
-            if (currentChapter != null) {
-                Text(
-                    text = currentChapter.title,
-                    fontSize = dimensionResource(R.dimen.font_big).value.sp,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(vertical = dimensionResource(R.dimen.padding_medium))
-                )
-            }
-            // Render the content of the chapter
-            ChapterContent(
-                subChapters = subChapters,
-                viewModel = viewModel,
-                readingMode = readingMode,
+    Column(
+        modifier = Modifier
+            .height(500.dp)
+            .padding(dimensionResource(R.dimen.padding_medium))
+            .verticalScroll(rememberScrollState())
+    ) {
+        // Display the subchapter title at the top
+        if (currentChapter != null) {
+            Text(
+                text = currentChapter.title,
+                fontSize = dimensionResource(R.dimen.font_big).value.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(vertical = dimensionResource(R.dimen.padding_medium))
             )
         }
+        // Render the content of the chapter
+        ChapterContent(
+            subChapters = subChapters,
+            viewModel = viewModel,
+            readingMode = readingMode,
+        )
+    }
+    Column (
+        verticalArrangement = Arrangement.Bottom,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
         // Display the reading mode toggle at the bottom of the screen
         ReadingMode(
             readingMode = readingMode,
             onReadingCheck = onReadingCheck,
-            modifier = Modifier.align(Alignment.BottomCenter)
         )
-
         NavigateBook(
             readingMode = readingMode,
             navController = navController,
@@ -261,11 +267,10 @@ fun ImageContent(
 fun ReadingMode(
     readingMode: Boolean,
     onReadingCheck: (Boolean) -> Unit,
-    modifier: Modifier
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        modifier = modifier
+        horizontalArrangement = Arrangement.Center
     ) {
         Text(
             text = stringResource(R.string.reading_mode),
