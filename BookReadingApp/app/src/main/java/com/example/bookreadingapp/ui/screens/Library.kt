@@ -286,12 +286,14 @@ fun DownloadSection(viewModel: ReadingAppViewModel, scope: CoroutineScope) {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         bookTitles.forEachIndexed { index, title ->
-            DownloadButton(
-                title = title,
-                url = bookUrls[index],
-                scope = scope,
-                viewModel = viewModel
-            )
+            if (index > 2) {
+                DownloadButton(
+                    title = title,
+                    url = bookUrls[index],
+                    scope = scope,
+                    viewModel = viewModel
+                )
+            }
         }
         Spacer(modifier = Modifier.size(dimensionResource(id = R.dimen.spacer_medium)))
     }
@@ -424,9 +426,8 @@ fun ContentsButton(navController: NavController) {
 }
 
 // Created book download function for downloading book files
-private suspend fun downloadBook(url: String, fileName: String, viewModel: ReadingAppViewModel) {
+suspend fun downloadBook(url: String, fileName: String, viewModel: ReadingAppViewModel) {
     val zipFileName = url.substringAfterLast("/")
-
     viewModel.downloadUnzip(url, zipFileName, fileName)
 }
 

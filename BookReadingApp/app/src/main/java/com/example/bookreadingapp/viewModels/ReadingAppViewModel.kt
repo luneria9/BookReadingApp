@@ -66,18 +66,25 @@ class ReadingAppViewModel(private val fileSystem: FileSystem, application: Appli
     suspend fun downloadUnzip(url: String, fileName: String, destDirectory: String) {
         viewModelScope.launch(Dispatchers.Default) {
             // Download file
+            Log.d("job", "downloading")
             val downloadJob = launch(Dispatchers.IO) { setupDownload(url) }
             downloadJob.join()
+            Log.d("job", "unzip")
 
             // Unzip file
-            val unzipJob = launch(Dispatchers.Default) { unzipFile(fileName, destDirectory) }
+            val unzipJob = launch(Dispatchers.IO) { unzipFile(fileName, destDirectory) }
             unzipJob.join()
 
             // Get the path of the unzipped HTML file
             val unzippedPath = "${applicationContext.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS)}/$destDirectory"
 
+            val htmlFiles = File(unzippedPath).walk()
+                .filter { it.isFile && it.extension.equals("html", ignoreCase = true) }
+                .map { it.toURI().toString() }
+                .toList()
             // Parse and insert the book data
-            parseAndInsert(mutableListOf("$unzippedPath/index.html"))
+            Log.d("job", "parsing")
+            val parseJob = launch(Dispatchers.IO) { parseAndInsert(htmlFiles.toMutableList()) }
         }
     }
 
@@ -315,13 +322,11 @@ class ReadingAppViewModel(private val fileSystem: FileSystem, application: Appli
         imagesRepository.findImagesOfPage(1)
     }
 
-    fun parseAndInsert(listOfPaths: MutableList<String>){
-        // TODO use the listOfPaths
-        val directory = this.applicationContext.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS).toString()+"/Physics/pg40175-images.html";
+    private fun parseAndInsert(listOfPaths: MutableList<String>){
         val viewModel = this
         viewModelScope.launch(Dispatchers.Default) {
             val parser = HtmlParser(viewModel = viewModel);
-            parser.parse(mutableListOf(directory), viewModel);
+            parser.parse(listOfPaths, viewModel);
         }
 
     }

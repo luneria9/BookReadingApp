@@ -35,7 +35,10 @@
     <!-- Placeholder list of book titles -->
     <string-array name="book_titles">
         <item>Physics</item>
-        <item>Treasure Island</item>
-        <item>The inventions, researches and writings of Nikola Tesla</item>
+        <item>Treasure</item>
+        <item>Tesla</item>
+        <item>Chemistry</item>
+        <item>Cookery</item>
+        <item>Food</item>
     </string-array>
 </resources>

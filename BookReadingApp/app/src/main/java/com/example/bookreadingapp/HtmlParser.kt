@@ -25,7 +25,7 @@ class HtmlParser (viewModel: ReadingAppViewModel) {
     private fun readFile(paths: MutableList<String>) :String {
         var data = ""
         for (path in paths){
-            val myObj = File(path)
+            val myObj = File(path.substringAfter(":"))
             val myReader = Scanner(myObj)
             while (myReader.hasNextLine()) {
                 data += myReader.nextLine()
@@ -98,6 +98,7 @@ class HtmlParser (viewModel: ReadingAppViewModel) {
                 val result = runBlocking {
                     viewModel.asyncInsertAndReturnBook(Books(title, authorsString, subject, release))
                 }
+                Log.d("parsing", title)
                 currentBook = result
             }
         }
@@ -176,16 +177,16 @@ class HtmlParser (viewModel: ReadingAppViewModel) {
             }
             when (unclosedTagList.lastOrNull()) {
                 "tbody" -> {
-                    content +="<tbody>"
+                    content +="</tbody>"
                 }
                 "tr" -> {
-                    content += "<tr>"
+                    content += "</tr>"
                 }
                 "td" -> {
-                    content += "<td>"
+                    content += "</td>"
                 }
                 "th" -> {
-                    content += "<th>"
+                    content += "</th>"
                 }
             }
             when (unclosedTagList.lastOrNull()) {
