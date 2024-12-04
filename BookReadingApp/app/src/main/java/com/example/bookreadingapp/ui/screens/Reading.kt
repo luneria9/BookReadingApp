@@ -181,7 +181,7 @@ fun PageContent(
     val replacedImage = page.contents.replace("<IMAGE>", "")
     val replacedPlaceholder = replacedImage.replace("<PLACEHOLDER>", "")
 
-//    val tableHTML = getTableHTML(page.contents)
+    val tableHTML = getTableHTML(page.contents)
 
     Column(
         modifier = Modifier
@@ -200,10 +200,10 @@ fun PageContent(
             )
         }
 
-//        Table(
-//            tableString = tableHTML,
-//            fontSize = textSize
-//        )
+        Table(
+            tableString = tableHTML,
+            fontSize = textSize
+        )
     }
 }
 
@@ -325,40 +325,40 @@ fun NavigateBook(
     }
 }
 
-//@Composable
-//fun Table(tableString: String, fontSize: TextUnit) {
-//    val doc: Document = Jsoup.parse(tableString)
-//    val rows = doc.select("tr")
-//
-//    Column(
-//        modifier = Modifier
-//            .padding(dimensionResource(R.dimen.padding_medium))
-//    ) {
-//        rows.forEach {
-//            Row (
-//                horizontalArrangement = Arrangement.spacedBy(
-//                    dimensionResource(R.dimen.spacer_medium)
-//                )
-//            ) {
-//                val cells = it.select("td, th")
-//                cells.forEach { cell ->
-//                    Text(
-//                        text = cell.text(),
-//                        fontSize = fontSize,
-//                        modifier = Modifier
-//                            .padding(dimensionResource(R.dimen.spacer_small))
-//                    )
-//                }
-//            }
-//        }
-//    }
-//}
+@Composable
+fun Table(tableString: String, fontSize: TextUnit) {
+    val doc: Document = Jsoup.parse(tableString)
+    val rows = doc.select("tr")
 
-//@Preview(showBackground = true)
-//@Composable
-//fun TablePreview() {
-//    Table(
-//        tableString = "<table><tr><td>test</td><td>test2</td></tr><tr><td>test</td><td>test2</td><td>test3</td></tr><tr><td>test</td><td>test2</td></tr></table>",
-//        fontSize = dimensionResource(R.dimen.font_medium).value.sp
-//    )
-//}
+    Column(
+        modifier = Modifier
+            .padding(dimensionResource(R.dimen.padding_medium))
+    ) {
+        rows.forEach {
+            Row (
+                horizontalArrangement = Arrangement.spacedBy(
+                    dimensionResource(R.dimen.spacer_medium)
+                )
+            ) {
+                val cells = it.select("td, th")
+                cells.forEach { cell ->
+                    Text(
+                        text = cell.text(),
+                        fontSize = fontSize,
+                        modifier = Modifier
+                            .padding(dimensionResource(R.dimen.spacer_small))
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun TablePreview() {
+    Table(
+        tableString = "<table><tr><td>test</td><td>test2</td></tr><tr><td>test</td><td>test2</td><td>test3</td></tr><tr><td>test</td><td>test2</td></tr></table>",
+        fontSize = dimensionResource(R.dimen.font_medium).value.sp
+    )
+}
