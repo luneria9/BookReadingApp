@@ -2,6 +2,7 @@ package com.example.bookreadingapp.ui.screens
 
 import androidx.compose.foundation.horizontalScroll
 import android.content.SharedPreferences
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -22,14 +23,17 @@ import com.example.bookreadingapp.R
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.material3.Button
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
+import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.bookreadingapp.data.entities.Pages
 import com.example.bookreadingapp.data.entities.SubChapters
+import com.example.bookreadingapp.ui.NavRoutes
 import com.example.bookreadingapp.viewModels.ReadingAppViewModel
 
 @Composable
@@ -40,7 +44,8 @@ fun ReadingScreen(
     bookId: Int,
     chapterId: Int,
     viewModel: ReadingAppViewModel,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    navController: NavController
 ) {
     // Store the last book and chapter accessed
     with (preferences.edit()) {
@@ -48,7 +53,6 @@ fun ReadingScreen(
         putInt(stringResource(R.string.last_location_chapter), chapterId)
         apply()
     }
-
     // Observe content states
     val subChapters by remember(chapterId) {
         viewModel.findSubChaptersOfChapter(chapterId)
@@ -67,7 +71,7 @@ fun ReadingScreen(
             ChapterContent(
                 subChapters = subChapters,
                 viewModel = viewModel,
-                readingMode = readingMode
+                readingMode = readingMode,
             )
         }
         // Display the reading mode toggle at the bottom of the screen
@@ -76,6 +80,8 @@ fun ReadingScreen(
             onReadingCheck = onReadingCheck,
             modifier = Modifier.align(Alignment.BottomCenter)
         )
+        NavigateBook(readingMode = readingMode, navController = navController,
+            bookId, chapterId, viewModel)
     }
 }
 
@@ -145,6 +151,8 @@ fun PageContent(
     } else {
         dimensionResource(R.dimen.font_medium).value.sp
     }
+    val replacedImage = page.contents.replace("<IMAGE>", "")
+    val replacedPlaceholder = replacedImage.replace("<PLACEHOLDER>", "")
 
     Column(
         modifier = Modifier
@@ -152,7 +160,7 @@ fun PageContent(
             .padding(vertical = dimensionResource(R.dimen.padding_small))
     ) {
         Text(
-            text = page.contents,
+            text = replacedPlaceholder,
             fontSize = textSize,
             modifier = Modifier.padding(bottom = dimensionResource(R.dimen.padding_small))
         )
@@ -202,7 +210,7 @@ fun ReadingMode(
         Text(
             text = stringResource(R.string.reading_mode),
             fontSize = dimensionResource(R.dimen.font_medium).value.sp,
-            fontWeight = FontWeight.Bold
+            fontWeight = FontWeight.Bold,
         )
         Spacer(Modifier.width(dimensionResource(R.dimen.spacer_medium)))
         Switch(
@@ -210,5 +218,42 @@ fun ReadingMode(
             onCheckedChange = onReadingCheck,
             modifier = Modifier.testTag("readingModeSwitch")
         )
+    }
+}
+
+// Composable to display nagivation for reading mode
+@Composable
+fun NavigateBook(
+    readingMode: Boolean,
+    navController: NavController,
+    bookId: Int,
+    chapterId: Int,
+    viewModel: ReadingAppViewModel
+) {
+    // Observe chapters
+    val chapters by remember(bookId) {
+        viewModel.findChaptersFromBook(bookId)
+        viewModel.searchResultsChapters
+    }.observeAsState(initial = emptyList())
+    if (readingMode) {
+        Row (
+            horizontalArrangement = Arrangement.SpaceBetween,
+            modifier = Modifier.fillMaxWidth()
+        ){
+            if(chapterId != 1){
+                Button(onClick = {
+                    navController.navigate(NavRoutes.Reading.createRoute(bookId, chapterId - 1))
+                }) {
+                    Text(text = "Previous Page")
+                }
+            }
+            if(chapterId < chapters.size) {
+                Button(onClick = {
+                    navController.navigate(NavRoutes.Reading.createRoute(bookId, chapterId + 1))
+                }) {
+                    Text(text = "Next Page")
+                }
+            }
+        }
     }
 }
