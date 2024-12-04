@@ -43,7 +43,10 @@ import com.example.bookreadingapp.ui.screens.*
 import com.example.bookreadingapp.ui.utils.AdaptiveNavigationType
 import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass as calculateWindowSizeClass1
 import androidx.compose.material3.Scaffold
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.dimensionResource
@@ -105,6 +108,7 @@ fun NavigationHost(
     if (lastBook != -1 && lastChapter != -1)
         startRoute = Reading.route
 
+    val isBookSelected by remember { mutableStateOf(false) }
     NavHost(navController = navController, startDestination = startRoute) {
         composable(Home.route) {
             HomeScreen(navController)
@@ -115,7 +119,7 @@ fun NavigationHost(
         }
 
         composable(Search.route) {
-            SearchScreen()
+            SearchScreen(viewModel, navController, isBookSelected)
         }
 
         composable(
