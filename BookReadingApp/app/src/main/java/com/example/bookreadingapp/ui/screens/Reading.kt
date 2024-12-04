@@ -5,6 +5,8 @@ import android.content.SharedPreferences
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -255,16 +257,34 @@ fun NavigateBook(
             modifier = Modifier.fillMaxWidth()
         ) {
             if (chapterId != 1) {
-                Button(onClick = {
-                    navController.navigate(NavRoutes.Reading.createRoute(bookId, chapterId - 1))
-                }) {
+                Button(
+                    onClick = {
+                        navController.navigate(NavRoutes.Reading.createRoute(bookId, chapterId - 1))
+                    },
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(end = 8.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        contentColor = MaterialTheme.colorScheme.onPrimary
+                    )
+                ) {
                     Text(text = "Previous Page")
                 }
             }
             if (chapterId < chapters.size) {
-                Button(onClick = {
-                    navController.navigate(NavRoutes.Reading.createRoute(bookId, chapterId + 1))
-                }) {
+                Button(
+                    onClick = {
+                        navController.navigate(NavRoutes.Reading.createRoute(bookId, chapterId + 1))
+                    },
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(start = 8.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        contentColor = MaterialTheme.colorScheme.onPrimary
+                    )
+                ) {
                     Text(text = "Next Page")
                 }
             }
