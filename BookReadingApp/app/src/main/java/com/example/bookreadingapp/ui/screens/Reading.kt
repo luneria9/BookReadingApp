@@ -1,10 +1,7 @@
 package com.example.bookreadingapp.ui.screens
 
-import android.app.Activity
-import android.content.Context
+import androidx.compose.foundation.horizontalScroll
 import android.content.SharedPreferences
-import android.util.Log
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -20,18 +17,13 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
-import androidx.navigation.compose.rememberNavController
 import com.example.bookreadingapp.R
-import com.example.bookreadingapp.ui.theme.BookReadingAppTheme
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import coil.compose.AsyncImage
@@ -43,6 +35,8 @@ import com.example.bookreadingapp.viewModels.ReadingAppViewModel
 @Composable
 fun ReadingScreen(
     preferences: SharedPreferences,
+    readingMode: Boolean,
+    onReadingCheck: (Boolean) -> Unit,
     bookId: Int,
     chapterId: Int,
     viewModel: ReadingAppViewModel,
@@ -61,31 +55,31 @@ fun ReadingScreen(
         viewModel.searchResultsSubChapters
     }.observeAsState(initial = emptyList())
 
-    // Reading mode state
-    val readingMode by remember { mutableStateOf(viewModel.readingMode) }
-
+    // Main container for the reading screen
     Box(modifier = modifier.fillMaxSize()) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .verticalScroll(rememberScrollState())
+                .horizontalScroll(rememberScrollState())
                 .padding(dimensionResource(R.dimen.padding_medium))
         ) {
+            // Render the content of the chapter
             ChapterContent(
                 subChapters = subChapters,
                 viewModel = viewModel,
                 readingMode = readingMode
             )
-
-            ReadingMode(
-                readingMode = readingMode,
-                onReadingCheck = { viewModel.toggleReadingMode() },
-                modifier = Modifier.align(Alignment.CenterHorizontally)
-            )
         }
+        // Display the reading mode toggle at the bottom of the screen
+        ReadingMode(
+            readingMode = readingMode,
+            onReadingCheck = onReadingCheck,
+            modifier = Modifier.align(Alignment.BottomCenter)
+        )
     }
 }
 
+// Composable to display the content of a chapter not working
 @Composable
 fun ChapterContent(
     subChapters: List<SubChapters>,
@@ -108,6 +102,7 @@ fun ChapterContent(
     }
 }
 
+// Composable to display a subchapter and its pages not working
 @Composable
 fun SubChapterSection(
     subChapter: SubChapters,
@@ -131,6 +126,7 @@ fun SubChapterSection(
     }
 }
 
+// Composable to display the content of a page not working
 @Composable
 fun PageContent(
     page: Pages,
@@ -163,17 +159,16 @@ fun PageContent(
 
         images.forEach { image ->
             ImageContent(
-                imageUrl = image.imageUrl,
-                readingMode = readingMode
+                imageUrl = image.imageUrl
             )
         }
     }
 }
 
+// Composable to display an image not working
 @Composable
 fun ImageContent(
-    imageUrl: String,
-    readingMode: Boolean
+    imageUrl: String
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -192,6 +187,8 @@ fun ImageContent(
         )
     }
 }
+
+// Composable to display the reading mode toggle
 @Composable
 fun ReadingMode(
     readingMode: Boolean,
@@ -215,37 +212,3 @@ fun ReadingMode(
         )
     }
 }
-
-//@Preview(showBackground = true)
-//@Composable
-//fun ReadingScreenPreview() {
-//    BookReadingAppTheme {
-//        ReadingScreen(false, {}, Activity().getPreferences(Context.MODE_PRIVATE))
-//    }
-//}
-//
-//@Composable
-//@Preview(showBackground = true, locale = "fr")
-//fun ReadingScreenPreviewFr() {
-//    BookReadingAppTheme {
-//        val navController = rememberNavController()
-//        ReadingScreen(false, {}, Activity().getPreferences(Context.MODE_PRIVATE))
-//    }
-//}
-
-//@Preview(showBackground = true)
-//@Composable
-//fun ReadingScreenPreview() {
-//    BookReadingAppTheme {
-//        ReadingScreen(false, {})
-//    }
-//}
-//
-//@Composable
-//@Preview(showBackground = true, locale = "fr")
-//fun ReadingScreenPreviewFr() {
-//    BookReadingAppTheme {
-//        val navController = rememberNavController()
-//        ReadingScreen(false, {})
-//    }
-//}
