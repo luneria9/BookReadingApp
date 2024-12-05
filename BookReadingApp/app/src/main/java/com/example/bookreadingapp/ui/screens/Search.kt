@@ -58,7 +58,7 @@ fun SearchScreen(viewModel: ReadingAppViewModel, navController: NavController) {
 
             // Check selectedBookId instead of isBookSelected
             if (viewModel.selectedBookId == null) {
-                Text(text = "No books selected")
+                Text(text = stringResource(R.string.please_select_a_book))
             } else {
                 SearchBar(
                     searchQuery.value,
