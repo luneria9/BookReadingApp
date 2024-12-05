@@ -1,6 +1,8 @@
 package com.example.bookreadingapp
 
+import android.app.Application
 import android.content.Context
+import android.preference.PreferenceManager
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.ui.Modifier
@@ -29,18 +31,20 @@ internal class NavigationTests {
             SemanticsActions.OnClick
         )?.label == label
     }
+    val context = ApplicationProvider.getApplicationContext<Context>()
+    val application = context.applicationContext as Application
+    val preferences = PreferenceManager.getDefaultSharedPreferences(context)
+    val viewModel = ReadingAppViewModelFactory(context, application).create(ReadingAppViewModel::class.java)
 
     @OptIn(ExperimentalMaterial3Api::class)
     @Test
     fun validateNavBar() {
-        val context = ApplicationProvider.getApplicationContext<Context>()
-        val viewModel = ReadingAppViewModelFactory(context).create(ReadingAppViewModel::class.java)
-
         composeTestRule.setContent {
             BookReadingApp(
                 windowSizeClass = WindowWidthSizeClass.Compact,
                 viewModel = viewModel,
-                modifier = Modifier
+                modifier = Modifier,
+                preferences = preferences
             )
         }
 
@@ -53,13 +57,14 @@ internal class NavigationTests {
     @Test
     fun validateNavRail() {
         val context = ApplicationProvider.getApplicationContext<Context>()
-        val viewModel = ReadingAppViewModelFactory(context).create(ReadingAppViewModel::class.java)
+        val viewModel = ReadingAppViewModelFactory(context, application).create(ReadingAppViewModel::class.java)
 
         composeTestRule.setContent {
             BookReadingApp(
                 windowSizeClass = WindowWidthSizeClass.Medium,
                 viewModel = viewModel,
-                modifier = Modifier
+                modifier = Modifier,
+                preferences = preferences
             )
         }
 
@@ -72,13 +77,14 @@ internal class NavigationTests {
     @Test
     fun validateNavDrawer() {
         val context = ApplicationProvider.getApplicationContext<Context>()
-        val viewModel = ReadingAppViewModelFactory(context).create(ReadingAppViewModel::class.java)
+        val viewModel = ReadingAppViewModelFactory(context, application).create(ReadingAppViewModel::class.java)
 
         composeTestRule.setContent {
             BookReadingApp(
                 windowSizeClass = WindowWidthSizeClass.Expanded,
                 viewModel = viewModel,
-                modifier = Modifier
+                modifier = Modifier,
+                preferences = preferences
             )
         }
 
@@ -91,14 +97,15 @@ internal class NavigationTests {
     @Test
     fun bottomNavigationBar_isVisibleInCompactMode() {
         val context = ApplicationProvider.getApplicationContext<Context>()
-        val viewModel = ReadingAppViewModelFactory(context).create(ReadingAppViewModel::class.java)
+        val viewModel = ReadingAppViewModelFactory(context, application).create(ReadingAppViewModel::class.java)
 
         composeTestRule.setContent {
             BookReadingAppTheme {
                 BookReadingApp(
                     windowSizeClass = WindowWidthSizeClass.Compact,
                     viewModel = viewModel,
-                    modifier = Modifier
+                    modifier = Modifier,
+                    preferences = preferences
                 )
             }
         }
@@ -125,7 +132,7 @@ internal class NavigationTests {
     @Test
     fun bottomNavigationBar_isHiddenInReadingMode() {
         val context = ApplicationProvider.getApplicationContext<Context>()
-        val viewModel = ReadingAppViewModelFactory(context).create(ReadingAppViewModel::class.java).apply {
+        val viewModel = ReadingAppViewModelFactory(context, application).create(ReadingAppViewModel::class.java).apply {
             toggleReadingMode() // Toggle reading mode to hide the bottom nav bar
         }
 
@@ -133,7 +140,8 @@ internal class NavigationTests {
             BookReadingApp(
                 windowSizeClass = WindowWidthSizeClass.Compact,
                 viewModel = viewModel,
-                modifier = Modifier
+                modifier = Modifier,
+                preferences = preferences
             )
         }
 

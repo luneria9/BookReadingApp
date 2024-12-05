@@ -2,8 +2,10 @@
 
 package com.example.bookreadingapp
 
+import android.app.Activity
+import android.content.Context
+import android.content.SharedPreferences
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -35,14 +37,13 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
 import com.example.bookreadingapp.ui.NavBarItems
 import com.example.bookreadingapp.ui.NavRoutes.*
 import com.example.bookreadingapp.ui.screens.*
 import com.example.bookreadingapp.ui.utils.AdaptiveNavigationType
 import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass as calculateWindowSizeClass1
 import androidx.compose.material3.Scaffold
-import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.dimensionResource
@@ -51,17 +52,22 @@ import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import com.example.bookreadingapp.fileSystem.FileSystem
-import com.example.bookreadingapp.ui.NavRoutes
+import androidx.navigation.NavType
+import androidx.navigation.navArgument
 import com.example.bookreadingapp.ui.theme.BookReadingAppTheme
 import com.example.bookreadingapp.viewModels.ReadingAppViewModel
 import com.example.bookreadingapp.viewModels.ReadingAppViewModelFactory
-import java.nio.file.Paths
-
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.newSingleThreadContext
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 
 class MainActivity : ComponentActivity() {
     private val viewModel: ReadingAppViewModel by viewModels {
-        ReadingAppViewModelFactory(this.applicationContext) // Use application context to prevent memory leaks
+        ReadingAppViewModelFactory(this.applicationContext, application) // Use application context to prevent memory leaks
     }
     @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -70,10 +76,13 @@ class MainActivity : ComponentActivity() {
         setContent {
             BookReadingAppTheme  {
                 val windowSize = calculateWindowSizeClass1(this)
+                val sharedPref = this.getPreferences(Context.MODE_PRIVATE)
+
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     BookReadingApp(
                         windowSizeClass = windowSize.widthSizeClass,
                         viewModel = viewModel,
+                        preferences = sharedPref,
                         modifier = Modifier.padding(innerPadding)
                     )
                 }
@@ -84,9 +93,19 @@ class MainActivity : ComponentActivity() {
 
 // Defines navigation routes for the app
 @Composable
-fun NavigationHost(navController: NavHostController, viewModel: ReadingAppViewModel) {
-    NavHost(navController = navController, startDestination = NavRoutes.Home.route
-    ) {
+fun NavigationHost(
+    navController: NavHostController,
+    viewModel: ReadingAppViewModel,
+    preferences: SharedPreferences,
+) {
+    var startRoute = Home.route
+    var lastBook = preferences.getInt(stringResource(R.string.last_location_book), -1)
+    var lastChapter = preferences.getInt(stringResource(R.string.last_location_chapter), -1)
+
+    if (lastBook != -1 && lastChapter != -1)
+        startRoute = Reading.route
+
+    NavHost(navController = navController, startDestination = startRoute) {
         composable(Home.route) {
             HomeScreen(navController)
         }
@@ -99,14 +118,45 @@ fun NavigationHost(navController: NavHostController, viewModel: ReadingAppViewMo
             SearchScreen()
         }
 
-        composable(Contents.route) {
-            ContentsScreen()
+        composable(
+            route = Contents.route,
+            arguments = listOf(navArgument("bookId") { type = NavType.IntType })
+        ) { backStackEntry ->
+            val bookId = backStackEntry.arguments?.getInt("bookId") ?: 0
+            ContentsScreen(
+                bookId = bookId,
+                navController = navController,
+                viewModel = viewModel
+            )
         }
 
-        composable(Reading.route) {
+        composable(
+            route = Reading.route,
+            arguments = listOf(
+                navArgument("bookId") { type = NavType.IntType },
+                navArgument("chapterId") { type = NavType.IntType }
+            )
+        ) { backStackEntry ->
+            var bookId = backStackEntry.arguments?.getInt("bookId") ?: 0
+            var chapterId = backStackEntry.arguments?.getInt("chapterId") ?: 0
+
+            if (lastBook != -1 && lastChapter != -1) {
+                bookId = lastBook
+                chapterId = lastChapter
+            }
+
+            // Reset location
+            lastBook = -1
+            lastChapter = -1
+
             ReadingScreen(
+                preferences = preferences,
+                bookId = bookId,
+                chapterId = chapterId,
                 readingMode = viewModel.readingMode,
-                onReadingCheck = { viewModel.toggleReadingMode() }
+                onReadingCheck = { viewModel.toggleReadingMode() },
+                viewModel = viewModel,
+                navController = navController
             )
         }
     }
@@ -123,16 +173,30 @@ fun getAdaptiveNavigationType(windowSizeClass: WindowWidthSizeClass): AdaptiveNa
 }
 
 // Composable to adapts layout to screen size
+@OptIn(ExperimentalCoroutinesApi::class, DelicateCoroutinesApi::class)
 @Composable
 @ExperimentalMaterial3Api
 fun BookReadingApp(
     windowSizeClass: WindowWidthSizeClass,
     viewModel: ReadingAppViewModel = viewModel(),
+    preferences: SharedPreferences,
     modifier: Modifier
 ) {
     val navController = rememberNavController()
     val adaptiveNavigationType = getAdaptiveNavigationType(windowSizeClass)
-    BookReadingScaffold(navController, adaptiveNavigationType, viewModel)
+    BookReadingScaffold(navController, adaptiveNavigationType, viewModel, preferences)
+
+    val booksToDownload = stringArrayResource(R.array.book_urls)
+    val bookTitles = stringArrayResource(R.array.book_titles)
+    val coroutineScope = rememberCoroutineScope()
+    booksToDownload.forEachIndexed { index, url ->
+        if (index < 3) {
+            runBlocking {
+                val fileName = url.substringAfterLast("/")
+                viewModel.downloadUnzip(url, fileName, bookTitles[index])
+            }
+        }
+    }
 }
 
 // Scaffold structure with conditional top and bottom bars
@@ -141,6 +205,7 @@ fun BookReadingScaffold(
     navController: NavHostController,
     adaptiveNavigationType: AdaptiveNavigationType,
     viewModel: ReadingAppViewModel,
+    preferences: SharedPreferences,
 ) {
     Scaffold(
         topBar = {
@@ -159,7 +224,8 @@ fun BookReadingScaffold(
             navController = navController,
             adaptiveNavigationType = adaptiveNavigationType,
             viewModel = viewModel,
-            paddingValues = paddingValues
+            paddingValues = paddingValues,
+            preferences = preferences
         )
     }
 }
@@ -170,11 +236,12 @@ fun BookReadingContent(
     navController: NavHostController,
     adaptiveNavigationType: AdaptiveNavigationType,
     viewModel: ReadingAppViewModel,
-    paddingValues: PaddingValues
+    paddingValues: PaddingValues,
+    preferences: SharedPreferences,
 ) {
     Row(modifier = Modifier.padding(paddingValues)) {
         if (adaptiveNavigationType == AdaptiveNavigationType.PERMANENT_NAVIGATION_DRAWER) {
-            PermanentNavigationDrawerComponent(viewModel, navController)
+            PermanentNavigationDrawerComponent(viewModel, navController, preferences)
         } else {
             if (adaptiveNavigationType == AdaptiveNavigationType.NAVIGATION_RAIL && !viewModel.readingMode) {
                 NavigationRailComponent(navController = navController)
@@ -185,7 +252,11 @@ fun BookReadingContent(
                     .fillMaxSize()
                     .padding(paddingValues)
             ) {
-                NavigationHost(navController = navController, viewModel = viewModel)
+                NavigationHost(
+                    navController = navController,
+                    viewModel = viewModel,
+                    preferences = preferences
+                )
             }
         }
     }
@@ -284,6 +355,7 @@ fun DrawerContent(viewModel: ReadingAppViewModel, navController: NavHostControll
 fun PermanentNavigationDrawerComponent(
     viewModel: ReadingAppViewModel,
     navController: NavHostController,
+    preferences: SharedPreferences,
 ) {
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentRoutes = backStackEntry?.destination?.route
@@ -293,7 +365,11 @@ fun PermanentNavigationDrawerComponent(
         },
         content = {
             Box(modifier = Modifier.fillMaxSize()) {
-                NavigationHost(navController = navController, viewModel = viewModel)
+                NavigationHost(
+                    navController = navController,
+                    viewModel = viewModel,
+                    preferences = preferences
+                )
             }
         }
     )
@@ -331,6 +407,6 @@ fun BookReadingTopAppBar(modifier: Modifier = Modifier){
 @Composable
 fun GreetingPreview() {
     BookReadingAppTheme {
-        BookReadingApp(windowSizeClass = Expanded, modifier = Modifier)
+        BookReadingApp(windowSizeClass = Expanded, preferences = Activity().getPreferences(Context.MODE_PRIVATE), modifier = Modifier)
     }
 }

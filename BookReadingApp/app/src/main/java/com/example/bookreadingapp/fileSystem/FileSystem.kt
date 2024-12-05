@@ -2,7 +2,6 @@ package com.example.bookreadingapp.fileSystem
 
 import android.content.Context
 import android.os.Environment
-import android.util.Log
 import java.io.File
 import java.io.FileOutputStream
 import java.io.InputStream
@@ -79,5 +78,4 @@ open class FileSystem(private val context: Context){
         val downloadFolder = File(context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS), directoryName)
         downloadFolder.listFiles()?.forEach { it.delete() }
     }
-
 }

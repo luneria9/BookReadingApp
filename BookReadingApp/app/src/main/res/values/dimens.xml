@@ -8,6 +8,7 @@
     <dimen name="spacer_medium">12dp</dimen>
     <dimen name="spacer_big">20dp</dimen>
 
+    <dimen name="font_very_small">10sp</dimen>
     <dimen name="font_small">16sp</dimen>
     <dimen name="font_medium_small">20sp</dimen>
     <dimen name="font_medium">24sp</dimen>

@@ -1,5 +1,6 @@
 package com.example.bookreadingapp.ui.screens
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -9,19 +10,34 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.example.bookreadingapp.R
-import com.example.bookreadingapp.ui.theme.BookReadingAppTheme
+import com.example.bookreadingapp.data.entities.Chapters
+import com.example.bookreadingapp.ui.NavRoutes
+import com.example.bookreadingapp.viewModels.ReadingAppViewModel
 
 @Composable
-fun ContentsScreen() {
+fun ContentsScreen(
+    bookId: Int,
+    navController: NavController,
+    viewModel: ReadingAppViewModel
+) {
+    // Observe chapters
+    val chapters by remember(bookId) {
+        viewModel.findChaptersFromBook(bookId)
+        viewModel.searchResultsChapters
+    }.observeAsState(initial = emptyList())
+
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
@@ -29,10 +45,44 @@ fun ContentsScreen() {
             .verticalScroll(rememberScrollState())
     ) {
         TitleText()
-        ChapterContents()
+        ChapterList(
+            chapters = chapters,
+            onChapterClick = { chapterId ->
+                // Navigate to reading screen when chapter is clicked
+                navController.navigate(NavRoutes.Reading.createRoute(bookId, chapterId))
+            }
+        )
     }
 }
 
+// Displays a list of chapters as rows
+@Composable
+fun ChapterList(
+    chapters: List<Chapters>,
+    onChapterClick: (Int) -> Unit,
+) {
+    chapters.forEach { chapter ->
+        ChapterWithSubChapters(
+            chapter = chapter,
+            onChapterClick = onChapterClick
+        )
+    }
+}
+
+// Displays a single chapter
+@Composable
+fun ChapterWithSubChapters(
+    chapter: Chapters,
+    onChapterClick: (Int) -> Unit,
+) {
+    ChapterRow(
+        chapter = chapter.title,
+        page = chapter.id.toString(),
+        onClick = { onChapterClick(chapter.id) }
+    )
+}
+
+// Displays the title text for the Contents screen
 @Composable
 fun TitleText() {
     Text(
@@ -44,39 +94,17 @@ fun TitleText() {
     )
 }
 
-@Composable
-fun ChapterContents() {
-    // THIS IS ALL PLACEHOLDER
-    Column {
-        ChapterRow("Introduction", "I")
-
-        ChapterRow("Chapter 1", "1")
-        SubChapterRow(subchapter = "Subchapter 1", page = "2")
-        SubChapterRow(subchapter = "Subchapter 2", page = "5")
-        SubChapterRow(subchapter = "Subchapter 3", page = "12")
-
-        ChapterRow("Chapter 2", "15")
-        SubChapterRow(subchapter = "Subchapter 1", page = "16")
-        SubChapterRow(subchapter = "Subchapter 2", page = "25")
-        SubChapterRow(subchapter = "Subchapter 3", page = "29")
-
-        ChapterRow("Chapter 3", "36")
-        SubChapterRow(subchapter = "Subchapter 1", page = "37")
-        SubChapterRow(subchapter = "Subchapter 2", page = "45")
-        SubChapterRow(subchapter = "Subchapter 3", page = "53")
-
-        ChapterRow("Conclusion", "54")
-    }
-}
-
+// Displays a single chapter row with its title and page
 @Composable
 fun ChapterRow(
     chapter: String,
-    page: String
+    page: String,
+    onClick: () -> Unit
 ) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
+            .clickable(onClick = onClick)
     ) {
         Text(
             text = chapter,
@@ -99,46 +127,19 @@ fun ChapterRow(
     }
 }
 
-@Composable
-fun SubChapterRow(
-    subchapter: String,
-    page: String
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-    ) {
-        Text(
-            text = subchapter,
-            textAlign = TextAlign.Left,
-            fontSize = dimensionResource(R.dimen.font_small).value.sp,
-            modifier = Modifier
-                .padding(start = dimensionResource(R.dimen.padding_big), top = dimensionResource(R.dimen.spacer_medium), bottom = dimensionResource(R.dimen.spacer_medium))
-        )
-
-        Text(
-            text = page,
-            textAlign = TextAlign.Right,
-            fontSize = dimensionResource(R.dimen.font_small).value.sp,
-            modifier = Modifier
-                .padding(end = dimensionResource(R.dimen.padding_big), top = dimensionResource(R.dimen.spacer_medium), bottom = dimensionResource(R.dimen.spacer_medium))
-                .fillMaxWidth()
-        )
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun PreviewContents() {
-    BookReadingAppTheme {
-        ContentsScreen()
-    }
-}
-
-@Preview(showBackground = true, locale = "fr")
-@Composable
-fun PreviewContentsFr() {
-    BookReadingAppTheme {
-        ContentsScreen()
-    }
-}
+//
+//@Preview(showBackground = true)
+//@Composable
+//fun PreviewContents() {
+//    BookReadingAppTheme {
+//        ContentsScreen()
+//    }
+//}
+//
+//@Preview(showBackground = true, locale = "fr")
+//@Composable
+//fun PreviewContentsFr() {
+//    BookReadingAppTheme {
+//        ContentsScreen()
+//    }
+//}
