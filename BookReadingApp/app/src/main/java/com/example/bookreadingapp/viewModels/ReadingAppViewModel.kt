@@ -36,10 +36,28 @@ class ReadingAppViewModel(private val fileSystem: FileSystem, application: Appli
     private val applicationContext = application
     var readingMode by mutableStateOf(false)
     val expandedChapters = MutableLiveData<Set<Int>>(emptySet())
+    var selectedBookId: Int? = null
     val downloadedTitles = MutableLiveData<MutableList<String>>()
 
     fun toggleReadingMode() {
         readingMode = !readingMode
+    }
+
+    fun performSearch(query: String) {
+        if (selectedBookId != null) {
+            viewModelScope.launch {
+                withContext(Dispatchers.IO) {
+                    val chapters = chaptersRepository.searchChapters(query, selectedBookId!!)
+                    val subChapters = subchaptersRepository.searchSubChapters(query, selectedBookId!!)
+                    val pages = pagesRepository.searchPages(query, selectedBookId!!)
+
+                    // Post results to LiveData
+                    searchResultsChapters.postValue(chapters)
+                    searchResultsSubChapters.postValue(subChapters)
+                    searchResultsPages.postValue(pages)
+                }
+            }
+        }
     }
 
     fun addDownload(title: String) {

@@ -22,7 +22,9 @@
     <string name="download">Download %s</string>
     <string name="last_location_book" translatable="false">last_location_book</string>
     <string name="last_location_chapter" translatable="false">last_location_chapter</string>
+    <string name="please_select_a_book">Please select a book to Search</string>
     <string name="downloading">Downloading books...</string>
+    <string name="no_searches_found">No searches found</string>
     <string name="downloading_book">Downloading %s...</string>
 
     <string-array name="book_urls">
