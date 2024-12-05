@@ -325,16 +325,3 @@ class HtmlParser (viewModel: ReadingAppViewModel) {
         return string
     }
 }
-
-//fun main() {
-//    // REPLACE WITH PATH
-//    // does not replace <i>
-//    val path = Paths.get("./app/src/main/assets/book1.html").toAbsolutePath().toString()
-//    val path2 = Paths.get("./app/src/main/assets/book2.html").toAbsolutePath().toString()
-//    val list : MutableList<String> = mutableListOf(path, path2)
-//    val parser = HtmlParser(ReadingAppViewModelFactory)
-//
-//    var string = parser.parse(list)
-//
-//    println(string)
-//}
