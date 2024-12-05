@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -28,6 +29,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.bookreadingapp.R
@@ -35,6 +38,7 @@ import com.example.bookreadingapp.data.entities.Chapters
 import com.example.bookreadingapp.data.entities.Pages
 import com.example.bookreadingapp.data.entities.SubChapters
 import com.example.bookreadingapp.ui.NavRoutes
+import com.example.bookreadingapp.ui.theme.Typography
 import com.example.bookreadingapp.viewModels.ReadingAppViewModel
 
 @Composable
@@ -122,36 +126,48 @@ fun SearchResultsList(
     selectedResult: MutableState<Pair<Int, Int>?>
 ) {
     Column {
-        chapters.forEach { chapter ->
-            // Used https://www.baeldung.com/kotlin/pair-class
+        // Check if all lists are empty
+        if (chapters.isEmpty() && subChapters.isEmpty() && pages.isEmpty()) {
             Text(
-                text = chapter.title,
-                modifier = Modifier.clickable {
-                    selectedResult.value = Pair(chapter.bookId, chapter.id)
-                }
+                text = "No searches found",
+                style = Typography.labelLarge,
+                modifier = Modifier.padding(16.dp),
+                textAlign = TextAlign.Center
             )
-        }
-        subChapters.forEach { subChapter ->
-            val bookId = chapters.find { it.id == subChapter.chapterId }?.bookId
-            if (bookId != null) {
+        } else {
+            // Display chapters
+            chapters.forEach { chapter ->
                 Text(
-                    text = subChapter.title,
+                    text = chapter.title,
                     modifier = Modifier.clickable {
-                        selectedResult.value = Pair(bookId, subChapter.chapterId)
+                        selectedResult.value = Pair(chapter.bookId, chapter.id)
                     }
                 )
             }
-        }
-        pages.forEach { page ->
-            val subChapter = subChapters.find { it.id == page.subchapterId }
-            val bookId = chapters.find { it.id == subChapter?.chapterId }?.bookId
-            if (bookId != null) {
-                Text(
-                    text = page.contents,
-                    modifier = Modifier.clickable {
-                        selectedResult.value = Pair(bookId, page.subchapterId) // Set selected result
-                    }
-                )
+            // Display subchapters
+            subChapters.forEach { subChapter ->
+                val bookId = chapters.find { it.id == subChapter.chapterId }?.bookId
+                if (bookId != null) {
+                    Text(
+                        text = subChapter.title,
+                        modifier = Modifier.clickable {
+                            selectedResult.value = Pair(bookId, subChapter.chapterId)
+                        }
+                    )
+                }
+            }
+            // Display pages
+            pages.forEach { page ->
+                val subChapter = subChapters.find { it.id == page.subchapterId }
+                val bookId = chapters.find { it.id == subChapter?.chapterId }?.bookId
+                if (bookId != null) {
+                    Text(
+                        text = page.contents,
+                        modifier = Modifier.clickable {
+                            selectedResult.value = Pair(bookId, page.subchapterId)
+                        }
+                    )
+                }
             }
         }
     }

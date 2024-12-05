@@ -20,7 +20,11 @@ interface ChaptersDao {
     @Query("SELECT * FROM chapters WHERE book_id = :bookId")
     fun getAllChaptersFromBook(bookId: Int): List<Chapters>
 
-    @Query("SELECT * FROM chapters WHERE chapter_title LIKE '%' || :query || '%' AND book_id = :bookId")
+    @Query("""
+        SELECT * FROM chapters 
+        WHERE (chapter_title LIKE '%' || :query || '%' )
+        AND book_id = :bookId
+    """)
     fun searchChapters(query: String, bookId: Int): List<Chapters>
 
     @Insert

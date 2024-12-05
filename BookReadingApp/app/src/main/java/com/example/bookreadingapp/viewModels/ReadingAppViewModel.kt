@@ -49,7 +49,8 @@ class ReadingAppViewModel(private val fileSystem: FileSystem, application: Appli
                     val chapters = chaptersRepository.searchChapters(query, selectedBookId!!)
                     val subChapters = subchaptersRepository.searchSubChapters(query, selectedBookId!!)
                     val pages = pagesRepository.searchPages(query, selectedBookId!!)
-                    
+
+                    // Post results to LiveData
                     searchResultsChapters.postValue(chapters)
                     searchResultsSubChapters.postValue(subChapters)
                     searchResultsPages.postValue(pages)
