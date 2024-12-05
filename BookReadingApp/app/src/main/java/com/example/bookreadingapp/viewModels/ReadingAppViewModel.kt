@@ -22,7 +22,7 @@ import com.example.bookreadingapp.data.repository.ChaptersRepository
 import com.example.bookreadingapp.data.repository.ImageRepository
 import com.example.bookreadingapp.data.repository.PageRepository
 import com.example.bookreadingapp.data.repository.SubChaptersRepository
-import com.example.bookreadingapp.fileSystem.FileSystem
+import com.example.bookreadingapp.data.fileSystem.FileSystem
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.delay

@@ -5,7 +5,7 @@ import android.content.Context
 import android.os.Environment
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.example.bookreadingapp.fileSystem.FileSystem
+import com.example.bookreadingapp.data.fileSystem.FileSystem
 import com.example.bookreadingapp.viewModels.ReadingAppViewModel
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertFalse

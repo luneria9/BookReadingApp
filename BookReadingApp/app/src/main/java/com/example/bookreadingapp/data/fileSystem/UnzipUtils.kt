@@ -1,4 +1,4 @@
-package com.example.bookreadingapp.fileSystem
+package com.example.bookreadingapp.data.fileSystem
 
 import java.io.*
 import java.util.zip.ZipFile
