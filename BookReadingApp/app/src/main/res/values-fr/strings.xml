@@ -22,4 +22,5 @@
     <string name="library">Bibliothèque</string>
     <string name="download">Télécharger %s</string>
     <string name="downloading">Téléchargement des livres...</string>
+    <string name="downloading_book">Télécharge %s...</string>
 </resources>
