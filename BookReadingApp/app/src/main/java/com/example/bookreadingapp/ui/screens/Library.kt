@@ -302,6 +302,12 @@ fun DownloadSection(viewModel: ReadingAppViewModel, scope: CoroutineScope) {
         verticalArrangement = Arrangement.Bottom,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        downloadedTitles.forEach {
+            Text(
+                text = stringResource(R.string.downloading_book, it)
+            )
+        }
+
         bookTitles.forEachIndexed { index, title ->
             if (index > 2 && !downloadedTitles.contains(title)) {
                 DownloadButton(
