@@ -109,6 +109,19 @@ class ReadingAppViewModel(private val fileSystem: FileSystem, application: Appli
         updateDirectoryContents(directoryName)
     }
 
+    private val pagesMap = mutableMapOf<Int, MutableLiveData<List<Pages>>>()
+
+    fun getSetPagesOfSubChapter(subChapterId: Int): LiveData<List<Pages>> {
+        return pagesMap.getOrPut(subChapterId) {
+            MutableLiveData<List<Pages>>().also { liveData ->
+                // Fetch pages for the subchapter and post the result
+                viewModelScope.launch {
+                    val pages = asyncFindPageOfSubChapter(subChapterId)
+                    liveData.postValue(pages)
+                }
+            }
+        }
+    }
     val allBooks: LiveData<List<Books>>
     private val booksRepository: BooksRepository
     private val chaptersRepository: ChaptersRepository
@@ -256,6 +269,11 @@ class ReadingAppViewModel(private val fileSystem: FileSystem, application: Appli
 
     fun findPageOfSubChapter(id: Int){
         pagesRepository.findPagesOfSubchapter(id)
+    }
+
+    suspend fun asyncFindPageOfSubChapter(id: Int): List<Pages> {
+        val result = pagesRepository.asyncfindPagesOfSubchapter(id)
+        return result.await()
     }
 
     suspend fun asyncInsertAndReturnPages(page: Pages): Pages {

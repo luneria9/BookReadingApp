@@ -147,8 +147,7 @@ fun ChapterContent(
     subChapters.forEach { subChapter ->
         // Observe pages for each subchapter
         val pages by remember(subChapter.id) {
-            viewModel.findPageOfSubChapter(subChapter.id)
-            viewModel.searchResultsPages
+            viewModel.getSetPagesOfSubChapter(subChapter.id)
         }.observeAsState(initial = emptyList())
 
         SubChapterSection(
