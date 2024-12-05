@@ -23,5 +23,9 @@
     <string name="download">Télécharger %s</string>
     <string name="please_select_a_book">Veuillez sélectionner un livre pour effectuer la recherche</string>
     <string name="downloading">Téléchargement des livres...</string>
+<<<<<<< HEAD
     <string name="no_searches_found">Aucune recherche trouvée</string>
+=======
+    <string name="downloading_book">Télécharge %s...</string>
+>>>>>>> 27f0bf4dc087741b302594257b8be020f4bda058
 </resources>

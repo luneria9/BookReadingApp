@@ -37,6 +37,7 @@ class ReadingAppViewModel(private val fileSystem: FileSystem, application: Appli
     var readingMode by mutableStateOf(false)
     val expandedChapters = MutableLiveData<Set<Int>>(emptySet())
     var selectedBookId: Int? = null
+    val downloadedTitles = MutableLiveData<MutableList<String>>()
 
     fun toggleReadingMode() {
         readingMode = !readingMode
@@ -58,6 +59,12 @@ class ReadingAppViewModel(private val fileSystem: FileSystem, application: Appli
             }
         }
     }
+
+    fun addDownload(title: String) {
+        val updatedList = downloadedTitles.value.orEmpty().toMutableList().apply { add(title) }
+        downloadedTitles.value = updatedList
+    }
+
     // from https://gitlab.com/crdavis/networkandfileio/-/tree/master?ref_type=heads
     // Function to set up file download
     fun setupDownload(url: String) {
