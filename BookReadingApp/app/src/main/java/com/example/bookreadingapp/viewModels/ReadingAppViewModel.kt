@@ -34,7 +34,6 @@ import java.io.File
 class ReadingAppViewModel(private val fileSystem: FileSystem, application: Application) : ViewModel() {
     private val _directoryContents = MutableLiveData<List<String>>()
     private val applicationContext = application
-    val directoryContents: LiveData<List<String>> = _directoryContents
     var readingMode by mutableStateOf(false)
     val expandedChapters = MutableLiveData<Set<Int>>(emptySet())
 
@@ -102,11 +101,6 @@ class ReadingAppViewModel(private val fileSystem: FileSystem, application: Appli
     private fun updateDirectoryContents(directoryName: String) {
         val contents = fileSystem.listDirectoryContents(directoryName)
         _directoryContents.postValue(contents)
-    }
-
-    fun confirmDeletion(directoryName: String) {
-        fileSystem.deleteDirectoryContents(directoryName)
-        updateDirectoryContents(directoryName)
     }
 
     private val pagesMap = mutableMapOf<Int, MutableLiveData<List<Pages>>>()
@@ -343,7 +337,7 @@ class ReadingAppViewModel(private val fileSystem: FileSystem, application: Appli
     private fun parseAndInsert(listOfPaths: MutableList<String>){
         val viewModel = this
         viewModelScope.launch(Dispatchers.Default) {
-            val parser = HtmlParser(viewModel = viewModel);
+            val parser = HtmlParser(viewModel = viewModel)
             parser.parse(listOfPaths, viewModel);
         }
 
