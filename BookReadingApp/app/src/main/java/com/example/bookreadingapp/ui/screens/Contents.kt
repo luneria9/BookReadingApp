@@ -126,20 +126,3 @@ fun ChapterRow(
         )
     }
 }
-
-//
-//@Preview(showBackground = true)
-//@Composable
-//fun PreviewContents() {
-//    BookReadingAppTheme {
-//        ContentsScreen()
-//    }
-//}
-//
-//@Preview(showBackground = true, locale = "fr")
-//@Composable
-//fun PreviewContentsFr() {
-//    BookReadingAppTheme {
-//        ContentsScreen()
-//    }
-//}

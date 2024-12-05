@@ -236,18 +236,3 @@ fun PagesList(
         }
     }
 }
-
-
-//@Preview(showBackground = true)
-//@Composable
-//fun SearchScreenPreview() {
-//    SearchScreen()
-//}
-//
-//@Composable
-//@Preview(showBackground = true, locale = "fr")
-//fun SearchScreenPreviewFr() {
-//    BookReadingAppTheme {
-//        SearchScreen()
-//    }
-//}

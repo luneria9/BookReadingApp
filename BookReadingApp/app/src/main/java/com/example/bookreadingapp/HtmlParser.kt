@@ -1,22 +1,15 @@
-import android.os.Build
+
 import android.util.Log
-import androidx.annotation.RequiresApi
 import com.example.bookreadingapp.data.entities.Books
 import com.example.bookreadingapp.data.entities.Chapters
 import com.example.bookreadingapp.data.entities.Images
 import com.example.bookreadingapp.data.entities.Pages
 import com.example.bookreadingapp.data.entities.SubChapters
 import com.example.bookreadingapp.viewModels.ReadingAppViewModel
-import com.example.bookreadingapp.viewModels.ReadingAppViewModelFactory
 import com.mohamedrejeb.ksoup.html.parser.KsoupHtmlHandler
 import com.mohamedrejeb.ksoup.html.parser.KsoupHtmlParser
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
 import java.io.File
-import java.nio.file.Paths
 import java.util.Scanner
 
 class HtmlParser (viewModel: ReadingAppViewModel) {
