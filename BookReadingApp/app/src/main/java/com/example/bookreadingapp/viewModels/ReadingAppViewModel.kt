@@ -34,7 +34,6 @@ import java.io.File
 class ReadingAppViewModel(private val fileSystem: FileSystem, application: Application) : ViewModel() {
     private val _directoryContents = MutableLiveData<List<String>>()
     private val applicationContext = application
-    val directoryContents: LiveData<List<String>> = _directoryContents
     var readingMode by mutableStateOf(false)
     val expandedChapters = MutableLiveData<Set<Int>>(emptySet())
 
@@ -104,11 +103,19 @@ class ReadingAppViewModel(private val fileSystem: FileSystem, application: Appli
         _directoryContents.postValue(contents)
     }
 
-    fun confirmDeletion(directoryName: String) {
-        fileSystem.deleteDirectoryContents(directoryName)
-        updateDirectoryContents(directoryName)
-    }
+    private val pagesMap = mutableMapOf<Int, MutableLiveData<List<Pages>>>()
 
+    fun getSetPagesOfSubChapter(subChapterId: Int): LiveData<List<Pages>> {
+        return pagesMap.getOrPut(subChapterId) {
+            MutableLiveData<List<Pages>>().also { liveData ->
+                // Fetch pages for the subchapter and post the result
+                viewModelScope.launch {
+                    val pages = asyncFindPageOfSubChapter(subChapterId)
+                    liveData.postValue(pages)
+                }
+            }
+        }
+    }
     val allBooks: LiveData<List<Books>>
     private val booksRepository: BooksRepository
     private val chaptersRepository: ChaptersRepository
@@ -258,6 +265,11 @@ class ReadingAppViewModel(private val fileSystem: FileSystem, application: Appli
         pagesRepository.findPagesOfSubchapter(id)
     }
 
+    suspend fun asyncFindPageOfSubChapter(id: Int): List<Pages> {
+        val result = pagesRepository.asyncfindPagesOfSubchapter(id)
+        return result.await()
+    }
+
     suspend fun asyncInsertAndReturnPages(page: Pages): Pages {
         val insertGet = runBlocking {
             withContext(Dispatchers.IO) {
@@ -325,7 +337,7 @@ class ReadingAppViewModel(private val fileSystem: FileSystem, application: Appli
     private fun parseAndInsert(listOfPaths: MutableList<String>){
         val viewModel = this
         viewModelScope.launch(Dispatchers.Default) {
-            val parser = HtmlParser(viewModel = viewModel);
+            val parser = HtmlParser(viewModel = viewModel)
             parser.parse(listOfPaths, viewModel);
         }
 
