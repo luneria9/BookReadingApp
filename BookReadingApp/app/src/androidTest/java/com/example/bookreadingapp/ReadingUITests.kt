@@ -12,6 +12,7 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.compose.rememberNavController
 import androidx.test.core.app.ApplicationProvider
 import com.example.bookreadingapp.ui.screens.ReadingScreen
 import com.example.bookreadingapp.ui.theme.BookReadingAppTheme
@@ -54,7 +55,8 @@ class ReadingUITests {
                     bookId = testBookId,
                     chapterId = testChapterId,
                     viewModel = viewModel,
-                    modifier = Modifier
+                    modifier = Modifier,
+                    navController = rememberNavController()
                 )
             }
         }

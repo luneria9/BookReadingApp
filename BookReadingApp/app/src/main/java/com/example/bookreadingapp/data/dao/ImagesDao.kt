@@ -1,11 +1,10 @@
 package com.example.bookreadingapp.data.dao
 
-import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
 import com.example.bookreadingapp.data.entities.Images
-import com.example.bookreadingapp.data.entities.Pages
+
 // referenced from https://gitlab.com/crdavis/roomdatabasedemoproject
 @Dao
 interface ImagesDao {

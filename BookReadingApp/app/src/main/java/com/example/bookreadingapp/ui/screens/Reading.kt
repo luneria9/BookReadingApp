@@ -3,7 +3,6 @@ package com.example.bookreadingapp.ui.screens
 import android.content.SharedPreferences
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -38,11 +37,11 @@ import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.bookreadingapp.R
+import com.example.bookreadingapp.data.entities.Chapters
 import com.example.bookreadingapp.data.entities.Pages
 import com.example.bookreadingapp.data.entities.SubChapters
 import com.example.bookreadingapp.ui.NavRoutes
 import com.example.bookreadingapp.viewModels.ReadingAppViewModel
-import com.example.bookreadingapp.data.entities.Chapters
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 

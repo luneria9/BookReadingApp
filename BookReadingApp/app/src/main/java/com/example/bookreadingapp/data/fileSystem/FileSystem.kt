@@ -1,13 +1,13 @@
-package com.example.bookreadingapp.fileSystem
+package com.example.bookreadingapp.data.fileSystem
 
 import android.content.Context
 import android.os.Environment
-import java.io.File
-import java.io.FileOutputStream
-import java.io.InputStream
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import java.io.File
+import java.io.FileOutputStream
 import java.io.IOException
+import java.io.InputStream
 
 // referenced from https://gitlab.com/crdavis/networkandfileio/-/tree/master?ref_type=heads
 open class FileSystem(private val context: Context){

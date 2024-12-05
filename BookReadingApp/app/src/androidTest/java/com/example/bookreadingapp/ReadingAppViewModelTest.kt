@@ -3,7 +3,7 @@ package com.example.bookreadingapp
 import android.app.Application
 import android.content.Context
 import androidx.test.core.app.ApplicationProvider
-import com.example.bookreadingapp.fileSystem.FileSystem
+import com.example.bookreadingapp.data.fileSystem.FileSystem
 import com.example.bookreadingapp.viewModels.ReadingAppViewModel
 import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.ExperimentalCoroutinesApi
