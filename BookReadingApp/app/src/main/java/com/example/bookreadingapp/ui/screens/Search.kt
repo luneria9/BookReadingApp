@@ -38,28 +38,33 @@ import com.example.bookreadingapp.ui.NavRoutes
 import com.example.bookreadingapp.viewModels.ReadingAppViewModel
 
 @Composable
-fun SearchScreen(viewModel: ReadingAppViewModel, navController: NavController, isBookSelected: Boolean) {
+fun SearchScreen(viewModel: ReadingAppViewModel, navController: NavController) {
     val searchQuery = remember { mutableStateOf("") }
     val searchResultsChapters by viewModel.searchResultsChapters.observeAsState(emptyList())
     val searchResultsSubChapters by viewModel.searchResultsSubChapters.observeAsState(emptyList())
     val searchResultsPages by viewModel.searchResultsPages.observeAsState(emptyList())
-
-    // State to hold the selected result
     val selectedResult = remember { mutableStateOf<Pair<Int, Int>?>(null) }
 
     Box(modifier = Modifier.fillMaxSize()) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
             HeaderTitle()
             Spacer(Modifier.height(dimensionResource(R.dimen.spacer_medium)))
 
-            if (!isBookSelected) {
+            // Check selectedBookId instead of isBookSelected
+            if (viewModel.selectedBookId == null) {
                 Text(text = "No books selected")
             } else {
-                SearchBar(searchQuery.value, onDone = {
-                    selectedResult.value?.let { (bookId, chapterId) ->
-                        navController.navigate(NavRoutes.Reading.createRoute(bookId, chapterId))
+                SearchBar(
+                    searchQuery.value,
+                    onDone = {
+                        selectedResult.value?.let { (bookId, chapterId) ->
+                            navController.navigate(NavRoutes.Reading.createRoute(bookId, chapterId))
+                        }
                     }
-                }) { query ->
+                ) { query ->
                     searchQuery.value = query
                     viewModel.performSearch(query)
                 }

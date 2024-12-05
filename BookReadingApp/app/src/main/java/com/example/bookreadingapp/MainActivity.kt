@@ -108,7 +108,6 @@ fun NavigationHost(
     if (lastBook != -1 && lastChapter != -1)
         startRoute = Reading.route
 
-    val isBookSelected by remember { mutableStateOf(false) }
     NavHost(navController = navController, startDestination = startRoute) {
         composable(Home.route) {
             HomeScreen(navController)
@@ -119,7 +118,7 @@ fun NavigationHost(
         }
 
         composable(Search.route) {
-            SearchScreen(viewModel, navController, isBookSelected)
+            SearchScreen(viewModel, navController)
         }
 
         composable(
