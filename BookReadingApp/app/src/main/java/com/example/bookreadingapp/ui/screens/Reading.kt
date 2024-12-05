@@ -167,6 +167,10 @@ fun SubChapterSection(
     viewModel: ReadingAppViewModel,
     readingMode: Boolean
 ) {
+    var displayTitle = subChapter.title
+    if (displayTitle.contains("<PLACEHOLDER>")){
+        displayTitle = ""
+    }
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -174,7 +178,7 @@ fun SubChapterSection(
     ) {
         // Display the subchapter title at the top
         Text(
-            text = subChapter.title,
+            text = displayTitle,
             fontSize = dimensionResource(R.dimen.font_big).value.sp,
             fontWeight = FontWeight.Bold,
             modifier = Modifier.padding(vertical = dimensionResource(R.dimen.padding_medium))
