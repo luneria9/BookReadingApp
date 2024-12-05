@@ -39,7 +39,10 @@ import com.example.bookreadingapp.viewModels.ReadingAppViewModel
 
 @Composable
 fun SearchScreen(viewModel: ReadingAppViewModel, navController: NavController) {
+    // State for storing the user's search query
     val searchQuery = remember { mutableStateOf("") }
+
+    // Observing search results from the ViewModel
     val searchResultsChapters by viewModel.searchResultsChapters.observeAsState(emptyList())
     val searchResultsSubChapters by viewModel.searchResultsSubChapters.observeAsState(emptyList())
     val searchResultsPages by viewModel.searchResultsPages.observeAsState(emptyList())
@@ -68,6 +71,7 @@ fun SearchScreen(viewModel: ReadingAppViewModel, navController: NavController) {
                     searchQuery.value = query
                     viewModel.performSearch(query)
                 }
+                // Display the search results list
                 SearchResultsList(
                     searchResultsChapters,
                     searchResultsSubChapters,
@@ -91,6 +95,7 @@ fun HeaderTitle(modifier: Modifier = Modifier) {
     }
 }
 
+// Composable function for the search bar input
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchBar(query: String, onDone: () -> Unit, onQueryChange: (String) -> Unit) {
@@ -108,6 +113,7 @@ fun SearchBar(query: String, onDone: () -> Unit, onQueryChange: (String) -> Unit
     )
 }
 
+// Composable function for displaying the search results list
 @Composable
 fun SearchResultsList(
     chapters: List<Chapters>,
@@ -117,6 +123,7 @@ fun SearchResultsList(
 ) {
     Column {
         chapters.forEach { chapter ->
+            // Used https://www.baeldung.com/kotlin/pair-class
             Text(
                 text = chapter.title,
                 modifier = Modifier.clickable {
