@@ -2,13 +2,13 @@ package com.example.bookreadingapp.data.repository
 
 import androidx.lifecycle.MutableLiveData
 import com.example.bookreadingapp.data.dao.SubChaptersDao
-import com.example.bookreadingapp.data.entities.Chapters
 import com.example.bookreadingapp.data.entities.SubChapters
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
+
 // referenced from https://gitlab.com/crdavis/roomdatabasedemoproject
 class SubChaptersRepository(private val dao: SubChaptersDao) {
     val searchResults = MutableLiveData<List<SubChapters>>()
