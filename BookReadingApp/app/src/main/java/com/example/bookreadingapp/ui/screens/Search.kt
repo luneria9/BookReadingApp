@@ -43,10 +43,7 @@ import com.example.bookreadingapp.viewModels.ReadingAppViewModel
 
 @Composable
 fun SearchScreen(viewModel: ReadingAppViewModel, navController: NavController) {
-    // State for storing the user's search query
     val searchQuery = remember { mutableStateOf("") }
-
-    // Observing search results from the ViewModel
     val searchResultsChapters by viewModel.searchResultsChapters.observeAsState(emptyList())
     val searchResultsSubChapters by viewModel.searchResultsSubChapters.observeAsState(emptyList())
     val searchResultsPages by viewModel.searchResultsPages.observeAsState(emptyList())
@@ -58,33 +55,65 @@ fun SearchScreen(viewModel: ReadingAppViewModel, navController: NavController) {
             verticalArrangement = Arrangement.Center
         ) {
             HeaderTitle()
-            Spacer(Modifier.height(dimensionResource(R.dimen.spacer_medium)))
-
-            // Check selectedBookId instead of isBookSelected
-            if (viewModel.selectedBookId == null) {
-                Text(text = stringResource(R.string.please_select_a_book))
-            } else {
-                SearchBar(
-                    searchQuery.value,
-                    onDone = {
-                        selectedResult.value?.let { (bookId, chapterId) ->
-                            navController.navigate(NavRoutes.Reading.createRoute(bookId, chapterId))
-                        }
-                    }
-                ) { query ->
-                    searchQuery.value = query
-                    viewModel.performSearch(query)
-                }
-                // Display the search results list
-                SearchResultsList(
-                    searchResultsChapters,
-                    searchResultsSubChapters,
-                    searchResultsPages,
-                    selectedResult
-                )
-            }
+            Spacer(Modifier.height(16.dp))
+            SearchContent(
+                viewModel = viewModel,
+                searchQuery = searchQuery,
+                searchResultsChapters = searchResultsChapters,
+                searchResultsSubChapters = searchResultsSubChapters,
+                searchResultsPages = searchResultsPages,
+                selectedResult = selectedResult,
+                navController = navController
+            )
         }
     }
+}
+
+@Composable
+fun SearchContent(
+    viewModel: ReadingAppViewModel,
+    searchQuery: MutableState<String>,
+    searchResultsChapters: List<Chapters>,
+    searchResultsSubChapters: List<SubChapters>,
+    searchResultsPages: List<Pages>,
+    selectedResult: MutableState<Pair<Int, Int>?>,
+    navController: NavController
+) {
+    if (viewModel.selectedBookId == null) {
+        Text(text = stringResource(R.string.please_select_a_book))
+    } else {
+        SearchInput(
+            searchQuery = searchQuery.value,
+            onQueryChange = { query ->
+                searchQuery.value = query
+                viewModel.performSearch(query)
+            },
+            onDone = {
+                selectedResult.value?.let { (bookId, chapterId) ->
+                    navController.navigate(NavRoutes.Reading.createRoute(bookId, chapterId))
+                }
+            }
+        )
+        SearchResultsList(
+            chapters = searchResultsChapters,
+            subChapters = searchResultsSubChapters,
+            pages = searchResultsPages,
+            selectedResult = selectedResult
+        )
+    }
+}
+
+@Composable
+fun SearchInput(
+    searchQuery: String,
+    onQueryChange: (String) -> Unit,
+    onDone: () -> Unit
+) {
+    SearchBar(
+        query = searchQuery,
+        onQueryChange = onQueryChange,
+        onDone = onDone
+    )
 }
 
 // The header title that displays Search indicating this is the search screen
@@ -126,52 +155,81 @@ fun SearchResultsList(
     selectedResult: MutableState<Pair<Int, Int>?>
 ) {
     Column {
-        // Check if all lists are empty
         if (chapters.isEmpty() && subChapters.isEmpty() && pages.isEmpty()) {
-            Text(
-                text = "No searches found",
-                style = Typography.labelLarge,
-                modifier = Modifier.padding(16.dp),
-                textAlign = TextAlign.Center
-            )
+            NoResultsMessage()
         } else {
-            // Display chapters
-            chapters.forEach { chapter ->
-                Text(
-                    text = chapter.title,
-                    modifier = Modifier.clickable {
-                        selectedResult.value = Pair(chapter.bookId, chapter.id)
-                    }
-                )
-            }
-            // Display subchapters
-            subChapters.forEach { subChapter ->
-                val bookId = chapters.find { it.id == subChapter.chapterId }?.bookId
-                if (bookId != null) {
-                    Text(
-                        text = subChapter.title,
-                        modifier = Modifier.clickable {
-                            selectedResult.value = Pair(bookId, subChapter.chapterId)
-                        }
-                    )
-                }
-            }
-            // Display pages
-            pages.forEach { page ->
-                val subChapter = subChapters.find { it.id == page.subchapterId }
-                val bookId = chapters.find { it.id == subChapter?.chapterId }?.bookId
-                if (bookId != null) {
-                    Text(
-                        text = page.contents,
-                        modifier = Modifier.clickable {
-                            selectedResult.value = Pair(bookId, page.subchapterId)
-                        }
-                    )
-                }
-            }
+            ChaptersList(chapters, selectedResult)
+            SubChaptersList(subChapters, chapters, selectedResult)
+            PagesList(pages, subChapters, chapters, selectedResult)
         }
     }
 }
+
+@Composable
+fun NoResultsMessage() {
+    Text(
+        text = "No searches found",
+        style = Typography.labelLarge,
+        modifier = Modifier.padding(16.dp),
+        textAlign = TextAlign.Center
+    )
+}
+
+@Composable
+fun ChaptersList(
+    chapters: List<Chapters>,
+    selectedResult: MutableState<Pair<Int, Int>?>
+) {
+    chapters.forEach { chapter ->
+        Text(
+            text = chapter.title,
+            modifier = Modifier.clickable {
+                selectedResult.value = Pair(chapter.bookId, chapter.id)
+            }
+        )
+    }
+}
+
+@Composable
+fun SubChaptersList(
+    subChapters: List<SubChapters>,
+    chapters: List<Chapters>,
+    selectedResult: MutableState<Pair<Int, Int>?>
+) {
+    subChapters.forEach { subChapter ->
+        val bookId = chapters.find { it.id == subChapter.chapterId }?.bookId
+        if (bookId != null) {
+            Text(
+                text = subChapter.title,
+                modifier = Modifier.clickable {
+                    selectedResult.value = Pair(bookId, subChapter.chapterId)
+                }
+            )
+        }
+    }
+}
+
+@Composable
+fun PagesList(
+    pages: List<Pages>,
+    subChapters: List<SubChapters>,
+    chapters: List<Chapters>,
+    selectedResult: MutableState<Pair<Int, Int>?>
+) {
+    pages.forEach { page ->
+        val subChapter = subChapters.find { it.id == page.subchapterId }
+        val bookId = chapters.find { it.id == subChapter?.chapterId }?.bookId
+        if (bookId != null) {
+            Text(
+                text = page.contents,
+                modifier = Modifier.clickable {
+                    selectedResult.value = Pair(bookId, page.subchapterId)
+                }
+            )
+        }
+    }
+}
+
 
 //@Preview(showBackground = true)
 //@Composable
