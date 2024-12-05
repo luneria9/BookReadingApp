@@ -2,6 +2,7 @@ package com.example.bookreadingapp.data.repository
 
 import androidx.lifecycle.MutableLiveData
 import com.example.bookreadingapp.data.dao.SubChaptersDao
+import com.example.bookreadingapp.data.entities.Chapters
 import com.example.bookreadingapp.data.entities.SubChapters
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
@@ -39,6 +40,10 @@ class SubChaptersRepository(private val dao: SubChaptersDao) {
 
     fun insertSubChapterAsync(subChapters: SubChapters): Long {
         return dao.insertSubChapterAwait(subChapters)
+    }
+
+    fun searchSubChapters(query: String, bookId: Int): List<SubChapters> {
+        return dao.searchSubChapters(query, bookId)
     }
 
     fun asyncfindSubChapterId(subchapterId: Int): Deferred<List<SubChapters>> =
