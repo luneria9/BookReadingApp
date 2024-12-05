@@ -34,12 +34,17 @@ import java.io.File
 class ReadingAppViewModel(private val fileSystem: FileSystem, application: Application) : ViewModel() {
     private val _directoryContents = MutableLiveData<List<String>>()
     private val applicationContext = application
-    val directoryContents: LiveData<List<String>> = _directoryContents
     var readingMode by mutableStateOf(false)
     val expandedChapters = MutableLiveData<Set<Int>>(emptySet())
+    val downloadedTitles = MutableLiveData<MutableList<String>>()
 
     fun toggleReadingMode() {
         readingMode = !readingMode
+    }
+
+    fun addDownload(title: String) {
+        val updatedList = downloadedTitles.value.orEmpty().toMutableList().apply { add(title) }
+        downloadedTitles.value = updatedList
     }
 
     // from https://gitlab.com/crdavis/networkandfileio/-/tree/master?ref_type=heads
@@ -66,18 +71,25 @@ class ReadingAppViewModel(private val fileSystem: FileSystem, application: Appli
     suspend fun downloadUnzip(url: String, fileName: String, destDirectory: String) {
         viewModelScope.launch(Dispatchers.Default) {
             // Download file
+            Log.d("job", "downloading")
             val downloadJob = launch(Dispatchers.IO) { setupDownload(url) }
             downloadJob.join()
+            Log.d("job", "unzip")
 
             // Unzip file
-            val unzipJob = launch(Dispatchers.Default) { unzipFile(fileName, destDirectory) }
+            val unzipJob = launch(Dispatchers.IO) { unzipFile(fileName, destDirectory) }
             unzipJob.join()
 
             // Get the path of the unzipped HTML file
             val unzippedPath = "${applicationContext.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS)}/$destDirectory"
 
+            val htmlFiles = File(unzippedPath).walk()
+                .filter { it.isFile && it.extension.equals("html", ignoreCase = true) }
+                .map { it.toURI().toString() }
+                .toList()
             // Parse and insert the book data
-            parseAndInsert(mutableListOf("$unzippedPath/index.html"))
+            Log.d("job", "parsing")
+            val parseJob = launch(Dispatchers.IO) { parseAndInsert(htmlFiles.toMutableList()) }
         }
     }
 
@@ -97,11 +109,19 @@ class ReadingAppViewModel(private val fileSystem: FileSystem, application: Appli
         _directoryContents.postValue(contents)
     }
 
-    fun confirmDeletion(directoryName: String) {
-        fileSystem.deleteDirectoryContents(directoryName)
-        updateDirectoryContents(directoryName)
-    }
+    private val pagesMap = mutableMapOf<Int, MutableLiveData<List<Pages>>>()
 
+    fun getSetPagesOfSubChapter(subChapterId: Int): LiveData<List<Pages>> {
+        return pagesMap.getOrPut(subChapterId) {
+            MutableLiveData<List<Pages>>().also { liveData ->
+                // Fetch pages for the subchapter and post the result
+                viewModelScope.launch {
+                    val pages = asyncFindPageOfSubChapter(subChapterId)
+                    liveData.postValue(pages)
+                }
+            }
+        }
+    }
     val allBooks: LiveData<List<Books>>
     private val booksRepository: BooksRepository
     private val chaptersRepository: ChaptersRepository
@@ -251,6 +271,11 @@ class ReadingAppViewModel(private val fileSystem: FileSystem, application: Appli
         pagesRepository.findPagesOfSubchapter(id)
     }
 
+    suspend fun asyncFindPageOfSubChapter(id: Int): List<Pages> {
+        val result = pagesRepository.asyncfindPagesOfSubchapter(id)
+        return result.await()
+    }
+
     suspend fun asyncInsertAndReturnPages(page: Pages): Pages {
         val insertGet = runBlocking {
             withContext(Dispatchers.IO) {
@@ -315,13 +340,11 @@ class ReadingAppViewModel(private val fileSystem: FileSystem, application: Appli
         imagesRepository.findImagesOfPage(1)
     }
 
-    fun parseAndInsert(listOfPaths: MutableList<String>){
-        // TODO use the listOfPaths
-        val directory = this.applicationContext.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS).toString()+"/Physics/pg40175-images.html";
+    private fun parseAndInsert(listOfPaths: MutableList<String>){
         val viewModel = this
         viewModelScope.launch(Dispatchers.Default) {
-            val parser = HtmlParser(viewModel = viewModel);
-            parser.parse(mutableListOf(directory), viewModel);
+            val parser = HtmlParser(viewModel = viewModel)
+            parser.parse(listOfPaths, viewModel);
         }
 
     }
