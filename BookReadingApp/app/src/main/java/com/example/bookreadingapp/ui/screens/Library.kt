@@ -149,7 +149,10 @@ fun BookCard(
             .padding(dimensionResource(id = R.dimen.padding_small))
             .fillMaxWidth()
             .aspectRatio(0.7f)
-            .clickable(onClick = onBookClick),
+            .clickable {
+                viewModel.selectedBookId = book.id
+                onBookClick()
+            },
         elevation = CardDefaults.cardElevation(
             defaultElevation = dimensionResource(id = R.dimen.spacer_small)
         )
