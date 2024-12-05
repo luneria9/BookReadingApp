@@ -177,7 +177,13 @@ fun BookCardContent(book: Books, viewModel: ReadingAppViewModel) {
 @Composable
 fun BookCoverSection(book: Books, modifier: Modifier = Modifier, viewModel: ReadingAppViewModel) {
     val context = LocalContext.current
-    val bookDir = "${context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS)}/${book.title}"
+    val bookNames = stringArrayResource(R.array.book_titles)
+    var bookDir = "${context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS)}/"
+    bookNames.forEach { b ->
+        if(book.title.contains(b)){
+            bookDir += b
+        }
+    }
     val coverPath = viewModel.getCoverImagePath(bookDir)
 
     Box(
