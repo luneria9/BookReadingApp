@@ -129,11 +129,21 @@ fun LibraryContent(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         LibraryTitle()
-        BookGrid(
-            books = books,
-            navController = navController,
-            viewModel = viewModel
-        )
+
+        if (books.isEmpty()) {
+            Text(
+                text = stringResource(R.string.downloading),
+                modifier = Modifier.padding(
+                    top = dimensionResource(R.dimen.spacer_big)
+                )
+            )
+        } else {
+            BookGrid(
+                books = books,
+                navController = navController,
+                viewModel = viewModel
+            )
+        }
     }
 }
 
