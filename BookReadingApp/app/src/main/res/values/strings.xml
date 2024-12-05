@@ -24,6 +24,7 @@
     <string name="last_location_chapter" translatable="false">last_location_chapter</string>
     <string name="please_select_a_book">Please select a book to Search</string>
     <string name="downloading">Downloading books...</string>
+    <string name="no_searches_found">No searches found</string>
 
     <string-array name="book_urls">
         <item>https://www.gutenberg.org/cache/epub/40175/pg40175-h.zip</item>

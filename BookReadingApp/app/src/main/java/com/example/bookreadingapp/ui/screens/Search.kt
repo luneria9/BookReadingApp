@@ -41,6 +41,7 @@ import com.example.bookreadingapp.ui.NavRoutes
 import com.example.bookreadingapp.ui.theme.Typography
 import com.example.bookreadingapp.viewModels.ReadingAppViewModel
 
+// Displays the search screen with a search bar and search results
 @Composable
 fun SearchScreen(viewModel: ReadingAppViewModel, navController: NavController) {
     val searchQuery = remember { mutableStateOf("") }
@@ -69,6 +70,7 @@ fun SearchScreen(viewModel: ReadingAppViewModel, navController: NavController) {
     }
 }
 
+// Manages the search input and displays the corresponding search results
 @Composable
 fun SearchContent(
     viewModel: ReadingAppViewModel,
@@ -103,6 +105,7 @@ fun SearchContent(
     }
 }
 
+// Displays a text field for the search query
 @Composable
 fun SearchInput(
     searchQuery: String,
@@ -116,7 +119,7 @@ fun SearchInput(
     )
 }
 
-// The header title that displays Search indicating this is the search screen
+// Displays the header title for the search screen
 @Composable
 fun HeaderTitle(modifier: Modifier = Modifier) {
     Row(
@@ -128,7 +131,7 @@ fun HeaderTitle(modifier: Modifier = Modifier) {
     }
 }
 
-// Composable function for the search bar input
+// Composable function to render the search bar
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchBar(query: String, onDone: () -> Unit, onQueryChange: (String) -> Unit) {
@@ -146,7 +149,7 @@ fun SearchBar(query: String, onDone: () -> Unit, onQueryChange: (String) -> Unit
     )
 }
 
-// Composable function for displaying the search results list
+// Displays the search results, categorized into chapters, sub-chapters, and pages
 @Composable
 fun SearchResultsList(
     chapters: List<Chapters>,
@@ -165,16 +168,18 @@ fun SearchResultsList(
     }
 }
 
+// Displays a message when no search results are found
 @Composable
 fun NoResultsMessage() {
     Text(
-        text = "No searches found",
+        text = stringResource(R.string.no_searches_found),
         style = Typography.labelLarge,
         modifier = Modifier.padding(16.dp),
         textAlign = TextAlign.Center
     )
 }
 
+// Displays a list of chapter search results
 @Composable
 fun ChaptersList(
     chapters: List<Chapters>,
@@ -190,6 +195,7 @@ fun ChaptersList(
     }
 }
 
+// Displays a list of sub-chapter search results
 @Composable
 fun SubChaptersList(
     subChapters: List<SubChapters>,
@@ -209,6 +215,7 @@ fun SubChaptersList(
     }
 }
 
+// Displays a list of page search results
 @Composable
 fun PagesList(
     pages: List<Pages>,
