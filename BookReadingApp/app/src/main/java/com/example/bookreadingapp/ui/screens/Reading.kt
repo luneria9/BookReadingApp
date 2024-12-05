@@ -182,6 +182,7 @@ fun PageContent(
     val replacedPlaceholder = replacedImage.replace("<PLACEHOLDER>", "")
 
     val tableHTML = getTableHTML(page.contents)
+    val replacedTable = replacedPlaceholder.replace(tableHTML, "")
 
     Column(
         modifier = Modifier
@@ -189,7 +190,7 @@ fun PageContent(
             .padding(vertical = dimensionResource(R.dimen.padding_small))
     ) {
         Text(
-            text = replacedPlaceholder,
+            text = replacedTable,
             fontSize = textSize,
             modifier = Modifier.padding(bottom = dimensionResource(R.dimen.padding_small))
         )
