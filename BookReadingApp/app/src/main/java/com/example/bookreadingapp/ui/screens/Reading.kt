@@ -1,9 +1,18 @@
 package com.example.bookreadingapp.ui.screens
 
-import androidx.compose.foundation.horizontalScroll
 import android.content.SharedPreferences
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
@@ -20,17 +29,23 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.bookreadingapp.R
+import com.example.bookreadingapp.data.entities.Chapters
 import com.example.bookreadingapp.data.entities.Pages
 import com.example.bookreadingapp.data.entities.SubChapters
 import com.example.bookreadingapp.ui.NavRoutes
 import com.example.bookreadingapp.viewModels.ReadingAppViewModel
-import androidx.navigation.NavController
+import org.jsoup.Jsoup
+import org.jsoup.nodes.Document
 
+// the main reading screen function
 @Composable
 fun ReadingScreen(
     preferences: SharedPreferences,
@@ -55,33 +70,81 @@ fun ReadingScreen(
         viewModel.searchResultsSubChapters
     }.observeAsState(initial = emptyList())
 
+    // Observe chapters
+    val chapters by remember(bookId) {
+        viewModel.findChaptersFromBook(bookId)
+        viewModel.searchResultsChapters
+    }.observeAsState(initial = emptyList())
+
     // Main container for the reading screen
-    Box(modifier = modifier.fillMaxSize()) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(dimensionResource(R.dimen.padding_medium))
-        ) {
-            // Render the content of the chapter
-            ChapterContent(
-                subChapters = subChapters,
-                viewModel = viewModel,
-                readingMode = readingMode,
+    Column(Modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally) {
+        ReadingMainContent(
+            modifier,
+            subChapters,
+            viewModel,
+            readingMode,
+            onReadingCheck,
+            navController,
+            bookId,
+            chapterId,
+            chapters
+        )
+    }
+}
+
+// contains all the main content for ReadingScreen
+@Composable
+private fun ReadingMainContent(
+    modifier: Modifier,
+    subChapters: List<SubChapters>,
+    viewModel: ReadingAppViewModel,
+    readingMode: Boolean,
+    onReadingCheck: (Boolean) -> Unit,
+    navController: NavController,
+    bookId: Int,
+    chapterId: Int,
+    chapters: List<Chapters>
+) {
+    val currentChapter = chapters.find { it.id == chapterId}
+    Column(
+        modifier = Modifier
+            .height(500.dp)
+            .padding(dimensionResource(R.dimen.padding_medium))
+            .verticalScroll(rememberScrollState())
+    ) {
+        // Display the subchapter title at the top
+        if (currentChapter != null) {
+            Text(
+                text = currentChapter.title,
+                fontSize = dimensionResource(R.dimen.font_big).value.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(vertical = dimensionResource(R.dimen.padding_medium))
             )
         }
+        // Render the content of the chapter
+        ChapterContent(
+            subChapters = subChapters,
+            viewModel = viewModel,
+            readingMode = readingMode,
+        )
+    }
+    Column (
+        verticalArrangement = Arrangement.Bottom,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
         // Display the reading mode toggle at the bottom of the screen
         ReadingMode(
             readingMode = readingMode,
             onReadingCheck = onReadingCheck,
-            modifier = Modifier.align(Alignment.BottomCenter)
         )
-
         NavigateBook(
             readingMode = readingMode,
             navController = navController,
             bookId = bookId,
             chapterId = chapterId,
-            viewModel = viewModel
+            viewModel = viewModel,
+            chapters
         )
     }
 }
@@ -96,8 +159,7 @@ fun ChapterContent(
     subChapters.forEach { subChapter ->
         // Observe pages for each subchapter
         val pages by remember(subChapter.id) {
-            viewModel.findPageOfSubChapter(subChapter.id)
-            viewModel.searchResultsPages
+            viewModel.getSetPagesOfSubChapter(subChapter.id)
         }.observeAsState(initial = emptyList())
 
         SubChapterSection(
@@ -117,6 +179,10 @@ fun SubChapterSection(
     viewModel: ReadingAppViewModel,
     readingMode: Boolean
 ) {
+    var displayTitle = subChapter.title
+    if (displayTitle.contains("<PLACEHOLDER>")){
+        displayTitle = ""
+    }
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -124,7 +190,7 @@ fun SubChapterSection(
     ) {
         // Display the subchapter title at the top
         Text(
-            text = subChapter.title,
+            text = displayTitle,
             fontSize = dimensionResource(R.dimen.font_big).value.sp,
             fontWeight = FontWeight.Bold,
             modifier = Modifier.padding(vertical = dimensionResource(R.dimen.padding_medium))
@@ -169,13 +235,16 @@ fun PageContent(
     val replacedImage = page.contents.replace("<IMAGE>", "")
     val replacedPlaceholder = replacedImage.replace("<PLACEHOLDER>", "")
 
+    val tableHTML = getTableHTML(page.contents)
+    val replacedTable = replacedPlaceholder.replace(tableHTML, "")
+
     Column(
         modifier = Modifier
             .width(380.dp)
             .padding(vertical = dimensionResource(R.dimen.padding_small))
     ) {
         Text(
-            text = replacedPlaceholder,
+            text = replacedTable,
             fontSize = textSize,
             modifier = Modifier.padding(bottom = dimensionResource(R.dimen.padding_small))
         )
@@ -185,7 +254,26 @@ fun PageContent(
                 imageUrl = image.imageUrl
             )
         }
+
+        Table(
+            tableString = tableHTML,
+            fontSize = textSize
+        )
     }
+}
+
+/**
+ * Finds table tags in HTML and returns the entire table element and its children.
+ *
+ * @param string HTML string.
+ */
+private fun getTableHTML(string: String): String {
+    val startIndex = string.lowercase().indexOf("<table>")
+    val endIndex = string.lowercase().indexOf("</table>") + "<table>".length
+
+    return if (startIndex != -1 && endIndex != -1) {
+        string.substring(startIndex, endIndex)
+    } else { "" }
 }
 
 // Composable to display an image
@@ -216,16 +304,15 @@ fun ImageContent(
 fun ReadingMode(
     readingMode: Boolean,
     onReadingCheck: (Boolean) -> Unit,
-    modifier: Modifier
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        modifier = modifier
+        horizontalArrangement = Arrangement.Center
     ) {
         Text(
             text = stringResource(R.string.reading_mode),
             fontSize = dimensionResource(R.dimen.font_medium).value.sp,
-            fontWeight = FontWeight.Bold,
+            fontWeight = FontWeight.Bold
         )
         Spacer(Modifier.width(dimensionResource(R.dimen.spacer_medium)))
         Switch(
@@ -243,27 +330,31 @@ fun NavigateBook(
     navController: NavController,
     bookId: Int,
     chapterId: Int,
-    viewModel: ReadingAppViewModel
+    viewModel: ReadingAppViewModel,
+    chapters: List<Chapters>
 ) {
-    // Observe chapters
-    val chapters by remember(bookId) {
-        viewModel.findChaptersFromBook(bookId)
-        viewModel.searchResultsChapters
-    }.observeAsState(initial = emptyList())
 
+
+    var currentBookPosition = 0;
+    chapters.forEachIndexed { index, chapter ->
+        if (chapter.id == chapterId){
+            currentBookPosition = index
+        }
+    }
     if (readingMode) {
         Row(
             horizontalArrangement = Arrangement.SpaceBetween,
             modifier = Modifier.fillMaxWidth()
         ) {
-            if (chapterId != 1) {
+            if (currentBookPosition > 0) {
                 Button(
                     onClick = {
-                        navController.navigate(NavRoutes.Reading.createRoute(bookId, chapterId - 1))
+                        navController.navigate(NavRoutes.Reading.createRoute(bookId,
+                            chapters[currentBookPosition - 1].id))
                     },
                     modifier = Modifier
                         .weight(1f)
-                        .padding(end = 8.dp),
+                        .padding(end = dimensionResource(R.dimen.padding_small)),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = MaterialTheme.colorScheme.primary,
                         contentColor = MaterialTheme.colorScheme.onPrimary
@@ -272,14 +363,15 @@ fun NavigateBook(
                     Text(text = "Previous Page")
                 }
             }
-            if (chapterId < chapters.size) {
+            if (currentBookPosition < chapters.size - 1) {
                 Button(
                     onClick = {
-                        navController.navigate(NavRoutes.Reading.createRoute(bookId, chapterId + 1))
+                        navController.navigate(NavRoutes.Reading.createRoute(bookId,
+                            chapters[currentBookPosition + 1].id))
                     },
                     modifier = Modifier
                         .weight(1f)
-                        .padding(start = 8.dp),
+                        .padding(start = dimensionResource(R.dimen.padding_small)),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = MaterialTheme.colorScheme.primary,
                         contentColor = MaterialTheme.colorScheme.onPrimary
@@ -290,4 +382,42 @@ fun NavigateBook(
             }
         }
     }
+}
+
+@Composable
+fun Table(tableString: String, fontSize: TextUnit) {
+    val doc: Document = Jsoup.parse(tableString)
+    val rows = doc.select("tr")
+
+    Column(
+        modifier = Modifier
+            .padding(dimensionResource(R.dimen.padding_medium))
+    ) {
+        rows.forEach {
+            Row (
+                horizontalArrangement = Arrangement.spacedBy(
+                    dimensionResource(R.dimen.spacer_medium)
+                )
+            ) {
+                val cells = it.select("td, th")
+                cells.forEach { cell ->
+                    Text(
+                        text = cell.text(),
+                        fontSize = fontSize,
+                        modifier = Modifier
+                            .padding(dimensionResource(R.dimen.spacer_small))
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun TablePreview() {
+    Table(
+        tableString = "<table><tr><td>test</td><td>test2</td></tr><tr><td>test</td><td>test2</td><td>test3</td></tr><tr><td>test</td><td>test2</td></tr></table>",
+        fontSize = dimensionResource(R.dimen.font_medium).value.sp
+    )
 }

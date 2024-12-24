@@ -2,9 +2,8 @@ package com.example.bookreadingapp.data.entities
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
-import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
-import java.sql.Date
+
 // referenced from https://gitlab.com/crdavis/roomdatabasedemoproject
 @Entity(tableName = "books")
 class Books {

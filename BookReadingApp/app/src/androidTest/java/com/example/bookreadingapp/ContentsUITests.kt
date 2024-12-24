@@ -6,7 +6,7 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.navigation.NavController
 import androidx.navigation.testing.TestNavHostController
 import androidx.test.core.app.ApplicationProvider
-import com.example.bookreadingapp.fileSystem.FileSystem
+import com.example.bookreadingapp.data.fileSystem.FileSystem
 import com.example.bookreadingapp.ui.screens.ContentsScreen
 import com.example.bookreadingapp.viewModels.ReadingAppViewModel
 import org.junit.Before

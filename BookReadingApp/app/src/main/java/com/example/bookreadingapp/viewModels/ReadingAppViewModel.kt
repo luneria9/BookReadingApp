@@ -17,12 +17,12 @@ import com.example.bookreadingapp.data.entities.Chapters
 import com.example.bookreadingapp.data.entities.Images
 import com.example.bookreadingapp.data.entities.Pages
 import com.example.bookreadingapp.data.entities.SubChapters
+import com.example.bookreadingapp.data.fileSystem.FileSystem
 import com.example.bookreadingapp.data.repository.BooksRepository
 import com.example.bookreadingapp.data.repository.ChaptersRepository
 import com.example.bookreadingapp.data.repository.ImageRepository
 import com.example.bookreadingapp.data.repository.PageRepository
 import com.example.bookreadingapp.data.repository.SubChaptersRepository
-import com.example.bookreadingapp.fileSystem.FileSystem
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
@@ -34,12 +34,35 @@ import java.io.File
 class ReadingAppViewModel(private val fileSystem: FileSystem, application: Application) : ViewModel() {
     private val _directoryContents = MutableLiveData<List<String>>()
     private val applicationContext = application
-    val directoryContents: LiveData<List<String>> = _directoryContents
     var readingMode by mutableStateOf(false)
     val expandedChapters = MutableLiveData<Set<Int>>(emptySet())
+    var selectedBookId: Int? = null
+    val downloadedTitles = MutableLiveData<MutableList<String>>()
 
     fun toggleReadingMode() {
         readingMode = !readingMode
+    }
+
+    fun performSearch(query: String) {
+        if (selectedBookId != null) {
+            viewModelScope.launch {
+                withContext(Dispatchers.IO) {
+                    val chapters = chaptersRepository.searchChapters(query, selectedBookId!!)
+                    val subChapters = subchaptersRepository.searchSubChapters(query, selectedBookId!!)
+                    val pages = pagesRepository.searchPages(query, selectedBookId!!)
+
+                    // Post results to LiveData
+                    searchResultsChapters.postValue(chapters)
+                    searchResultsSubChapters.postValue(subChapters)
+                    searchResultsPages.postValue(pages)
+                }
+            }
+        }
+    }
+
+    fun addDownload(title: String) {
+        val updatedList = downloadedTitles.value.orEmpty().toMutableList().apply { add(title) }
+        downloadedTitles.value = updatedList
     }
 
     // from https://gitlab.com/crdavis/networkandfileio/-/tree/master?ref_type=heads
@@ -84,7 +107,7 @@ class ReadingAppViewModel(private val fileSystem: FileSystem, application: Appli
                 .toList()
             // Parse and insert the book data
             Log.d("job", "parsing")
-            val parseJob = launch(Dispatchers.IO) { parseAndInsert(htmlFiles.toMutableList()) }
+            launch(Dispatchers.IO) { parseAndInsert(htmlFiles.toMutableList()) }
         }
     }
 
@@ -104,11 +127,19 @@ class ReadingAppViewModel(private val fileSystem: FileSystem, application: Appli
         _directoryContents.postValue(contents)
     }
 
-    fun confirmDeletion(directoryName: String) {
-        fileSystem.deleteDirectoryContents(directoryName)
-        updateDirectoryContents(directoryName)
-    }
+    private val pagesMap = mutableMapOf<Int, MutableLiveData<List<Pages>>>()
 
+    fun getSetPagesOfSubChapter(subChapterId: Int): LiveData<List<Pages>> {
+        return pagesMap.getOrPut(subChapterId) {
+            MutableLiveData<List<Pages>>().also { liveData ->
+                // Fetch pages for the subchapter and post the result
+                viewModelScope.launch {
+                    val pages = asyncFindPageOfSubChapter(subChapterId)
+                    liveData.postValue(pages)
+                }
+            }
+        }
+    }
     val allBooks: LiveData<List<Books>>
     private val booksRepository: BooksRepository
     private val chaptersRepository: ChaptersRepository
@@ -258,6 +289,11 @@ class ReadingAppViewModel(private val fileSystem: FileSystem, application: Appli
         pagesRepository.findPagesOfSubchapter(id)
     }
 
+    suspend fun asyncFindPageOfSubChapter(id: Int): List<Pages> {
+        val result = pagesRepository.asyncfindPagesOfSubchapter(id)
+        return result.await()
+    }
+
     suspend fun asyncInsertAndReturnPages(page: Pages): Pages {
         val insertGet = runBlocking {
             withContext(Dispatchers.IO) {
@@ -287,45 +323,10 @@ class ReadingAppViewModel(private val fileSystem: FileSystem, application: Appli
         imagesRepository.findImagesOfPage(id)
     }
 
-    //     for testing inserting
-    fun testAll() {
-        viewModelScope.launch(Dispatchers.Default){
-            val insertBook = launch(Dispatchers.IO){ insertBook(Books("test title", "test author", "test subject", "test date"))}
-            insertBook.join()
-            Log.d("insert", "book")
-            val insertChapter = launch(Dispatchers.IO) {insertChapter(Chapters("chapter1", 1))}
-            insertChapter.join()
-            Log.d("insert", "chapter")
-            val insertSubChapter = launch(Dispatchers.IO) {insertSubChapter(SubChapters("test subchapter", 1))}
-            insertSubChapter.join()
-            Log.d("insert", "subchapter")
-            val insertPage = launch(Dispatchers.IO){insertPage(Pages(1, 1, "test content"))}
-            insertPage.join()
-            Log.d("insert", "page")
-            val insertImage = launch(Dispatchers.IO){insertImage(Images(1, "url"))}
-            Log.d("insert", "image")
-        }
-    }
-
-    fun testFindId() {
-        booksRepository.findBookId(1)
-        chaptersRepository.findChapterId(1)
-        subchaptersRepository.findSubChapterId(1)
-        pagesRepository.findPageId(1)
-        imagesRepository.findImageId(1)
-    }
-
-    fun testFindAllOf() {
-        chaptersRepository.findChaptersOfBook(1)
-        subchaptersRepository.findSubChaptersOfChapter(1)
-        pagesRepository.findPagesOfSubchapter(1)
-        imagesRepository.findImagesOfPage(1)
-    }
-
     private fun parseAndInsert(listOfPaths: MutableList<String>){
         val viewModel = this
         viewModelScope.launch(Dispatchers.Default) {
-            val parser = HtmlParser(viewModel = viewModel);
+            val parser = HtmlParser(viewModel = viewModel)
             parser.parse(listOfPaths, viewModel);
         }
 

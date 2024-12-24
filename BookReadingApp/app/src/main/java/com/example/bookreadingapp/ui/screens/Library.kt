@@ -45,6 +45,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
+import com.example.bookreadingapp.R
 import com.example.bookreadingapp.data.entities.Books
 import com.example.bookreadingapp.ui.NavRoutes
 import com.example.bookreadingapp.ui.theme.BookReadingAppTheme
@@ -52,7 +53,6 @@ import com.example.bookreadingapp.ui.theme.Typography
 import com.example.bookreadingapp.viewModels.ReadingAppViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import com.example.bookreadingapp.R
 import java.io.File
 
 // Referred to https://developer.android.com/codelabs/basic-android-kotlin-compose-material-theming#6
@@ -129,11 +129,21 @@ fun LibraryContent(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         LibraryTitle()
-        BookGrid(
-            books = books,
-            navController = navController,
-            viewModel = viewModel
-        )
+
+        if (books.isEmpty()) {
+            Text(
+                text = stringResource(R.string.downloading),
+                modifier = Modifier.padding(
+                    top = dimensionResource(R.dimen.spacer_big)
+                )
+            )
+        } else {
+            BookGrid(
+                books = books,
+                navController = navController,
+                viewModel = viewModel
+            )
+        }
     }
 }
 
@@ -149,7 +159,10 @@ fun BookCard(
             .padding(dimensionResource(id = R.dimen.padding_small))
             .fillMaxWidth()
             .aspectRatio(0.7f)
-            .clickable(onClick = onBookClick),
+            .clickable {
+                viewModel.selectedBookId = book.id
+                onBookClick()
+            },
         elevation = CardDefaults.cardElevation(
             defaultElevation = dimensionResource(id = R.dimen.spacer_small)
         )
@@ -177,7 +190,13 @@ fun BookCardContent(book: Books, viewModel: ReadingAppViewModel) {
 @Composable
 fun BookCoverSection(book: Books, modifier: Modifier = Modifier, viewModel: ReadingAppViewModel) {
     val context = LocalContext.current
-    val bookDir = "${context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS)}/${book.title}"
+    val bookNames = stringArrayResource(R.array.book_titles)
+    var bookDir = "${context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS)}/"
+    bookNames.forEach { b ->
+        if(book.title.contains(b)){
+            bookDir += b
+        }
+    }
     val coverPath = viewModel.getCoverImagePath(bookDir)
 
     Box(
@@ -276,6 +295,7 @@ fun BookDate(date: String) {
 fun DownloadSection(viewModel: ReadingAppViewModel, scope: CoroutineScope) {
     val bookTitles = stringArrayResource(R.array.book_titles)
     val bookUrls = stringArrayResource(R.array.book_urls)
+    val downloadedTitles by viewModel.downloadedTitles.observeAsState(mutableListOf())
 
     Column(
         modifier = Modifier
@@ -285,8 +305,14 @@ fun DownloadSection(viewModel: ReadingAppViewModel, scope: CoroutineScope) {
         verticalArrangement = Arrangement.Bottom,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        downloadedTitles.forEach {
+            Text(
+                text = stringResource(R.string.downloading_book, it)
+            )
+        }
+
         bookTitles.forEachIndexed { index, title ->
-            if (index > 2) {
+            if (index > 2 && !downloadedTitles.contains(title)) {
                 DownloadButton(
                     title = title,
                     url = bookUrls[index],
@@ -303,7 +329,10 @@ fun DownloadSection(viewModel: ReadingAppViewModel, scope: CoroutineScope) {
 @Composable
 fun DownloadButton(title: String, url: String, scope: CoroutineScope, viewModel: ReadingAppViewModel) {
     Button(
-        onClick = { scope.launch { downloadBook(url, title, viewModel) } },
+        onClick = {
+            scope.launch { downloadBook(url, title, viewModel) }
+            viewModel.addDownload(title)
+        },
         modifier = Modifier
             .fillMaxWidth(0.8f)
             .padding(vertical = dimensionResource(id = R.dimen.spacer_small)),

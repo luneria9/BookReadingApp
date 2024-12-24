@@ -13,57 +13,70 @@ import androidx.activity.viewModels
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.material3.*
-import androidx.compose.runtime.getValue
-import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationDrawerItem
+import androidx.compose.material3.NavigationRail
+import androidx.compose.material3.NavigationRailItem
+import androidx.compose.material3.PermanentDrawerSheet
+import androidx.compose.material3.PermanentNavigationDrawer
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass.Companion.Compact
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass.Companion.Expanded
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass.Companion.Medium
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
-import com.example.bookreadingapp.ui.NavBarItems
-import com.example.bookreadingapp.ui.NavRoutes.*
-import com.example.bookreadingapp.ui.screens.*
-import com.example.bookreadingapp.ui.utils.AdaptiveNavigationType
-import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass as calculateWindowSizeClass1
-import androidx.compose.material3.Scaffold
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.example.bookreadingapp.ui.NavBarItems
+import com.example.bookreadingapp.ui.NavRoutes.Contents
+import com.example.bookreadingapp.ui.NavRoutes.Home
+import com.example.bookreadingapp.ui.NavRoutes.Library
+import com.example.bookreadingapp.ui.NavRoutes.Reading
+import com.example.bookreadingapp.ui.NavRoutes.Search
+import com.example.bookreadingapp.ui.screens.ContentsScreen
+import com.example.bookreadingapp.ui.screens.HomeScreen
+import com.example.bookreadingapp.ui.screens.LibraryScreen
+import com.example.bookreadingapp.ui.screens.ReadingScreen
+import com.example.bookreadingapp.ui.screens.SearchScreen
 import com.example.bookreadingapp.ui.theme.BookReadingAppTheme
+import com.example.bookreadingapp.ui.utils.AdaptiveNavigationType
 import com.example.bookreadingapp.viewModels.ReadingAppViewModel
 import com.example.bookreadingapp.viewModels.ReadingAppViewModelFactory
 import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.newSingleThreadContext
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
+import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass as calculateWindowSizeClass1
 
 class MainActivity : ComponentActivity() {
     private val viewModel: ReadingAppViewModel by viewModels {
@@ -103,7 +116,7 @@ fun NavigationHost(
     var lastChapter = preferences.getInt(stringResource(R.string.last_location_chapter), -1)
 
     if (lastBook != -1 && lastChapter != -1)
-        startRoute = Reading.route
+        startRoute = Reading.createRoute(lastBook, lastChapter)
 
     NavHost(navController = navController, startDestination = startRoute) {
         composable(Home.route) {
@@ -115,7 +128,7 @@ fun NavigationHost(
         }
 
         composable(Search.route) {
-            SearchScreen()
+            SearchScreen(viewModel, navController)
         }
 
         composable(
@@ -188,7 +201,6 @@ fun BookReadingApp(
 
     val booksToDownload = stringArrayResource(R.array.book_urls)
     val bookTitles = stringArrayResource(R.array.book_titles)
-    val coroutineScope = rememberCoroutineScope()
     booksToDownload.forEachIndexed { index, url ->
         if (index < 3) {
             runBlocking {

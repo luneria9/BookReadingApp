@@ -21,4 +21,8 @@
     <string name="drawer_item">élément du tiroir</string>
     <string name="library">Bibliothèque</string>
     <string name="download">Télécharger %s</string>
+    <string name="please_select_a_book">Veuillez sélectionner un livre pour effectuer la recherche</string>
+    <string name="downloading">Téléchargement des livres...</string>
+    <string name="no_searches_found">Aucune recherche trouvée</string>
+    <string name="downloading_book">Télécharge %s...</string>
 </resources>

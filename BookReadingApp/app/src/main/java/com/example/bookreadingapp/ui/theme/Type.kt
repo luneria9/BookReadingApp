@@ -2,10 +2,10 @@ package com.example.bookreadingapp.ui.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.text.font.Font
 import com.example.bookreadingapp.R
 
 //referenced from https://developer.android.com/codelabs/basic-android-kotlin-compose-material-theming#5

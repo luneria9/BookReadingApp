@@ -8,6 +8,7 @@ import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
+
 // referenced from https://gitlab.com/crdavis/roomdatabasedemoproject
 class SubChaptersRepository(private val dao: SubChaptersDao) {
     val searchResults = MutableLiveData<List<SubChapters>>()
@@ -39,6 +40,10 @@ class SubChaptersRepository(private val dao: SubChaptersDao) {
 
     fun insertSubChapterAsync(subChapters: SubChapters): Long {
         return dao.insertSubChapterAwait(subChapters)
+    }
+
+    fun searchSubChapters(query: String, bookId: Int): List<SubChapters> {
+        return dao.searchSubChapters(query, bookId)
     }
 
     fun asyncfindSubChapterId(subchapterId: Int): Deferred<List<SubChapters>> =
